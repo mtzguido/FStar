@@ -518,6 +518,10 @@ let () =
       mk_tac_step_3 1 "with_compat_pre_core"
         (fun _ -> with_compat_pre_core) e_any e_int (e_tactic_thunk e_any) e_any
         (fun _ -> with_compat_pre_core) NBET.e_any NBET.e_int (e_tactic_nbe_thunk NBET.e_any) NBET.e_any;
+
+      mk_tac_step_1 0 "smt_sync"
+        smt_sync e_unit e_unit
+        smt_sync NBET.e_unit NBET.e_unit;
     ]
 
 let unembed_tactic_1_alt (ea:embedding 'a) (er:embedding 'r) (f:term) (ncb:norm_cb) : option ('a -> tac 'r) =

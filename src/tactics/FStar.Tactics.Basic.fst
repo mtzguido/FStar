@@ -2200,6 +2200,20 @@ let with_compat_pre_core (n:Z.t) (f:tac 'a) : tac 'a =
             FStar.Options.pop ();
             r)
 
+let smt_sync () : tac unit = wrap_err "smt_sync" <| (
+    let! goal = cur_goal in
+    match get_phi goal with
+    | None -> fail "Goal is not irrelevant"
+    | Some phi ->
+      let e = goal_env goal in
+      let res : bool = e.solver.solve_sync None e phi in
+      if res
+      then (
+        mark_uvar_as_already_checked goal.goal_ctx_uvar;
+        solve goal U.exp_unit
+      ) else fail "SMT did not solve this goal"
+)
+
 (**** Creating proper environments and proofstates ****)
 
 let tac_env (env:Env.env) : Env.env =

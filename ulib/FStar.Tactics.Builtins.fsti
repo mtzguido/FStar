@@ -422,3 +422,8 @@ val term_eq_old : term -> term -> Tac bool
 It is an escape hatch for maintaining backward compatibility
 for code that breaks with the core typechecker. *)
 val with_compat_pre_core : #a:Type -> n:int -> f:(unit -> Tac a) -> Tac a
+
+(** Attempt to solve the current goal with SMT immediately, and
+fail if it cannot be solved. If the goal can be solved, it will
+be discharged. *)
+val smt_sync : unit -> Tac unit
