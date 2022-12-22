@@ -1596,7 +1596,23 @@ let (uu___153 : unit) =
                                                                     FStar_TypeChecker_NBETerm.e_int
                                                                     uu___157
                                                                     FStar_TypeChecker_NBETerm.e_any in
-                                                                    [uu___155] in
+                                                                    let uu___156
+                                                                    =
+                                                                    let uu___157
+                                                                    =
+                                                                    FStar_Tactics_InterpFuns.mk_tac_step_1
+                                                                    Prims.int_zero
+                                                                    "smt_sync"
+                                                                    FStar_Tactics_Basic.smt_sync
+                                                                    FStar_Syntax_Embeddings.e_unit
+                                                                    FStar_Syntax_Embeddings.e_unit
+                                                                    FStar_Tactics_Basic.smt_sync
+                                                                    FStar_TypeChecker_NBETerm.e_unit
+                                                                    FStar_TypeChecker_NBETerm.e_unit in
+                                                                    [uu___157] in
+                                                                    uu___155
+                                                                    ::
+                                                                    uu___156 in
                                                                     uu___152
                                                                     ::
                                                                     uu___154 in
