@@ -1789,6 +1789,7 @@ let retry                        () = get_retry                       ()
 let reuse_hint_for               () = get_reuse_hint_for              ()
 let report_assumes               () = get_report_assumes              ()
 let silent                       () = get_silent                      ()
+let smt                          () = get_smt                         ()
 let smtencoding_elim_box         () = get_smtencoding_elim_box        ()
 let smtencoding_nl_arith_native  () = get_smtencoding_nl_arith_repr () = "native"
 let smtencoding_nl_arith_wrapped () = get_smtencoding_nl_arith_repr () = "wrapped"
@@ -1828,9 +1829,6 @@ let using_facts_from             () =
     | Some ns -> parse_settings ns
 let warn_default_effects         () = get_warn_default_effects        ()
 let warn_error                   () = String.concat " " (get_warn_error())
-let z3_exe                       () = match get_smt () with
-                                    | None -> Platform.exe "z3"
-                                    | Some s -> s
 let z3_cliopt                    () = get_z3cliopt                    ()
 let z3_smtopt                    () = get_z3smtopt                    ()
 let z3_refresh                   () = get_z3refresh                   ()

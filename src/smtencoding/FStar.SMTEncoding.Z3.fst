@@ -33,20 +33,52 @@ module BU = FStar.Compiler.Util
 *)
 let _z3version_checked : ref bool = BU.mk_ref false
 
-let _z3version_expected = "Z3 version 4.8.5"
+let _z3version_expected_num = "4.12.3"
+let _z3version_expected_str = "Z3 version " ^ _z3version_expected_num
 
 let _z3url = "https://github.com/FStarLang/binaries/tree/master/z3-tested"
+
+let inpath (path:string) : bool =
+  try
+    let s = BU.run_process "z3_pathtest" path ["-version"] None in
+    s <> ""
+  with
+  | _ -> false
+
+(*
+Find the Z3 executable that we should invoke. The logic is as
+follows:
+- If the user provided the --smt option, use that binary unconditionally.
+- If z3-4.12.2 (or z3-4.12.2.exe) exists in the PATH, use it.
+- Otherwise, default to "z3" in the PATH.
+
+This is thunked and memoized.
+*)
+let _z3_exe : Thunk.t string = Thunk.mk (fun () ->
+  let path =
+    let z3_v = "z3-" ^ _z3version_expected_num |> Platform.exe in
+    let smto = Options.smt () in
+    if Some? smto then Some?.v smto
+    else if inpath z3_v then z3_v
+    else Platform.exe "z3"
+  in
+  if Options.debug_any () then
+    BU.print1 "Chosen Z3 executable: %s\n" path;
+  path
+)
+
+let z3_exe () = Thunk.force _z3_exe
 
 let parse_z3_version_lines out =
     match splitlines out with
     | version :: _ ->
-      if BU.starts_with version _z3version_expected
+      if BU.starts_with version _z3version_expected_str
       then begin
           if Options.debug_any ()
           then
             print_string
               (BU.format1
-                  "Successfully found expected Z3 version %s\n"
+                  "Successfully found expected Z3 version \"%s\"\n"
                   version);
           None
         end
@@ -54,7 +86,7 @@ let parse_z3_version_lines out =
         let msg =
             BU.format2
                 "Expected Z3 version \"%s\", got \"%s\""
-                _z3version_expected
+                _z3version_expected_str
                 (BU.trim_string out)
         in
         Some msg
@@ -63,7 +95,7 @@ let parse_z3_version_lines out =
 let z3version_warning_message () =
     let run_proc_result =
         try
-            Some (BU.run_process "z3_version" (Options.z3_exe()) ["-version"] None)
+            Some (BU.run_process "z3_version" (z3_exe()) ["-version"] None)
         with _ -> None
     in
     match run_proc_result with
@@ -87,7 +119,7 @@ let check_z3version () =
                   msg
                   "Please download the version of Z3 corresponding to your platform from:"
                   _z3url
-                  "and add the bin/ subdirectory into your PATH"
+                  "and add the bin/ subdirectory into your PATH."
           in
           FStar.Errors.log_issue Range.dummyRange (e, msg)
     end
@@ -181,7 +213,7 @@ let query_logging =
 
 (*  Z3 background process handling *)
 let z3_cmd_and_args () =
-  let cmd = Options.z3_exe () in
+  let cmd = z3_exe () in
   let cmd_args =
     List.append ["-smt2";
                  "-in";
@@ -426,6 +458,10 @@ let z3_options = BU.mk_ref
      (set-option :produce-unsat-cores true)\n\
      (set-option :model true)\n\
      (set-option :smt.case_split 3)\n\
+     (set-option :smt.arith.solver 2)\n\
+     (set-option :rewriter.enable_der false)\n\
+     (set-option :rewriter.sort_disjunctions false)\n\
+     (set-option :pi.decompose_patterns false)\n\
      (set-option :smt.relevancy 2)\n"
 
 // Use by F*.js
