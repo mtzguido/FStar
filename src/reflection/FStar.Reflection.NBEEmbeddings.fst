@@ -119,14 +119,14 @@ let rec mapM_opt (f : ('a -> option 'b)) (l : list 'a) : option (list 'b) =
 
 let e_term_aq aq =
     let embed_term cb (t:term) : NBETerm.t =
-        let qi = { qkind = Quote_static; antiquotations = aq } in
+        let qi = { antiquotations = aq } in
         mk_t (NBETerm.Quote (t, qi))
     in
     let unembed_term cb (t:NBETerm.t) : option term =
         match t.nbe_t with
         | NBETerm.Quote (tm, qi) ->
             (* Just reuse the code from Reflection *)
-            Syntax.Embeddings.unembed (Reflection.Embeddings.e_term_aq (0, [])) (S.mk (Tm_quoted (tm, qi)) Range.dummyRange) false Syntax.Embeddings.id_norm_cb
+            Syntax.Embeddings.unembed (Reflection.Embeddings.e_term_aq noaqs) (S.mk (Tm_quoted (tm, qi)) Range.dummyRange) false Syntax.Embeddings.id_norm_cb
         | _ ->
             None
     in
@@ -416,6 +416,8 @@ let e_universe_view =
   
   mk_emb' embed_universe_view unembed_universe_view fstar_refl_universe_view_fv
 
+let e_antiquotations = e_tuple2 e_int (e_list e_term)
+
 let e_term_view_aq aq =
     let shift (s, aqs) = (s + 1, aqs) in
     let embed_term_view cb (tv:term_view) : t =
@@ -482,11 +484,10 @@ let e_term_view_aq aq =
                          as_arg (embed (e_option (e_term_aq aq)) cb tacopt);
                          as_arg (embed e_bool cb use_eq)]
 
-        | Tv_Quoted (t, k, anti) ->
+        | Tv_Quoted (t, anti) ->
             mkConstruct ref_Tv_Quoted.fv []
                         [as_arg (embed (e_term_aq aq) cb t);
-                         as_arg (embed e_bool cb k);
-                         as_arg (embed (e_list (e_tuple2 e_bv (e_term_aq aq))) cb anti)]
+                         as_arg (embed e_antiquotations cb anti)]
 
         | Tv_Unknown ->
             mkConstruct ref_Tv_Unknown.fv [] []
@@ -571,11 +572,10 @@ let e_term_view_aq aq =
             BU.bind_opt (unembed e_bool cb use_eq) (fun use_eq ->
             Some <| Tv_AscribedC (e, c, tacopt, use_eq)))))
 
-        | Construct (fv, _, [(t, _); (k, _); (anti, _)]) when S.fv_eq_lid fv ref_Tv_Quoted.lid ->
+        | Construct (fv, _, [(t, _); (anti, _)]) when S.fv_eq_lid fv ref_Tv_Quoted.lid ->
             BU.bind_opt (unembed (e_term_aq aq) cb t) (fun t ->
-            BU.bind_opt (unembed e_bool cb k) (fun k ->
-            BU.bind_opt (unembed (e_list (e_tuple2 e_bv (e_term_aq aq))) cb anti) (fun anti ->
-            Some <| Tv_Quoted (t, k, anti))))
+            BU.bind_opt (unembed e_antiquotations cb anti) (fun anti ->
+            Some <| Tv_Quoted (t, anti)))
 
         | Construct (fv, _, []) when S.fv_eq_lid fv ref_Tv_Unknown.lid ->
             Some <| Tv_Unknown

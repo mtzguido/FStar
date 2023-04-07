@@ -691,14 +691,8 @@ let rec translate (cfg:config) (bs:list t) (e:term) : t =
         let s2 = List.map (fun (bv, t) -> NT (bv, readback cfg t)) (List.zip bvs bs) in
         SS.subst s2 (SS.subst s1 t)
       in
-      begin match qi.qkind with
-      | Quote_dynamic ->
-        let qt = close qt in
-        mk_t <| Quote (qt, qi)
-      | Quote_static  ->
-        let qi = S.on_antiquoted close qi in
-        mk_t <| Quote (qt, qi)
-      end
+      let qi = S.on_antiquoted close qi in
+      mk_t <| Quote (qt, qi)
 
     | Tm_lazy li ->
       let f () =

@@ -167,8 +167,7 @@ let rec tag_of_term (t:term) = match t.n with
   | Tm_uinst _ -> "Tm_uinst"
   | Tm_constant _ -> "Tm_constant"
   | Tm_type _ -> "Tm_type"
-  | Tm_quoted (_, {qkind=Quote_static}) -> "Tm_quoted (static)"
-  | Tm_quoted (_, {qkind=Quote_dynamic}) -> "Tm_quoted (dynamic)"
+  | Tm_quoted (_, _) -> "Tm_quoted"
   | Tm_abs _ -> "Tm_abs"
   | Tm_arrow _ -> "Tm_arrow"
   | Tm_refine _ -> "Tm_refine"
@@ -203,13 +202,8 @@ and term_to_string x =
         ^"]"
 
       | Tm_quoted (tm, qi) ->
-        begin match qi.qkind with
-        | Quote_static ->
-            U.format2 "`(%s)%s" (term_to_string tm)
-                                (FStar.Common.string_of_list term_to_string (snd qi.antiquotations))
-        | Quote_dynamic ->
-            U.format1 "quote (%s)" (term_to_string tm)
-        end
+        U.format2 "`(%s)%s" (term_to_string tm)
+                            (FStar.Common.string_of_list term_to_string (snd qi.antiquotations))
 
       | Tm_meta(t, Meta_pattern (_, ps)) ->
         let pats = ps |> List.map (fun args -> args |> List.map (fun (t, _) -> term_to_string t) |> String.concat "; ") |> String.concat "\/" in

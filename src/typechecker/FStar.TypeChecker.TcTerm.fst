@@ -726,10 +726,10 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
         in
         BU.for_some is_not_name (snd qi.antiquotations)
     in
-    begin match qi.qkind with
+    if non_trivial_antiquotations qi then begin
     (* In this case, let-bind all antiquotations so we're sure that effects
      * are properly handled. *)
-    | Quote_static when non_trivial_antiquotations qi ->
+     // FIXME: coallesce
       // FIXME: check shift=0
         let e0 = e in
         let newbvs = List.map (fun _ -> S.new_bv None S.t_term) (snd qi.antiquotations) in
@@ -747,8 +747,8 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
                                                         SS.close [S.mk_binder (projl lb.lbname)] t)) top.pos) nq lbs in
         tc_maybe_toplevel_term env e
 
+    end else begin
     (* A static quote is of type `term`, as long as its antiquotations are too *)
-    | Quote_static ->
         (* Typecheck the antiquotations expecting a term *)
         let aqs = snd qi.antiquotations in
         let env_tm = Env.set_expected_typ env t_term in
@@ -763,24 +763,6 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
 
         let tm = mk (Tm_quoted (qt, qi)) top.pos in
         value_check_expected_typ env tm (Inl S.t_term) guard
-
-    | Quote_dynamic ->
-        let c = mk_Tac S.t_term in
-
-        (* Typechecked the quoted term just to elaborate it *)
-        let env', _ = Env.clear_expected_typ env in
-        let env' = { env' with lax = true } in
-        let qt, _, g = tc_term env' qt in
-        let g0 = { g with guard_f = Trivial } in //explicitly dropping the logical guard; this is just a quotation
-        let g0 = Rel.resolve_implicits env' g0 in
-
-
-        let t = mk (Tm_quoted (qt, qi)) top.pos in
-
-        let t, lc, g = value_check_expected_typ env t (Inr (TcComm.lcomp_of_comp c)) Env.trivial_guard in
-        let t = mk (Tm_meta(t, Meta_monadic_lift (Const.effect_PURE_lid, Const.effect_TAC_lid, S.t_term)))
-                   t.pos in
-        t, lc, Env.conj_guard g0 g
     end
 
   | Tm_lazy ({lkind=Lazy_embedding _ }) ->

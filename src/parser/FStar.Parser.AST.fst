@@ -36,10 +36,6 @@ type let_qualifier =
   | NoLetQualifier
   | Rec
 
-type quote_kind =
-  | Static
-  | Dynamic
-
 type term' =
   | Wild
   | Const     of sconst
@@ -85,7 +81,7 @@ type term' =
   | Discrim   of lid   (* Some?  (formerly is_Some) *)
   | Attributes of list term   (* attributes decorating a term *)
   | Antiquote of term  (* Antiquotation within a quoted term *)
-  | Quote     of term * quote_kind
+  | Quote     of term
   | VQuote    of term        (* Quoting an lid, this gets removed by the desugarer *)
   | CalcProof of term * term * list calc_step (* A calculational proof with relation, initial expression, and steps *)
   | IntroForall of list binder * term * term                     (* intro_forall x1..xn. P with e *)
@@ -748,11 +744,8 @@ let rec term_to_string (x:term) = match x.tm with
   | Antiquote t ->
     Util.format1 "(`#%s)" (term_to_string t)
 
-  | Quote (t, Static) ->
+  | Quote t ->
     Util.format1 "(`(%s))" (term_to_string t)
-
-  | Quote (t, Dynamic) ->
-    Util.format1 "quote (%s)" (term_to_string t)
 
   | VQuote t ->
     Util.format1 "`%%%s" (term_to_string t)

@@ -289,9 +289,8 @@ and eq_term' (t1 t2:term')
       eq_list eq_term ts1 ts2
     | Antiquote t1, Antiquote t2 ->
       eq_term t1 t2
-    | Quote (t1, k1), Quote (t2, k2) ->
-      eq_term t1 t2 &&
-      k1 = k2
+    | Quote t1, Quote t2 ->
+      eq_term t1 t2
     | VQuote t1, VQuote t2 ->
       eq_term t1 t2
     | CalcProof (t1, t2, cs1), CalcProof (t3, t4, cs2) ->
@@ -600,7 +599,7 @@ and lidents_of_term' (t:term')
   | Discrim lid -> [lid]
   | Attributes ts -> concat_map lidents_of_term ts
   | Antiquote t -> lidents_of_term t
-  | Quote (t, _) -> lidents_of_term t
+  | Quote t -> lidents_of_term t
   | VQuote t -> lidents_of_term t
   | CalcProof (t1, t2, ts) -> lidents_of_term t1 @ lidents_of_term t2 @ concat_map lidents_of_calc_step ts
   | IntroForall (bs, t1, t2) -> lidents_of_term t1 @ lidents_of_term t2

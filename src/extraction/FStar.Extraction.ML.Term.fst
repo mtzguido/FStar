@@ -1352,13 +1352,7 @@ and term_as_mlexpr' (g:uenv) (top:term) : (mlexpr * e_tag * mlty) =
         | Tm_arrow _ ->
           ml_unit, E_PURE, ml_unit_ty
 
-        | Tm_quoted (qt, { qkind = Quote_dynamic }) ->
-          let ({exp_b_expr=fw}) = UEnv.lookup_fv t.pos g (S.lid_as_fv (PC.failwith_lid()) delta_constant None) in
-          with_ty ml_int_ty <| MLE_App(fw, [with_ty ml_string_ty <| MLE_Const (MLC_String "Cannot evaluate open quotation at runtime")]),
-          E_PURE,
-          ml_int_ty
-
-        | Tm_quoted (qt, { qkind = Quote_static; antiquotations = (shift, aqs) }) ->
+        | Tm_quoted (qt, { antiquotations = (shift, aqs) }) ->
           begin match R.inspect_ln qt with
           | RD.Tv_BVar bv ->
             (* If it's a variable, check whether it's an antiquotation or just a bvar node *)

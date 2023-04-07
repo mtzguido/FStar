@@ -57,6 +57,12 @@ you want one anyway. For example, if you request a uvar through
 explicitly. *)
 val unshelve : term -> Tac unit
 
+(** [quote t] will return the syntax of the term [t] on which it
+was called. Clearly, this is very sketchy, as [quote 2] and [quote
+(1+1)] may differ. This primitive only works when tactics are being
+interpreted, and cannot be used in compiled tactics. *)
+val quote : #a:Type -> a -> Tac term
+
 (** [unquote t] with turn a quoted term [t] into an actual value, of
 any type. This will fail at tactic runtime if the quoted term does not
 typecheck to type [a]. *)

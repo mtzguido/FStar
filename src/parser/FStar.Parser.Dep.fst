@@ -997,7 +997,7 @@ let collect_one
            collect_term t1; collect_term t2
           end
         | Decreases (t, _) -> collect_term t
-        | Quote (t, _)
+        | Quote t
         | Antiquote t
         | VQuote t ->
             collect_term t

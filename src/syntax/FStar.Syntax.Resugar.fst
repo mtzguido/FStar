@@ -740,11 +740,7 @@ let rec resugar_term' (env: DsEnv.env) (t : S.term) : A.term =
       label s (mk A.Wild)
 
     | Tm_quoted (tm, qi) ->
-      let qi = match qi.qkind with
-               | Quote_static -> Static
-               | Quote_dynamic -> Dynamic
-      in
-      mk (A.Quote (resugar_term' env tm, qi))
+      mk (A.Quote (resugar_term' env tm))
 
     | Tm_meta(e, m) ->
        let resugar_meta_desugared = function

@@ -708,9 +708,6 @@ let desugar_universe t : Syntax.universe =
 let check_no_aq (aq : antiquotations_temp) : unit =
     match aq with
     | [] -> ()
-    | (bv, { n = Tm_quoted (e, { qkind = Quote_dynamic })})::_ ->
-        raise_error (Errors.Fatal_UnexpectedAntiquotation,
-                      BU.format1 "Unexpected antiquotation: `@(%s)" (Print.term_to_string e)) e.pos
     | (bv, e)::_ ->
         raise_error (Errors.Fatal_UnexpectedAntiquotation,
                       BU.format1 "Unexpected antiquotation: `#(%s)" (Print.term_to_string e)) e.pos
@@ -1866,7 +1863,7 @@ and desugar_term_maybe_top (top_level:bool) (env:env_t) (top:term) : S.term * an
     | VQuote e ->
       { U.exp_string (desugar_vquote env e top.range) with pos = e.range }, noaqs
 
-    | Quote (e, Static) ->
+    | Quote e ->
       let tm, vts = desugar_term_aq env e in
       let vt_binders = List.map (fun (bv, _tm) -> S.mk_binder bv) vts in
       let vt_tms = List.map snd vts in // not closing these, they are already well-scoped
@@ -1879,7 +1876,7 @@ and desugar_term_maybe_top (top_level:bool) (env:env_t) (top:term) : S.term * an
                      (e.range)
       in
 
-      let qi = { qkind = Quote_static; antiquotations = (0, vt_tms) } in
+      let qi = { antiquotations = (0, vt_tms) } in
       mk <| Tm_quoted (tm, qi), noaqs
 
     | Antiquote e ->
@@ -1887,12 +1884,6 @@ and desugar_term_maybe_top (top_level:bool) (env:env_t) (top:term) : S.term * an
       (* We use desugar_term, so there can be double antiquotations *)
       let tm = desugar_term env e in
       S.bv_to_name bv, [(bv, tm)]
-
-    | Quote (e, Dynamic) ->
-      let qi = { qkind = Quote_dynamic
-               ; antiquotations = (0, [])
-               } in
-      mk <| Tm_quoted (desugar_term env e, qi), noaqs
 
     | CalcProof (rel, init_expr, steps) ->
       (* We elaborate it into surface syntax and recursively desugar it *)

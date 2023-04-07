@@ -2034,8 +2034,11 @@ let rec inspect (t:term) : tac term_view = wrap_err "inspect" (
     | Tm_unknown ->
         ret <| Tv_Unknown
 
-    | Tm_quoted (t, {qkind; antiquotes}) ->
-        ret <| Tv_Quoted (t, (match qkind with | Quote_static -> false | Quote_dynamic -> true), antiquotes)
+    | Tm_quoted (t, qi) ->
+        let (n, ts) = qi.antiquotations in
+        let n' : Z.t = Z.of_int_fs n in
+        let aqs' = (n', ts) in
+        ret <| Tv_Quoted (t, aqs')
 
     | _ ->
         Err.log_issue t.pos (Err.Warning_CantInspect, BU.format2 "inspect: outside of expected syntax (%s, %s)\n" (Print.tag_of_term t) (Print.term_to_string t));
@@ -2109,10 +2112,11 @@ let pack' (tv:term_view) (leave_curried:bool) : tac term =
     | Tv_AscribedC(e, c, tacopt, use_eq) ->
         ret <| S.mk (Tm_ascribed(e, (Inr c, tacopt, use_eq), None)) Range.dummyRange
 
-    | Tv_Quoted(t, k, anti) ->
-        ret <| S.mk (Tm_quoted(t, { qkind = if k then Quote_dynamic else Quote_static
-                                 ; antiquotes = anti })) Range.dummyRange
-
+    | Tv_Quoted(t, anti) ->
+        let (n, ts) = anti in
+        let n' : int = Z.to_int_fs n in
+        let aqs' = (n', ts) in
+        ret <| S.mk (Tm_quoted(t, { antiquotations = aqs' })) Range.dummyRange
 
     | Tv_Unknown ->
         ret <| S.mk Tm_unknown Range.dummyRange

@@ -91,7 +91,6 @@ let () =
   Hashtbl.add keywords "open"          OPEN        ;
   Hashtbl.add keywords "opaque"        OPAQUE      ;
   Hashtbl.add keywords "private"       PRIVATE     ;
-  Hashtbl.add keywords "quote"         QUOTE       ;
   Hashtbl.add keywords "range_of"      RANGE_OF    ;
   Hashtbl.add keywords "rec"           REC         ;
   Hashtbl.add keywords "reifiable"     REIFIABLE   ;

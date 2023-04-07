@@ -330,9 +330,7 @@ and hash_meta_source_info m =
 and hash_lazyinfo li = of_int 0 //no meaningful way to hash the blob
 
 and hash_quoteinfo qi =
-  mix
-    (hash_bool (qi.qkind = Quote_static))
-    (hash_list hash_term (snd qi.antiquotations))
+    hash_list hash_term (snd qi.antiquotations)
 
 ////////////////////////////////////////////////////////////////////////////////
 let rec equal_list f l1 l2 =
@@ -555,7 +553,6 @@ and equal_meta m1 m2 =
 and equal_lazyinfo l1 l2 = l1 = l2
 
 and equal_quoteinfo q1 q2 =
-  q1.qkind = q2.qkind &&
   (fst q1.antiquotations) = (fst q2.antiquotations) &&
   equal_list equal_term (snd q1.antiquotations) (snd q2.antiquotations)
 

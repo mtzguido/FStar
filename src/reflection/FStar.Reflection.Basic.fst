@@ -280,8 +280,11 @@ let rec inspect_ln (t:term) : term_view =
     | Tm_unknown ->
         Tv_Unknown
 
-    | Tm_quoted (t, {qkind; antiquotes}) ->
-        Tv_Quoted (t, (match qkind with | Quote_static -> false | Quote_dynamic -> true), antiquotes)
+    | Tm_quoted (t, qi) ->
+        let (n, ts) = qi.antiquotations in
+        let n' : Z.t = Z.of_int_fs n in
+        let aqs' = (n', ts) in
+        Tv_Quoted (t, aqs')
 
     | _ ->
         Err.log_issue t.pos (Err.Warning_CantInspect, BU.format2 "inspect_ln: outside of expected syntax (%s, %s)\n" (Print.tag_of_term t) (Print.term_to_string t));
@@ -431,9 +434,11 @@ let pack_ln (tv:term_view) : term =
     | Tv_AscribedC(e, c, tacopt, use_eq) ->
         S.mk (Tm_ascribed(e, (Inr c, tacopt, use_eq), None)) Range.dummyRange
 
-    | Tv_Quoted(t, k, anti) ->
-        S.mk (Tm_quoted(t, { qkind = if k then Quote_dynamic else Quote_static
-                           ; antiquotes = anti })) Range.dummyRange
+    | Tv_Quoted(t, anti) ->
+        let (n, ts) = anti in
+        let n' : int = Z.to_int_fs n in
+        let aqs' = (n', ts) in
+        S.mk (Tm_quoted(t, { antiquotations = aqs' })) Range.dummyRange
 
     | Tv_Unknown ->
         S.mk Tm_unknown Range.dummyRange

@@ -22,7 +22,7 @@ open FStar.Syntax.Embeddings
 open FStar.Order
 open FStar.Errors
 
-module S = FStar.Syntax.Syntax // TODO: remove, it's open
+module S = FStar.Syntax.Syntax
 
 module I = FStar.Ident
 module SS = FStar.Syntax.Subst
@@ -50,7 +50,7 @@ open FStar.Reflection.Constants
  * unembed : from user to compiler
  *)
 
-let noaqs : antiquotations = (0, [])
+let noaqs : S.antiquotations = (0, [])
 
 (* -------------------------------------------------------------------------------------- *)
 (* ------------------------------------- EMBEDDINGS ------------------------------------- *)
@@ -102,7 +102,7 @@ let rec mapM_opt (f : ('a -> option 'b)) (l : list 'a) : option (list 'b) =
 
 let e_term_aq aq =
     let embed_term (rng:Range.range) (t:term) : term =
-        let qi = { qkind = Quote_static; antiquotations = aq } in
+        let qi = { antiquotations = aq } in
         S.mk (Tm_quoted (t, qi)) rng
     in
     let rec unembed_term w (t:term) : option term =
@@ -429,6 +429,8 @@ let e_match_returns_annotation =
   e_option (e_tuple2 e_binder
                      (e_tuple3 (e_either e_term e_comp) (e_option e_term) e_bool))
 
+let e_antiquotations = e_tuple2 e_int (e_list e_term)
+
 let e_term_view_aq aq =
     let push (s, aq) = (s+1, aq) in
     let embed_term_view (rng:Range.range) (t:term_view) : term =
@@ -512,11 +514,10 @@ let e_term_view_aq aq =
                          S.as_arg (embed e_bool rng use_eq)]
                         rng
 
-        | Tv_Quoted (t, k, anti) ->
+        | Tv_Quoted (t, anti) ->
             S.mk_Tm_app ref_Tv_Quoted.t
                         [S.as_arg (embed (e_term_aq aq) rng t);
-                         S.as_arg (embed e_bool rng k);
-                         S.as_arg (embed (e_list (e_tuple2 e_bv (e_term_aq aq))) rng anti)
+                         S.as_arg (embed e_antiquotations rng anti)
                         ]
                         rng
 
@@ -605,11 +606,10 @@ let e_term_view_aq aq =
             BU.bind_opt (unembed' w e_bool use_eq) (fun use_eq ->
             Some <| Tv_AscribedC (e, c, tacopt, use_eq)))))
 
-        | Tm_fvar fv, [(t, _); (k, _); (anti, _)] when S.fv_eq_lid fv ref_Tv_Quoted.lid ->
+        | Tm_fvar fv, [(t, _); (anti, _)] when S.fv_eq_lid fv ref_Tv_Quoted.lid ->
             BU.bind_opt (unembed' w (e_term_aq aq) t) (fun t ->
-            BU.bind_opt (unembed' w e_bool k) (fun k ->
-            BU.bind_opt (unembed' w (e_list (e_tuple2 e_bv (e_term_aq aq))) anti) (fun anti ->
-            Some <| Tv_Quoted (t, k, anti))))
+            BU.bind_opt (unembed' w e_antiquotations anti) (fun anti ->
+            Some <| Tv_Quoted (t, anti)))
 
         | Tm_fvar fv, [] when S.fv_eq_lid fv ref_Tv_Unknown.lid ->
             Some <| Tv_Unknown

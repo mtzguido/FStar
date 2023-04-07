@@ -353,6 +353,10 @@ let () =
         unshelve RE.e_term e_unit
         unshelve NRE.e_term NBET.e_unit;
 
+      mk_tac_step_2 1 "quote"
+        (fun _ t -> t) e_any e_any RE.e_term
+        (fun _ t -> t) NBET.e_any NBET.e_any NRE.e_term;
+
       mk_tac_step_2 1 "unquote"
         unquote e_any RE.e_term e_any
         (fun _ _ -> failwith "NBE unquote") NBET.e_any NRE.e_term NBET.e_any;

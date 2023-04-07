@@ -82,7 +82,7 @@ type universe_view =
   | Uv_Unif : universe_uvar -> universe_view
   | Uv_Unk   : universe_view
 
-type antiquotations = list (bv * term)
+type antiquotations = (int * list term)
 
 noeq
 type term_view =
@@ -101,7 +101,7 @@ type term_view =
   | Tv_Match  : scrutinee:term -> ret:option match_returns_ascription -> brs:(list branch) -> term_view
   | Tv_AscribedT : e:term -> t:term -> tac:option term -> use_eq:bool -> term_view
   | Tv_AscribedC : e:term -> c:comp -> tac:option term -> use_eq:bool -> term_view
-  | Tv_Quoted   : e:term -> dynamic:bool -> anti:antiquotations -> term_view
+  | Tv_Quoted   : e:term -> anti:antiquotations -> term_view
   | Tv_Unknown  : term_view // Baked in "None"
 
 let notAscription (tv:term_view) : bool =

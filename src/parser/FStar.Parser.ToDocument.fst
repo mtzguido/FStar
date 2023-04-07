@@ -1434,14 +1434,10 @@ and p_noSeqTerm' ps pb e = match e.tm with
   | Abs([{pat=PatVar(x, typ_opt, _)}], {tm=Match(maybe_x, None, None, branches)}) when matches_var maybe_x x ->
     paren_if (ps || pb) (
       group (str "function" ^/^ separate_map_last hardline p_patternBranch branches))
-  | Quote (e, Dynamic) ->
-    group (str "quote" ^/^ p_noSeqTermAndComment ps pb e)
-  | Quote (e, Static) ->
+  | Quote e ->
     group (str "`" ^^ p_noSeqTermAndComment ps pb e)
   | VQuote e ->
     group (str "`%" ^^ p_noSeqTermAndComment ps pb e)
-  | Antiquote ({ tm = Quote (e, Dynamic) }) ->
-    group (str "`@" ^^ p_noSeqTermAndComment ps pb e)
   | Antiquote e ->
     group (str "`#" ^^ p_noSeqTermAndComment ps pb e)
   | CalcProof (rel, init, steps) ->

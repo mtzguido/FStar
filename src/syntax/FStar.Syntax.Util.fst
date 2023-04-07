@@ -767,9 +767,7 @@ and eq_comp (c1 c2:comp) : eq_result =
 
 (* Only used in term_eq *)
 let eq_quoteinfo q1 q2 =
-    if q1.qkind <> q2.qkind
-    then NotEqual
-    else eq_antiquotations (snd q1.antiquotations) (snd q2.antiquotations)
+    eq_antiquotations (snd q1.antiquotations) (snd q2.antiquotations)
 
 (* Only used in term_eq *)
 let eq_bqual a1 a2 =
@@ -2121,10 +2119,7 @@ let rec unbound_variables tm :  list bv =
         @ List.collect (fun lb -> unbound_variables lb.lbtyp @ unbound_variables lb.lbdef) lbs
 
       | Tm_quoted (tm, qi) ->
-        begin match qi.qkind with
-        | Quote_static  -> []
-        | Quote_dynamic -> unbound_variables tm
-        end
+        List.collect unbound_variables (snd (qi.antiquotations))
 
       | Tm_meta(t, m) ->
         unbound_variables t

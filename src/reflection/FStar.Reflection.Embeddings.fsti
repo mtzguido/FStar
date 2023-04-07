@@ -15,13 +15,16 @@
 *)
 module FStar.Reflection.Embeddings
 
-open FStar open FStar.Compiler
+open FStar
+open FStar.Compiler
 open FStar.Syntax.Syntax
 open FStar.Syntax.Embeddings
 open FStar.Order
 open FStar.TypeChecker.Env
 open FStar.Reflection.Data
-module O = FStar.Options
+
+module S  = FStar.Syntax.Syntax
+module O  = FStar.Options
 module RD = FStar.Reflection.Data
 
 (* Embeddings *)
@@ -59,8 +62,8 @@ val e_universe_view : embedding universe_view
 
 (* Useful for embedding antiquoted terms. They are only used for the embedding part,
  * so this is a bit hackish. *)
-val e_term_aq       : antiquotations -> embedding term
-val e_term_view_aq  : antiquotations -> embedding term_view
+val e_term_aq       : S.antiquotations -> embedding term
+val e_term_view_aq  : S.antiquotations -> embedding term_view
 
 (* Lazy unfoldings *)
 val unfold_lazy_bv     : lazyinfo -> term

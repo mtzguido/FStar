@@ -91,11 +91,6 @@ type universes     = list universe
 type monad_name    = lident
 
 // IN F*: [@@ PpxDerivingYoJson; PpxDerivingShow ]
-type quote_kind =
-  | Quote_static
-  | Quote_dynamic
-
-// IN F*: [@@ PpxDerivingYoJson; PpxDerivingShow ]
 type maybe_set_use_range =
   | NoUseRange
   | SomeUseRange of range
@@ -183,7 +178,6 @@ and letbinding = {  //let f : forall u1..un. M t = e
 }
 and antiquotations = int * list term
 and quoteinfo = {
-    qkind          : quote_kind;
     antiquotations : antiquotations;
 (*************************************************************************
   ANTIQUOTATIONS and shifting

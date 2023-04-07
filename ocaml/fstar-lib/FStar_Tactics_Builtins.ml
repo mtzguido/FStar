@@ -119,6 +119,7 @@ let refine_intro            = from_tac_1 B.refine_intro
 let tc                      = from_tac_2 B.tc
 let tcc                     = from_tac_2 B.tcc
 let unshelve                = from_tac_1 B.unshelve
+let quote                   = fun t -> failwith "Sorry, dynamic quote does not work in compiled tactics"
 let unquote                 = fun t -> failwith "Sorry, unquote does not work in compiled tactics"
 let norm                    = fun s ->   from_tac_1 B.norm (tr_repr_steps s) (* TODO: somehow avoid translating steps? *)
 let norm_term_env           = fun e s -> from_tac_3 B.norm_term_env e (tr_repr_steps s)
