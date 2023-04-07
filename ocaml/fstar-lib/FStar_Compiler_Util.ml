@@ -175,7 +175,8 @@ let process_read_all_output (p: proc) =
 
 
 let channel_read_all_nonblock (c: in_channel) : string =
-  let buffer = Bytes.create 8192 in
+  let maxlen = 8192 in (* max length of returned string *)
+  let buffer = Bytes.create maxlen in
   let fd = Unix.descr_of_in_channel c in
   let rec aux (idx:int) (rem:int) =
     if rem <= 0 then idx
@@ -190,7 +191,7 @@ let channel_read_all_nonblock (c: in_channel) : string =
       )
     )
   in
-  let len = aux 0 1024 in
+  let len = aux 0 maxlen in
   Bytes.sub_string buffer 0 len
 
 (** Feed `stdin` to `p`, and call `reader_fn` in a separate thread to read the
