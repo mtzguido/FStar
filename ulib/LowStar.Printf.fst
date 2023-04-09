@@ -250,7 +250,7 @@ let done : lift unit = Lift u#0 u#1 ()
 ///     latter).
 [@@__reduce__]
 noextract
-let rec arg_t (a:arg) : Type u#1 =
+let arg_t (a:arg) : Type u#1 =
   match a with
   | Base t -> lift (base_typ_as_type t)
   | Array t -> (l:UInt32.t & r:_ & s:_ & lmbuffer (base_typ_as_type t) r s l)

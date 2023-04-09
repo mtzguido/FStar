@@ -92,6 +92,10 @@ let rec visit_tm (ff : term -> Tac term) (t : term) : Tac term =
     | Tv_AscribedC e c topt use_eq ->
         let e = visit_tm ff e in
         Tv_AscribedC e c topt use_eq
+    | Tv_Quoted e (i, aqs) ->
+        let e = visit_tm ff e in
+        let aqs = map (visit_tm ff) aqs in
+        Tv_Quoted e (i, aqs)
   in
   ff (pack_ln tv')
 and visit_br (ff : term -> Tac term) (b:branch) : Tac branch =

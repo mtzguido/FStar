@@ -702,12 +702,9 @@ let rec visit_tm (ff : term -> Tac unit) (t : term) : Tac unit =
   | Tv_AscribedC e c topt _ ->
       visit_tm ff e
 
-  | Tv_Quoted e dynamic anti ->
+  | Tv_Quoted e anti ->
       visit_tm ff e;
-      iter (fun (bv, t) ->
-          let bv = on_sort_bv (visit_tm ff) bv in
-          visit_tm ff t
-      ) anti
+      iter (visit_tm ff) (snd anti)
 
   ); ff t
 

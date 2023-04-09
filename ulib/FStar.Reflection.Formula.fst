@@ -120,6 +120,7 @@ let term_as_formula' (t:term) : Tac formula =
         IntLit i
 
     (* Not formulas. *)
+    | Tv_Quoted _ _
     | Tv_Let _ _ _ _ _
     | Tv_Match _ _ _
     | Tv_Type _
