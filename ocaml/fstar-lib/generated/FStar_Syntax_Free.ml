@@ -263,17 +263,13 @@ let rec (free_names_and_uvs' :
           FStar_Compiler_Effect.op_Bar_Greater
             (FStar_Pervasives_Native.snd lbs) uu___
       | FStar_Syntax_Syntax.Tm_quoted (tm1, qi) ->
-          (match qi.FStar_Syntax_Syntax.qkind with
-           | FStar_Syntax_Syntax.Quote_static ->
-               FStar_Compiler_List.fold_left
-                 (fun n ->
-                    fun t1 ->
-                      let uu___ = free_names_and_uvars t1 use_cache in
-                      union n uu___) no_free_vars
-                 (FStar_Pervasives_Native.snd
-                    qi.FStar_Syntax_Syntax.antiquotations)
-           | FStar_Syntax_Syntax.Quote_dynamic ->
-               free_names_and_uvars tm1 use_cache)
+          FStar_Compiler_List.fold_left
+            (fun n ->
+               fun t1 ->
+                 let uu___ = free_names_and_uvars t1 use_cache in
+                 union n uu___) no_free_vars
+            (FStar_Pervasives_Native.snd
+               qi.FStar_Syntax_Syntax.antiquotations)
       | FStar_Syntax_Syntax.Tm_meta (t1, m) ->
           let u1 = free_names_and_uvars t1 use_cache in
           (match m with

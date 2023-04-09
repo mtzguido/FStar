@@ -1540,7 +1540,7 @@ let (collect_one :
                   collect_term t1;
                   collect_term t2)
              | FStar_Parser_AST.Decreases (t, uu___3) -> collect_term t
-             | FStar_Parser_AST.Quote (t, uu___3) -> collect_term t
+             | FStar_Parser_AST.Quote t -> collect_term t
              | FStar_Parser_AST.Antiquote t -> collect_term t
              | FStar_Parser_AST.VQuote t -> collect_term t
              | FStar_Parser_AST.Attributes cattributes ->

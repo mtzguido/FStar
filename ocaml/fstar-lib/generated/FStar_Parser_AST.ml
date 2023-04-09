@@ -23,13 +23,6 @@ let (uu___is_NoLetQualifier : let_qualifier -> Prims.bool) =
     match projectee with | NoLetQualifier -> true | uu___ -> false
 let (uu___is_Rec : let_qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Rec -> true | uu___ -> false
-type quote_kind =
-  | Static 
-  | Dynamic 
-let (uu___is_Static : quote_kind -> Prims.bool) =
-  fun projectee -> match projectee with | Static -> true | uu___ -> false
-let (uu___is_Dynamic : quote_kind -> Prims.bool) =
-  fun projectee -> match projectee with | Dynamic -> true | uu___ -> false
 type term' =
   | Wild 
   | Const of FStar_Const.sconst 
@@ -81,7 +74,7 @@ type term' =
   | Discrim of FStar_Ident.lid 
   | Attributes of term Prims.list 
   | Antiquote of term 
-  | Quote of (term * quote_kind) 
+  | Quote of term 
   | VQuote of term 
   | CalcProof of (term * term * calc_step Prims.list) 
   | IntroForall of (binder Prims.list * term * term) 
@@ -343,7 +336,7 @@ let (__proj__Antiquote__item___0 : term' -> term) =
   fun projectee -> match projectee with | Antiquote _0 -> _0
 let (uu___is_Quote : term' -> Prims.bool) =
   fun projectee -> match projectee with | Quote _0 -> true | uu___ -> false
-let (__proj__Quote__item___0 : term' -> (term * quote_kind)) =
+let (__proj__Quote__item___0 : term' -> term) =
   fun projectee -> match projectee with | Quote _0 -> _0
 let (uu___is_VQuote : term' -> Prims.bool) =
   fun projectee -> match projectee with | VQuote _0 -> true | uu___ -> false
@@ -1974,12 +1967,9 @@ let rec (term_to_string : term -> Prims.string) =
     | Antiquote t ->
         let uu___ = term_to_string t in
         FStar_Compiler_Util.format1 "(`#%s)" uu___
-    | Quote (t, Static) ->
+    | Quote t ->
         let uu___ = term_to_string t in
         FStar_Compiler_Util.format1 "(`(%s))" uu___
-    | Quote (t, Dynamic) ->
-        let uu___ = term_to_string t in
-        FStar_Compiler_Util.format1 "quote (%s)" uu___
     | VQuote t ->
         let uu___ = term_to_string t in
         FStar_Compiler_Util.format1 "`%%%s" uu___

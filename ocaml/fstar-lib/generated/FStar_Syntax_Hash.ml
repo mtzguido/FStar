@@ -615,13 +615,8 @@ and (hash_lazyinfo : FStar_Syntax_Syntax.lazyinfo -> FStar_Hash.hash_code mm)
 and (hash_quoteinfo :
   FStar_Syntax_Syntax.quoteinfo -> FStar_Hash.hash_code mm) =
   fun qi ->
-    let uu___ =
-      hash_bool
-        (qi.FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_static) in
-    let uu___1 =
-      hash_list hash_term
-        (FStar_Pervasives_Native.snd qi.FStar_Syntax_Syntax.antiquotations) in
-    mix uu___ uu___1
+    hash_list hash_term
+      (FStar_Pervasives_Native.snd qi.FStar_Syntax_Syntax.antiquotations)
 let rec equal_list :
   'uuuuu 'uuuuu1 .
     ('uuuuu -> 'uuuuu1 -> Prims.bool) ->
@@ -1091,11 +1086,8 @@ and (equal_quoteinfo :
   =
   fun q1 ->
     fun q2 ->
-      ((q1.FStar_Syntax_Syntax.qkind = q2.FStar_Syntax_Syntax.qkind) &&
-         ((FStar_Pervasives_Native.fst q1.FStar_Syntax_Syntax.antiquotations)
-            =
-            (FStar_Pervasives_Native.fst
-               q2.FStar_Syntax_Syntax.antiquotations)))
+      ((FStar_Pervasives_Native.fst q1.FStar_Syntax_Syntax.antiquotations) =
+         (FStar_Pervasives_Native.fst q2.FStar_Syntax_Syntax.antiquotations))
         &&
         (equal_list equal_term
            (FStar_Pervasives_Native.snd q1.FStar_Syntax_Syntax.antiquotations)

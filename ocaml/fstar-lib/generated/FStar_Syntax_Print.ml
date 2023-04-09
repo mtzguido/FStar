@@ -275,16 +275,7 @@ let rec (tag_of_term : FStar_Syntax_Syntax.term -> Prims.string) =
     | FStar_Syntax_Syntax.Tm_uinst uu___ -> "Tm_uinst"
     | FStar_Syntax_Syntax.Tm_constant uu___ -> "Tm_constant"
     | FStar_Syntax_Syntax.Tm_type uu___ -> "Tm_type"
-    | FStar_Syntax_Syntax.Tm_quoted
-        (uu___,
-         { FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_static;
-           FStar_Syntax_Syntax.antiquotations = uu___1;_})
-        -> "Tm_quoted (static)"
-    | FStar_Syntax_Syntax.Tm_quoted
-        (uu___,
-         { FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_dynamic;
-           FStar_Syntax_Syntax.antiquotations = uu___1;_})
-        -> "Tm_quoted (dynamic)"
+    | FStar_Syntax_Syntax.Tm_quoted (uu___, uu___1) -> "Tm_quoted"
     | FStar_Syntax_Syntax.Tm_abs uu___ -> "Tm_abs"
     | FStar_Syntax_Syntax.Tm_arrow uu___ -> "Tm_arrow"
     | FStar_Syntax_Syntax.Tm_refine uu___ -> "Tm_refine"
@@ -342,17 +333,12 @@ and (term_to_string : FStar_Syntax_Syntax.term -> Prims.string) =
                  Prims.op_Hat uu___4 "]" in
                Prims.op_Hat "[lazy:" uu___3
            | FStar_Syntax_Syntax.Tm_quoted (tm, qi) ->
-               (match qi.FStar_Syntax_Syntax.qkind with
-                | FStar_Syntax_Syntax.Quote_static ->
-                    let uu___3 = term_to_string tm in
-                    let uu___4 =
-                      (FStar_Common.string_of_list ()) term_to_string
-                        (FStar_Pervasives_Native.snd
-                           qi.FStar_Syntax_Syntax.antiquotations) in
-                    FStar_Compiler_Util.format2 "`(%s)%s" uu___3 uu___4
-                | FStar_Syntax_Syntax.Quote_dynamic ->
-                    let uu___3 = term_to_string tm in
-                    FStar_Compiler_Util.format1 "quote (%s)" uu___3)
+               let uu___3 = term_to_string tm in
+               let uu___4 =
+                 (FStar_Common.string_of_list ()) term_to_string
+                   (FStar_Pervasives_Native.snd
+                      qi.FStar_Syntax_Syntax.antiquotations) in
+               FStar_Compiler_Util.format2 "`(%s)%s" uu___3 uu___4
            | FStar_Syntax_Syntax.Tm_meta
                (t, FStar_Syntax_Syntax.Meta_pattern (uu___3, ps)) ->
                let pats =

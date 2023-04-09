@@ -294,8 +294,8 @@ and (eq_term' :
           eq_list eq_term ts1 ts2
       | (FStar_Parser_AST.Antiquote t11, FStar_Parser_AST.Antiquote t21) ->
           eq_term t11 t21
-      | (FStar_Parser_AST.Quote (t11, k1), FStar_Parser_AST.Quote (t21, k2))
-          -> (eq_term t11 t21) && (k1 = k2)
+      | (FStar_Parser_AST.Quote t11, FStar_Parser_AST.Quote t21) ->
+          eq_term t11 t21
       | (FStar_Parser_AST.VQuote t11, FStar_Parser_AST.VQuote t21) ->
           eq_term t11 t21
       | (FStar_Parser_AST.CalcProof (t11, t21, cs1),
@@ -754,7 +754,7 @@ and (lidents_of_term' :
     | FStar_Parser_AST.Discrim lid -> [lid]
     | FStar_Parser_AST.Attributes ts -> (concat_map ()) lidents_of_term ts
     | FStar_Parser_AST.Antiquote t1 -> lidents_of_term t1
-    | FStar_Parser_AST.Quote (t1, uu___) -> lidents_of_term t1
+    | FStar_Parser_AST.Quote t1 -> lidents_of_term t1
     | FStar_Parser_AST.VQuote t1 -> lidents_of_term t1
     | FStar_Parser_AST.CalcProof (t1, t2, ts) ->
         let uu___ = lidents_of_term t1 in

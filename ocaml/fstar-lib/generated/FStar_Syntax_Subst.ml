@@ -971,15 +971,8 @@ let rec (push_subst :
             FStar_Syntax_Syntax.Tm_meta uu___1 in
           mk uu___
       | FStar_Syntax_Syntax.Tm_quoted (tm, qi) ->
-          (match qi.FStar_Syntax_Syntax.qkind with
-           | FStar_Syntax_Syntax.Quote_dynamic ->
-               let uu___ =
-                 let uu___1 = let uu___2 = subst' s tm in (uu___2, qi) in
-                 FStar_Syntax_Syntax.Tm_quoted uu___1 in
-               mk uu___
-           | FStar_Syntax_Syntax.Quote_static ->
-               let qi1 = FStar_Syntax_Syntax.on_antiquoted (subst' s) qi in
-               mk (FStar_Syntax_Syntax.Tm_quoted (tm, qi1)))
+          let qi1 = FStar_Syntax_Syntax.on_antiquoted (subst' s) qi in
+          mk (FStar_Syntax_Syntax.Tm_quoted (tm, qi1))
       | FStar_Syntax_Syntax.Tm_meta (t1, m) ->
           let uu___ =
             let uu___1 = let uu___2 = subst' s t1 in (uu___2, m) in

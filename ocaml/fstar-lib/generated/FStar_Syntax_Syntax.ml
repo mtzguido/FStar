@@ -115,15 +115,6 @@ type universe_uvar =
 type univ_names = univ_name Prims.list[@@deriving yojson,show]
 type universes = universe Prims.list[@@deriving yojson,show]
 type monad_name = FStar_Ident.lident[@@deriving yojson,show]
-type quote_kind =
-  | Quote_static 
-  | Quote_dynamic [@@deriving yojson,show]
-let (uu___is_Quote_static : quote_kind -> Prims.bool) =
-  fun projectee ->
-    match projectee with | Quote_static -> true | uu___ -> false
-let (uu___is_Quote_dynamic : quote_kind -> Prims.bool) =
-  fun projectee ->
-    match projectee with | Quote_dynamic -> true | uu___ -> false
 type maybe_set_use_range =
   | NoUseRange 
   | SomeUseRange of FStar_Compiler_Range.range [@@deriving yojson,show]
@@ -259,9 +250,7 @@ and letbinding =
   lbdef: term' syntax ;
   lbattrs: term' syntax Prims.list ;
   lbpos: FStar_Compiler_Range.range }
-and quoteinfo =
-  {
-  qkind: quote_kind ;
+and quoteinfo = {
   antiquotations: (Prims.int * term' syntax Prims.list) }
 and comp_typ =
   {
@@ -619,12 +608,10 @@ let (__proj__Mkletbinding__item__lbpos :
   fun projectee ->
     match projectee with
     | { lbname; lbunivs; lbtyp; lbeff; lbdef; lbattrs; lbpos;_} -> lbpos
-let (__proj__Mkquoteinfo__item__qkind : quoteinfo -> quote_kind) =
-  fun projectee -> match projectee with | { qkind; antiquotations;_} -> qkind
 let (__proj__Mkquoteinfo__item__antiquotations :
   quoteinfo -> (Prims.int * term' syntax Prims.list)) =
   fun projectee ->
-    match projectee with | { qkind; antiquotations;_} -> antiquotations
+    match projectee with | { antiquotations;_} -> antiquotations
 let (__proj__Mkcomp_typ__item__comp_univs : comp_typ -> universes) =
   fun projectee ->
     match projectee with
@@ -1748,7 +1735,7 @@ let (on_antiquoted : (term -> term) -> quoteinfo -> quoteinfo) =
       match uu___ with
       | (s, aqs) ->
           let aqs' = FStar_Compiler_List.map f aqs in
-          { qkind = (qi.qkind); antiquotations = (s, aqs') }
+          { antiquotations = (s, aqs') }
 let (lookup_aq : bv -> antiquotations -> term) =
   fun bv1 ->
     fun aq ->

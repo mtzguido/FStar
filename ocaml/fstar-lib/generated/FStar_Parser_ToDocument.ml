@@ -2881,13 +2881,7 @@ and (p_noSeqTerm' :
                 FStar_Pprint.op_Hat_Slash_Hat uu___6 uu___7 in
               FStar_Pprint.group uu___5 in
             let uu___5 = paren_if (ps || pb) in uu___5 uu___4
-        | FStar_Parser_AST.Quote (e1, FStar_Parser_AST.Dynamic) ->
-            let uu___ =
-              let uu___1 = str "quote" in
-              let uu___2 = p_noSeqTermAndComment ps pb e1 in
-              FStar_Pprint.op_Hat_Slash_Hat uu___1 uu___2 in
-            FStar_Pprint.group uu___
-        | FStar_Parser_AST.Quote (e1, FStar_Parser_AST.Static) ->
+        | FStar_Parser_AST.Quote e1 ->
             let uu___ =
               let uu___1 = str "`" in
               let uu___2 = p_noSeqTermAndComment ps pb e1 in
@@ -2899,18 +2893,6 @@ and (p_noSeqTerm' :
               let uu___2 = p_noSeqTermAndComment ps pb e1 in
               FStar_Pprint.op_Hat_Hat uu___1 uu___2 in
             FStar_Pprint.group uu___
-        | FStar_Parser_AST.Antiquote
-            {
-              FStar_Parser_AST.tm = FStar_Parser_AST.Quote
-                (e1, FStar_Parser_AST.Dynamic);
-              FStar_Parser_AST.range = uu___;
-              FStar_Parser_AST.level = uu___1;_}
-            ->
-            let uu___2 =
-              let uu___3 = str "`@" in
-              let uu___4 = p_noSeqTermAndComment ps pb e1 in
-              FStar_Pprint.op_Hat_Hat uu___3 uu___4 in
-            FStar_Pprint.group uu___2
         | FStar_Parser_AST.Antiquote e1 ->
             let uu___ =
               let uu___1 = str "`#" in

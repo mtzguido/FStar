@@ -1309,12 +1309,8 @@ let rec (resugar_term' :
             Prims.op_Hat "?u" uu___2 in
           let uu___2 = mk FStar_Parser_AST.Wild in label s uu___2
       | FStar_Syntax_Syntax.Tm_quoted (tm, qi) ->
-          let qi1 =
-            match qi.FStar_Syntax_Syntax.qkind with
-            | FStar_Syntax_Syntax.Quote_static -> FStar_Parser_AST.Static
-            | FStar_Syntax_Syntax.Quote_dynamic -> FStar_Parser_AST.Dynamic in
           let uu___1 =
-            let uu___2 = let uu___3 = resugar_term' env tm in (uu___3, qi1) in
+            let uu___2 = resugar_term' env tm in
             FStar_Parser_AST.Quote uu___2 in
           mk uu___1
       | FStar_Syntax_Syntax.Tm_meta (e, m) ->

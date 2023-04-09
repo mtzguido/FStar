@@ -2633,46 +2633,7 @@ and (term_as_mlexpr' :
              FStar_Extraction_ML_Syntax.E_PURE,
              FStar_Extraction_ML_Syntax.ml_unit_ty)
        | FStar_Syntax_Syntax.Tm_quoted
-           (qt,
-            { FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_dynamic;
-              FStar_Syntax_Syntax.antiquotations = uu___1;_})
-           ->
-           let uu___2 =
-             let uu___3 =
-               let uu___4 = FStar_Parser_Const.failwith_lid () in
-               FStar_Syntax_Syntax.lid_as_fv uu___4
-                 FStar_Syntax_Syntax.delta_constant
-                 FStar_Pervasives_Native.None in
-             FStar_Extraction_ML_UEnv.lookup_fv t.FStar_Syntax_Syntax.pos g
-               uu___3 in
-           (match uu___2 with
-            | { FStar_Extraction_ML_UEnv.exp_b_name = uu___3;
-                FStar_Extraction_ML_UEnv.exp_b_expr = fw;
-                FStar_Extraction_ML_UEnv.exp_b_tscheme = uu___4;_} ->
-                let uu___5 =
-                  let uu___6 =
-                    let uu___7 =
-                      let uu___8 =
-                        let uu___9 =
-                          FStar_Compiler_Effect.op_Less_Bar
-                            (FStar_Extraction_ML_Syntax.with_ty
-                               FStar_Extraction_ML_Syntax.ml_string_ty)
-                            (FStar_Extraction_ML_Syntax.MLE_Const
-                               (FStar_Extraction_ML_Syntax.MLC_String
-                                  "Cannot evaluate open quotation at runtime")) in
-                        [uu___9] in
-                      (fw, uu___8) in
-                    FStar_Extraction_ML_Syntax.MLE_App uu___7 in
-                  FStar_Compiler_Effect.op_Less_Bar
-                    (FStar_Extraction_ML_Syntax.with_ty
-                       FStar_Extraction_ML_Syntax.ml_int_ty) uu___6 in
-                (uu___5, FStar_Extraction_ML_Syntax.E_PURE,
-                  FStar_Extraction_ML_Syntax.ml_int_ty))
-       | FStar_Syntax_Syntax.Tm_quoted
-           (qt,
-            { FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_static;
-              FStar_Syntax_Syntax.antiquotations = (shift, aqs);_})
-           ->
+           (qt, { FStar_Syntax_Syntax.antiquotations = (shift, aqs);_}) ->
            let uu___1 = FStar_Reflection_Basic.inspect_ln qt in
            (match uu___1 with
             | FStar_Reflection_Data.Tv_BVar bv ->

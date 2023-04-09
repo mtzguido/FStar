@@ -1419,22 +1419,6 @@ let (check_no_aq : antiquotations_temp -> unit) =
   fun aq ->
     match aq with
     | [] -> ()
-    | (bv,
-       {
-         FStar_Syntax_Syntax.n = FStar_Syntax_Syntax.Tm_quoted
-           (e,
-            { FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_dynamic;
-              FStar_Syntax_Syntax.antiquotations = uu___;_});
-         FStar_Syntax_Syntax.pos = uu___1; FStar_Syntax_Syntax.vars = uu___2;
-         FStar_Syntax_Syntax.hash_code = uu___3;_})::uu___4
-        ->
-        let uu___5 =
-          let uu___6 =
-            let uu___7 = FStar_Syntax_Print.term_to_string e in
-            FStar_Compiler_Util.format1 "Unexpected antiquotation: `@(%s)"
-              uu___7 in
-          (FStar_Errors_Codes.Fatal_UnexpectedAntiquotation, uu___6) in
-        FStar_Errors.raise_error uu___5 e.FStar_Syntax_Syntax.pos
     | (bv, e)::uu___ ->
         let uu___1 =
           let uu___2 =
@@ -4137,7 +4121,7 @@ and (desugar_term_maybe_top :
                   (uu___2.FStar_Syntax_Syntax.hash_code)
               } in
             (uu___1, noaqs)
-        | FStar_Parser_AST.Quote (e, FStar_Parser_AST.Static) ->
+        | FStar_Parser_AST.Quote e ->
             let uu___1 = desugar_term_aq env e in
             (match uu___1 with
              | (tm, vts) ->
@@ -4171,8 +4155,6 @@ and (desugar_term_maybe_top :
                    | () ->
                        let qi =
                          {
-                           FStar_Syntax_Syntax.qkind =
-                             FStar_Syntax_Syntax.Quote_static;
                            FStar_Syntax_Syntax.antiquotations =
                              (Prims.int_zero, vt_tms)
                          } in
@@ -4188,18 +4170,6 @@ and (desugar_term_maybe_top :
             let tm = desugar_term env e in
             let uu___1 = FStar_Syntax_Syntax.bv_to_name bv in
             (uu___1, [(bv, tm)])
-        | FStar_Parser_AST.Quote (e, FStar_Parser_AST.Dynamic) ->
-            let qi =
-              {
-                FStar_Syntax_Syntax.qkind = FStar_Syntax_Syntax.Quote_dynamic;
-                FStar_Syntax_Syntax.antiquotations = (Prims.int_zero, [])
-              } in
-            let uu___1 =
-              let uu___2 =
-                let uu___3 = let uu___4 = desugar_term env e in (uu___4, qi) in
-                FStar_Syntax_Syntax.Tm_quoted uu___3 in
-              FStar_Compiler_Effect.op_Less_Bar mk uu___2 in
-            (uu___1, noaqs)
         | FStar_Parser_AST.CalcProof (rel, init_expr, steps) ->
             let is_impl rel1 =
               let is_impl_t t =

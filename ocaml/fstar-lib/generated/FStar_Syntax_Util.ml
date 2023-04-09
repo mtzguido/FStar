@@ -1214,12 +1214,9 @@ let (eq_quoteinfo :
   =
   fun q1 ->
     fun q2 ->
-      if q1.FStar_Syntax_Syntax.qkind <> q2.FStar_Syntax_Syntax.qkind
-      then NotEqual
-      else
-        eq_antiquotations
-          (FStar_Pervasives_Native.snd q1.FStar_Syntax_Syntax.antiquotations)
-          (FStar_Pervasives_Native.snd q2.FStar_Syntax_Syntax.antiquotations)
+      eq_antiquotations
+        (FStar_Pervasives_Native.snd q1.FStar_Syntax_Syntax.antiquotations)
+        (FStar_Pervasives_Native.snd q2.FStar_Syntax_Syntax.antiquotations)
 let (eq_bqual :
   FStar_Syntax_Syntax.binder_qualifier FStar_Pervasives_Native.option ->
     FStar_Syntax_Syntax.binder_qualifier FStar_Pervasives_Native.option ->
@@ -4143,9 +4140,8 @@ let rec (unbound_variables :
                     FStar_Compiler_List.op_At uu___4 uu___5) lbs1 in
              FStar_Compiler_List.op_At uu___2 uu___3)
     | FStar_Syntax_Syntax.Tm_quoted (tm1, qi) ->
-        (match qi.FStar_Syntax_Syntax.qkind with
-         | FStar_Syntax_Syntax.Quote_static -> []
-         | FStar_Syntax_Syntax.Quote_dynamic -> unbound_variables tm1)
+        FStar_Compiler_List.collect unbound_variables
+          (FStar_Pervasives_Native.snd qi.FStar_Syntax_Syntax.antiquotations)
     | FStar_Syntax_Syntax.Tm_meta (t1, m) ->
         let uu___ = unbound_variables t1 in
         let uu___1 =

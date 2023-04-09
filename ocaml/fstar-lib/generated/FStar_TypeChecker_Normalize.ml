@@ -654,23 +654,12 @@ let rec (inline_closure_env :
                     rebuild_closure cfg env1 stack1 t2
                 | FStar_Syntax_Syntax.Tm_quoted (t', qi) ->
                     let t1 =
-                      match qi.FStar_Syntax_Syntax.qkind with
-                      | FStar_Syntax_Syntax.Quote_dynamic ->
-                          let uu___2 =
-                            let uu___3 =
-                              let uu___4 =
-                                non_tail_inline_closure_env cfg env1 t' in
-                              (uu___4, qi) in
-                            FStar_Syntax_Syntax.Tm_quoted uu___3 in
-                          FStar_Syntax_Syntax.mk uu___2
-                            t.FStar_Syntax_Syntax.pos
-                      | FStar_Syntax_Syntax.Quote_static ->
-                          let qi1 =
-                            FStar_Syntax_Syntax.on_antiquoted
-                              (non_tail_inline_closure_env cfg env1) qi in
-                          FStar_Syntax_Syntax.mk
-                            (FStar_Syntax_Syntax.Tm_quoted (t', qi1))
-                            t.FStar_Syntax_Syntax.pos in
+                      let qi1 =
+                        FStar_Syntax_Syntax.on_antiquoted
+                          (non_tail_inline_closure_env cfg env1) qi in
+                      FStar_Syntax_Syntax.mk
+                        (FStar_Syntax_Syntax.Tm_quoted (t', qi1))
+                        t.FStar_Syntax_Syntax.pos in
                     rebuild_closure cfg env1 stack1 t1
                 | FStar_Syntax_Syntax.Tm_meta (t', m) ->
                     let stack2 =

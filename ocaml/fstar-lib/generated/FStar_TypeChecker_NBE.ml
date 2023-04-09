@@ -1295,15 +1295,9 @@ let rec (translate :
                           FStar_Syntax_Syntax.NT uu___4) uu___2 in
                let uu___2 = FStar_Syntax_Subst.subst s1 t in
                FStar_Syntax_Subst.subst s2 uu___2 in
-             (match qi.FStar_Syntax_Syntax.qkind with
-              | FStar_Syntax_Syntax.Quote_dynamic ->
-                  let qt1 = close qt in
-                  FStar_Compiler_Effect.op_Less_Bar mk_t1
-                    (FStar_TypeChecker_NBETerm.Quote (qt1, qi))
-              | FStar_Syntax_Syntax.Quote_static ->
-                  let qi1 = FStar_Syntax_Syntax.on_antiquoted close qi in
-                  FStar_Compiler_Effect.op_Less_Bar mk_t1
-                    (FStar_TypeChecker_NBETerm.Quote (qt, qi1)))
+             let qi1 = FStar_Syntax_Syntax.on_antiquoted close qi in
+             FStar_Compiler_Effect.op_Less_Bar mk_t1
+               (FStar_TypeChecker_NBETerm.Quote (qt, qi1))
          | FStar_Syntax_Syntax.Tm_lazy li ->
              let f uu___2 =
                let t = FStar_Syntax_Util.unfold_lazy li in
