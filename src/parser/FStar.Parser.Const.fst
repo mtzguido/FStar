@@ -465,6 +465,7 @@ let is_name (lid:lident) =
 let inspect        = p2l ["FStar"; "Tactics"; "Builtins"; "inspect"]
 let pack           = p2l ["FStar"; "Tactics"; "Builtins"; "pack"]
 let binder_to_term = p2l ["FStar"; "Tactics"; "Derived"; "binder_to_term"]
+let quote_lid      = p2l ["FStar"; "Tactics"; "Builtins"; "quote"]
 
 let fstar_tactics_lid' s : lid = FStar.Ident.lid_of_path (["FStar"; "Tactics"]@s) FStar.Compiler.Range.dummyRange
 let fstar_tactics_lid  s = fstar_tactics_lid' [s]

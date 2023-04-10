@@ -1074,9 +1074,15 @@ tmEqWith(X):
   | MINUS e=tmEqWith(X)
       { mk_uminus e (rhs parseState 1) (rhs2 parseState 1 2) Expr }
   | BACKTICK e=tmEqWith(X)
-      { mk_term (Quote e) (rhs2 parseState 1 3) Un }
+      { mk_term (Quote e) (rhs2 parseState 1 2) Un }
   | BACKTICK_HASH e=atomicTerm
-      { mk_term (Antiquote e) (rhs2 parseState 1 3) Un }
+      { mk_term (Antiquote e) (rhs2 parseState 1 2) Un }
+  (* special syntax for dynamic antiquotes: `@t == `#(Tactics.quote t) *)
+  | BACKTICK_AT e=atomicTerm
+      { let quote = set_lid_range quote_lid (rhs parseState 1) in
+        let q = mk_term (Var quote) (rhs parseState 1) Un in
+        let app = mkExplicitApp q [e] (rhs2 parseState 1 2) in
+        mk_term (Antiquote app) (rhs2 parseState 1 2) Un }
   | e=tmNoEqWith(X)
       { e }
 
