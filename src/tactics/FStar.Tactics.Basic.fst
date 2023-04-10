@@ -53,6 +53,7 @@ module UF     = FStar.Syntax.Unionfind
 module U      = FStar.Syntax.Util
 module Z      = FStar.BigInt
 module Core   = FStar.TypeChecker.Core
+module NBET   = FStar.TypeChecker.NBETerm
 
 let core_check env sol t must_tot
   : either (option typ) Core.error
@@ -1581,6 +1582,12 @@ let top_env     () : tac env  = bind get (fun ps -> ret <| ps.main_context)
 let lax_on () : tac bool =
     let! g = cur_goal in
     ret (Options.lax () || (goal_env g).lax)
+
+(* The real magic happens at the embedding (or lack thereof) *)
+let quote (ty : term) (tm : term) : tac term =
+    ret tm
+let nbe_quote (ty : NBET.t) (tm : term) : tac term =
+   ret tm
 
 let unquote (ty : term) (tm : term) : tac term = wrap_err "unquote" <| (
     if_verbose (fun () -> BU.print1 "unquote: tm = %s\n" (Print.term_to_string tm)) ;!

@@ -620,6 +620,7 @@ let e_sealed (ea : embedding 'a) =
 let bogus_cbs = {
     iapp = (fun h _args -> h);
     translate = (fun _ -> failwith "bogus_cbs translate");
+    readback  = (fun _ -> failwith "bogus_cbs readback");
 }
 
 let arg_as_int    (a:arg) = fst a |> unembed e_int bogus_cbs

@@ -874,6 +874,7 @@ and translate_fv (cfg: config) (bs:list t) (fvar:fv): t =
                       let callbacks = {
                         iapp = iapp cfg;
                         translate = translate cfg bs;
+                        readback = readback cfg;
                       } in
                       debug (fun () -> BU.print1 "Caling primop with args = [%s]\n"
                                     (List.map (fun (x, _) -> t_to_string x) args' |> String.concat "; "));

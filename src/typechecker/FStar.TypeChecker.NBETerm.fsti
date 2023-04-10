@@ -206,6 +206,7 @@ type annot = option t
 type nbe_cbs = {
    iapp : t -> args -> t;
    translate : term -> t;
+   readback  : t -> term;
 }
 
 type embedding 'a = {

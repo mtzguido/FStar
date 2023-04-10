@@ -199,6 +199,16 @@ let e_tactic_nbe_1 (ea : NBET.embedding 'a) (er : NBET.embedding 'r) : NBET.embe
 (* Takes a `sealed a`, but that's just a userspace abstraction. *)
 let unseal (_typ:_) (x:'a) : tac 'a = ret x
 
+let e_readback : NBET.embedding term =
+ (* We just use this one to unembed a NBE term into a Syntax
+term by reading it back. All other fields are unused. *)
+ {
+   un = (fun cbs t -> Some (cbs.readback t));
+   em = (fun _ _ -> failwith "e_readback em");
+   typ = NBET.mk_t (NBET.Constant NBET.Unit);
+   emb_typ = ET_abstract;
+ }
+
 (* Set the primitive steps ref *)
 let () =
     __primitive_steps_ref := Some <|
@@ -354,8 +364,8 @@ let () =
         unshelve NRE.e_term NBET.e_unit;
 
       mk_tac_step_2 1 "quote"
-        (fun _ t -> t) e_any e_any RE.e_term
-        (fun _ t -> t) NBET.e_any NBET.e_any NRE.e_term;
+        quote e_any e_any RE.e_term
+        nbe_quote NBET.e_any e_readback NRE.e_term;
 
       mk_tac_step_2 1 "unquote"
         unquote e_any RE.e_term e_any

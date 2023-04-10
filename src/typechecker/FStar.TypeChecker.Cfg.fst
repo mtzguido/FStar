@@ -569,6 +569,7 @@ let built_in_primitive_steps : prim_step_set =
     let bogus_cbs = {
         NBE.iapp = (fun h _args -> h);
         NBE.translate = (fun _ -> failwith "bogus_cbs translate");
+        NBE.readback = (fun _ -> failwith "bogus_cbs readback");
     }
     in
     let int_as_bounded r int_to_t n =

@@ -36,6 +36,7 @@ module Range  = FStar.Compiler.Range
 module Z      = FStar.BigInt
 module TcComm = FStar.TypeChecker.Common
 module Core   = FStar.TypeChecker.Core
+module NBET   = FStar.TypeChecker.NBETerm
 
 (* Internal utilities *)
 val goal_typedness_deps : goal -> list ctx_uvar
@@ -58,6 +59,8 @@ val refine_intro           : unit -> tac unit
 val tc                     : env -> term -> tac typ
 val tcc                    : env -> term -> tac comp
 val unshelve               : term -> tac unit
+val quote                  : typ -> term -> tac term
+val nbe_quote              : NBET.t -> term -> tac term
 val unquote                : typ -> term -> tac term
 val norm                   : list EMB.norm_step -> tac unit
 val norm_term_env          : env -> list EMB.norm_step -> term -> tac term
