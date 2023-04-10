@@ -1106,6 +1106,9 @@ let get_extraction_mode env (m:Ident.lident) =
 let can_reify_for_extraction env (m:Ident.lident) =
   (get_extraction_mode env m) = S.Extract_reify
 
+let is_quote (t:term) =
+  let hd, _ = U.head_and_args t in
+  U.is_fvar PC.quote_lid hd
 
 (* GM: Please consider this function private outside of this recursive
  * group, and call `normalize` instead. `normalize` will print timing
@@ -1172,6 +1175,9 @@ let rec norm : cfg -> env -> stack -> term -> term =
           | Tm_quoted (qt, qi) ->
             let qi = S.on_antiquoted (norm cfg env []) qi in
             let t = mk (Tm_quoted (qt, qi)) t.pos in
+            rebuild cfg env stack (closure_as_term cfg env t)
+
+          | Tm_app(hd, args) when is_quote hd ->
             rebuild cfg env stack (closure_as_term cfg env t)
 
           | Tm_app(hd, args)
