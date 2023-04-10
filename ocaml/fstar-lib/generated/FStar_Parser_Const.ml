@@ -474,6 +474,8 @@ let (pack : FStar_Ident.lident) =
   p2l ["FStar"; "Tactics"; "Builtins"; "pack"]
 let (binder_to_term : FStar_Ident.lident) =
   p2l ["FStar"; "Tactics"; "Derived"; "binder_to_term"]
+let (quote_lid : FStar_Ident.lident) =
+  p2l ["FStar"; "Tactics"; "Builtins"; "quote"]
 let (fstar_tactics_lid' : Prims.string Prims.list -> FStar_Ident.lid) =
   fun s ->
     FStar_Ident.lid_of_path
