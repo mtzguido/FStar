@@ -4762,6 +4762,16 @@ let (lax_on : unit -> Prims.bool FStar_Tactics_Monad.tac) =
              (let uu___2 = FStar_Tactics_Types.goal_env g in
               uu___2.FStar_TypeChecker_Env.lax) in
          FStar_Tactics_Monad.ret uu___1)
+let (quote :
+  FStar_Syntax_Syntax.typ ->
+    FStar_Syntax_Syntax.term ->
+      FStar_Syntax_Syntax.term FStar_Tactics_Monad.tac)
+  = fun ty -> fun tm -> FStar_Tactics_Monad.ret tm
+let (nbe_quote :
+  FStar_TypeChecker_NBETerm.t ->
+    FStar_Syntax_Syntax.term ->
+      FStar_Syntax_Syntax.term FStar_Tactics_Monad.tac)
+  = fun ty -> fun tm -> FStar_Tactics_Monad.ret tm
 let (unquote :
   FStar_Syntax_Syntax.typ ->
     FStar_Syntax_Syntax.term ->

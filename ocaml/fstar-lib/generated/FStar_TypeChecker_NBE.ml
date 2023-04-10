@@ -1715,7 +1715,9 @@ and (translate_fv :
                                    FStar_TypeChecker_NBETerm.iapp =
                                      (iapp cfg);
                                    FStar_TypeChecker_NBETerm.translate =
-                                     (translate cfg bs)
+                                     (translate cfg bs);
+                                   FStar_TypeChecker_NBETerm.readback =
+                                     (readback cfg)
                                  } in
                                debug1
                                  (fun uu___10 ->

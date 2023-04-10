@@ -353,12 +353,19 @@ type annot = t FStar_Pervasives_Native.option
 type nbe_cbs =
   {
   iapp: t -> args -> t ;
-  translate: FStar_Syntax_Syntax.term -> t }
+  translate: FStar_Syntax_Syntax.term -> t ;
+  readback: t -> FStar_Syntax_Syntax.term }
 let (__proj__Mknbe_cbs__item__iapp : nbe_cbs -> t -> args -> t) =
-  fun projectee -> match projectee with | { iapp; translate;_} -> iapp
+  fun projectee ->
+    match projectee with | { iapp; translate; readback;_} -> iapp
 let (__proj__Mknbe_cbs__item__translate :
   nbe_cbs -> FStar_Syntax_Syntax.term -> t) =
-  fun projectee -> match projectee with | { iapp; translate;_} -> translate
+  fun projectee ->
+    match projectee with | { iapp; translate; readback;_} -> translate
+let (__proj__Mknbe_cbs__item__readback :
+  nbe_cbs -> t -> FStar_Syntax_Syntax.term) =
+  fun projectee ->
+    match projectee with | { iapp; translate; readback;_} -> readback
 type 'a embedding =
   {
   em: nbe_cbs -> 'a -> t ;
@@ -1582,7 +1589,8 @@ let e_sealed : 'a . 'a embedding -> 'a embedding =
 let (bogus_cbs : nbe_cbs) =
   {
     iapp = (fun h -> fun _args -> h);
-    translate = (fun uu___ -> failwith "bogus_cbs translate")
+    translate = (fun uu___ -> failwith "bogus_cbs translate");
+    readback = (fun uu___ -> failwith "bogus_cbs readback")
   }
 let (arg_as_int : arg -> FStar_BigInt.t FStar_Pervasives_Native.option) =
   fun a ->

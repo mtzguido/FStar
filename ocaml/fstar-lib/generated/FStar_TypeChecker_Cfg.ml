@@ -2427,7 +2427,9 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
     {
       FStar_TypeChecker_NBETerm.iapp = (fun h -> fun _args -> h);
       FStar_TypeChecker_NBETerm.translate =
-        (fun uu___ -> failwith "bogus_cbs translate")
+        (fun uu___ -> failwith "bogus_cbs translate");
+      FStar_TypeChecker_NBETerm.readback =
+        (fun uu___ -> failwith "bogus_cbs readback")
     } in
   let int_as_bounded r int_to_t n =
     let c = embed_simple FStar_Syntax_Embeddings.e_int r n in
