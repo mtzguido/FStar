@@ -764,6 +764,7 @@ val eterm_info_to_assertions :
 let eterm_info_to_assertions dbg with_gpre with_gpost ge t is_let is_assert info bind_var opt_c
                              parents children =
   print_dbg dbg "[> eterm_info_to_assertions";
+  admit();
   (* Introduce additional variables to instantiate the return type refinement,
    * the precondition, the postcondition and the goal *)
   (* First, the return value: returns an updated env, the value to use for

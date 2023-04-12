@@ -604,6 +604,7 @@ let rec strip_implicit_parameters tm =
 
 val unfold_in_assert_or_assume : bool -> exploration_result term -> Tac unit
 let unfold_in_assert_or_assume dbg ares =
+  admit();
   print_dbg dbg ("[> unfold_in_assert_or_assume:\n" ^ term_to_string ares.res);
   (* Find the focused term inside the assert, and on which side of the
    * equality if the assert is an equality *)
