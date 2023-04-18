@@ -2872,6 +2872,12 @@ let (can_reify_for_extraction :
     fun m ->
       let uu___ = get_extraction_mode env1 m in
       uu___ = FStar_Syntax_Syntax.Extract_reify
+let (is_quote : FStar_Syntax_Syntax.term -> Prims.bool) =
+  fun t ->
+    let uu___ = FStar_Syntax_Util.head_and_args t in
+    match uu___ with
+    | (hd, uu___1) ->
+        FStar_Syntax_Util.is_fvar FStar_Parser_Const.quote_lid hd
 let rec (norm :
   FStar_TypeChecker_Cfg.cfg ->
     env -> stack -> FStar_Syntax_Syntax.term -> FStar_Syntax_Syntax.term)
@@ -2991,6 +2997,9 @@ let rec (norm :
                    (FStar_Syntax_Syntax.Tm_quoted (qt, qi1))
                    t1.FStar_Syntax_Syntax.pos in
                let uu___2 = closure_as_term cfg env1 t2 in
+               rebuild cfg env1 stack2 uu___2
+           | FStar_Syntax_Syntax.Tm_app (hd, args) when is_quote hd ->
+               let uu___2 = closure_as_term cfg env1 t1 in
                rebuild cfg env1 stack2 uu___2
            | FStar_Syntax_Syntax.Tm_app (hd, args) when
                (should_consider_norm_requests cfg) &&
