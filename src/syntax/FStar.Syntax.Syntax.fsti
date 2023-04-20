@@ -323,7 +323,6 @@ and freenames = set bv
 and syntax 'a = {
     n:'a;
     pos:Range.range;
-    vars:memo free_vars;
     hash_code:memo FStar.Hash.hash_code
 }
 and bv = {
