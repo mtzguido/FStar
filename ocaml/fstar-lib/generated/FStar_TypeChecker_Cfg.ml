@@ -3857,8 +3857,6 @@ let (equality_ops : primitive_step FStar_Compiler_Util.psmap) =
                  FStar_Syntax_Syntax.n =
                    (FStar_Syntax_Util.t_true.FStar_Syntax_Syntax.n);
                  FStar_Syntax_Syntax.pos = r;
-                 FStar_Syntax_Syntax.vars =
-                   (FStar_Syntax_Util.t_true.FStar_Syntax_Syntax.vars);
                  FStar_Syntax_Syntax.hash_code =
                    (FStar_Syntax_Util.t_true.FStar_Syntax_Syntax.hash_code)
                }
@@ -3868,8 +3866,6 @@ let (equality_ops : primitive_step FStar_Compiler_Util.psmap) =
                  FStar_Syntax_Syntax.n =
                    (FStar_Syntax_Util.t_false.FStar_Syntax_Syntax.n);
                  FStar_Syntax_Syntax.pos = r;
-                 FStar_Syntax_Syntax.vars =
-                   (FStar_Syntax_Util.t_false.FStar_Syntax_Syntax.vars);
                  FStar_Syntax_Syntax.hash_code =
                    (FStar_Syntax_Util.t_false.FStar_Syntax_Syntax.hash_code)
                }
