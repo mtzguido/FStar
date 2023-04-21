@@ -146,7 +146,7 @@ function clean_slate () {
     # build fstar compiler bootstrap
     T0=`date +'%Y%m%d_%H%M%S'`
     echo "Starting fstar compiler bootstrap ${T0}"
-    make -j${JLEVEL} -C src ocaml-fstar-ocaml 2>&1 | tee ${BENCH_OUTDIR}/build_fstar.log
+    make -j${JLEVEL} dune-full-bootstrap 2>&1 | tee ${BENCH_OUTDIR}/build_fstar.log
     T1=`date +'%Y%m%d_%H%M%S'`
     echo "Finished fstar compiler boostrap ${T1} (started at ${T0})"
 
