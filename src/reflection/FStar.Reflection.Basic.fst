@@ -702,9 +702,8 @@ let inspect_bv (bv:bv) : bv_view =
 let pack_bv (bvv:bv_view) : bv =
     if Z.to_int_fs bvv.bv_index < 0 then (
         Err.log_issue Range.dummyRange
-            (Err.Warning_CantInspect, BU.format3 "pack_bv: index is negative (%s : %s), index = %s"
+            (Err.Warning_CantInspect, BU.format2 "pack_bv: index is negative (%s), index = %s"
                                          bvv.bv_ppname
-                                         (Print.term_to_string bvv.bv_sort)
                                          (string_of_int (Z.to_int_fs bvv.bv_index)))
     );
     {
