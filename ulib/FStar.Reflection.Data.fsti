@@ -62,14 +62,14 @@ noeq
 type bv_view = {
     bv_ppname : ppname_t;
     bv_index : nat;
-    bv_sort : typ;
 }
 
 noeq
 type binder_view = {
   binder_bv : bv;
   binder_qual : aqualv;
-  binder_attrs : list term
+  binder_attrs : list term;
+  binder_sort : typ;
 }
 
 noeq
