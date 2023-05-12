@@ -19,9 +19,9 @@ FSTAR_BUILD_PROFILE ?= release
 dune-fstar:
 	$(Q)cp version.txt $(DUNE_SNAPSHOT)/
 	@# Call Dune to build the snapshot.
-	@echo "  DUNE BUILD"
+	$(call msg, "DUNE BUILD")
 	$(Q)cd $(DUNE_SNAPSHOT) && dune build --profile=$(FSTAR_BUILD_PROFILE)
-	@echo "  DUNE INSTALL"
+	$(call msg, "DUNE INSTALL")
 	$(Q)cd $(DUNE_SNAPSHOT) && dune install --profile=$(FSTAR_BUILD_PROFILE) --prefix=$(FSTAR_CURDIR)
 
 verify-ulib:
