@@ -25,9 +25,25 @@
 Q?=@
 SIL?=--silent
 RUNLIM=
+
+# Setting V=1 makes the build verbose, commands are shown and --silent is not passed.
 ifneq ($(V),)
 	Q=
 	SIL=
+endif
+
+# Messages during the build.
+define msg =
+@printf "  %-8s  %s\n" $(1) $(2)
+endef
+
+# Setting QUIET=1 overrides V, and disables build messages too.
+ifneq ($(QUIET),)
+	Q=@
+	SIL=--silent
+define msg =
+
+endef
 endif
 
 define NO_RUNLIM_ERR
@@ -35,10 +51,6 @@ runlim not found:
   To use RESOURCEMONITOR=1, the `runlim` tool must be installed and in your $$PATH.
   It must also be a recent version supporting the `-p` option.
   You can get it from: [https://github.com/arminbiere/runlim]
-endef
-
-define msg =
-@printf "  %-8s  %s\n" $(1) $(2)
 endef
 
 # Passing RESOURCEMONITOR=1 will create .runlim files through the source tree with
