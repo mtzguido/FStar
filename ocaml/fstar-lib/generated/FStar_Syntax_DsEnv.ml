@@ -2332,8 +2332,6 @@ let (push_bv' :
             FStar_Syntax_Syntax.n =
               (FStar_Syntax_Syntax.tun.FStar_Syntax_Syntax.n);
             FStar_Syntax_Syntax.pos = r;
-            FStar_Syntax_Syntax.vars =
-              (FStar_Syntax_Syntax.tun.FStar_Syntax_Syntax.vars);
             FStar_Syntax_Syntax.hash_code =
               (FStar_Syntax_Syntax.tun.FStar_Syntax_Syntax.hash_code)
           } in

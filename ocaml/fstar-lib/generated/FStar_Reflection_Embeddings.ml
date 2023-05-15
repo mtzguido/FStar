@@ -212,7 +212,6 @@ let (e_aqualv :
     {
       FStar_Syntax_Syntax.n = (r.FStar_Syntax_Syntax.n);
       FStar_Syntax_Syntax.pos = rng;
-      FStar_Syntax_Syntax.vars = (r.FStar_Syntax_Syntax.vars);
       FStar_Syntax_Syntax.hash_code = (r.FStar_Syntax_Syntax.hash_code)
     } in
   let unembed_aqualv w t =
@@ -606,7 +605,6 @@ let (e_const :
     {
       FStar_Syntax_Syntax.n = (r.FStar_Syntax_Syntax.n);
       FStar_Syntax_Syntax.pos = rng;
-      FStar_Syntax_Syntax.vars = (r.FStar_Syntax_Syntax.vars);
       FStar_Syntax_Syntax.hash_code = (r.FStar_Syntax_Syntax.hash_code)
     } in
   let unembed_const w t =
@@ -1180,7 +1178,6 @@ let (e_term_view_aq :
           {
             FStar_Syntax_Syntax.n = (uu___.FStar_Syntax_Syntax.n);
             FStar_Syntax_Syntax.pos = rng;
-            FStar_Syntax_Syntax.vars = (uu___.FStar_Syntax_Syntax.vars);
             FStar_Syntax_Syntax.hash_code =
               (uu___.FStar_Syntax_Syntax.hash_code)
           }
@@ -1190,7 +1187,6 @@ let (e_term_view_aq :
           {
             FStar_Syntax_Syntax.n = (uu___.FStar_Syntax_Syntax.n);
             FStar_Syntax_Syntax.pos = rng;
-            FStar_Syntax_Syntax.vars = (uu___.FStar_Syntax_Syntax.vars);
             FStar_Syntax_Syntax.hash_code =
               (uu___.FStar_Syntax_Syntax.hash_code)
           } in
@@ -1842,7 +1838,6 @@ let (e_order : FStar_Order.order FStar_Syntax_Embeddings.embedding) =
     {
       FStar_Syntax_Syntax.n = (r.FStar_Syntax_Syntax.n);
       FStar_Syntax_Syntax.pos = rng;
-      FStar_Syntax_Syntax.vars = (r.FStar_Syntax_Syntax.vars);
       FStar_Syntax_Syntax.hash_code = (r.FStar_Syntax_Syntax.hash_code)
     } in
   let unembed_order w t =
@@ -2113,7 +2108,6 @@ let (e_sigelt_view :
         {
           FStar_Syntax_Syntax.n = (uu___.FStar_Syntax_Syntax.n);
           FStar_Syntax_Syntax.pos = rng;
-          FStar_Syntax_Syntax.vars = (uu___.FStar_Syntax_Syntax.vars);
           FStar_Syntax_Syntax.hash_code =
             (uu___.FStar_Syntax_Syntax.hash_code)
         } in
@@ -2245,7 +2239,6 @@ let (e_exp : FStar_Reflection_Data.exp FStar_Syntax_Embeddings.embedding) =
     {
       FStar_Syntax_Syntax.n = (r.FStar_Syntax_Syntax.n);
       FStar_Syntax_Syntax.pos = rng;
-      FStar_Syntax_Syntax.vars = (r.FStar_Syntax_Syntax.vars);
       FStar_Syntax_Syntax.hash_code = (r.FStar_Syntax_Syntax.hash_code)
     } in
   let rec unembed_exp w t =
@@ -2410,7 +2403,6 @@ let (e_qualifier :
     {
       FStar_Syntax_Syntax.n = (r.FStar_Syntax_Syntax.n);
       FStar_Syntax_Syntax.pos = rng;
-      FStar_Syntax_Syntax.vars = (r.FStar_Syntax_Syntax.vars);
       FStar_Syntax_Syntax.hash_code = (r.FStar_Syntax_Syntax.hash_code)
     } in
   let unembed w t =
