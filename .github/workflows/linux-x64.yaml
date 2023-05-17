@@ -69,6 +69,7 @@ jobs:
 
 
       - name: Build FStar and its dependencies
+        if: false
         run: |
           ci_docker_image_tag=fstar:local-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT
           echo "ci_docker_image_tag=$ci_docker_image_tag" >> $GITHUB_ENV
@@ -177,8 +178,17 @@ jobs:
           ERRORS_MSG=" <$ERRORS_URL|(Error summary)>"
           echo "ERRORS_MSG=$ERRORS_MSG" >> $GITHUB_ENV
 
+      - name: Testing
+        run: |
+          echo
+          echo
+          echo "${{ toJSON(github) }}"
+          echo
+          echo
+          true
+
       - name: Post to the Slack channel
-        if: ${{ always() && (github.event_name != 'workflow_dispatch') }}
+        if: ${{ always() }} # && (github.event_name != 'workflow_dispatch') }}
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
         with:
