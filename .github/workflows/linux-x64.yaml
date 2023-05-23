@@ -30,6 +30,17 @@ jobs:
         # keep in mind you need a way to handle this.
         shell: bash
     steps:
+      - name: Peek
+        run: |
+          echo
+          echo
+          ls
+          echo
+          echo
+          find
+          echo
+          echo
+
       - name: Record initial timestamp
         run: |
           echo "CI_INITIAL_TIMESTAMP=$(date '+%s')" >> $GITHUB_ENV
