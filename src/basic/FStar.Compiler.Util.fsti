@@ -380,7 +380,7 @@ val save_value_to_file: string -> 'a -> unit
 val load_value_from_file: string -> option 'a
 val load_zipped_value_from_file: string -> option 'a
 val save_2values_to_file: string -> 'a -> 'b -> unit
-val load_2values_from_file: string -> option ('a * 'b)
+val load_2_zipped_values_from_file: string -> option ('a * 'b)
 val print_exn: exn -> string
 val digest_of_file: string -> string
 val digest_of_string: string -> string

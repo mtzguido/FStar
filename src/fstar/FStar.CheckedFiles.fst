@@ -242,7 +242,7 @@ let load_checked_file_with_tc_result (deps:Dep.deps) (fn:string) (checked_fn:str
     BU.print1 "Trying to load checked file with tc result %s\n" checked_fn;
 
   let load_tc_result (fn:string) :list (string * string) * tc_result =
-    let entry :option (checked_file_entry_stage1 * checked_file_entry_stage2) = BU.load_2values_from_file checked_fn in
+    let entry :option (checked_file_entry_stage1 * checked_file_entry_stage2) = BU.load_2_zipped_values_from_file checked_fn in
     match entry with
      | Some ((_,s2)) -> s2.deps_dig, s2.tc_res
      | _ ->
@@ -473,7 +473,7 @@ let store_module_to_cache env fn parsing_data tc_result =
 
 let unsafe_raw_load_checked_file (checked_fn:string)
   : option (list string & tc_result)
-  = let entry : option (checked_file_entry_stage1 * checked_file_entry_stage2) = BU.load_2values_from_file checked_fn in
+  = let entry : option (checked_file_entry_stage1 * checked_file_entry_stage2) = BU.load_2_zipped_values_from_file checked_fn in
     match entry with
      | Some ((s1,s2)) -> Some (List.map fst s2.deps_dig, s2.tc_res)
      | _ -> None

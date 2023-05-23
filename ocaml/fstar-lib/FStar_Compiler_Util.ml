@@ -1081,7 +1081,7 @@ let save_2values_to_file (fname:string) value1 value2 =
   | e -> delete_file fname;
          raise e
 
-let load_2values_from_file (fname:string) =
+let load_2_zipped_values_from_file (fname:string) =
   try
     let channel = open_in_bin fname in
     BatPervasives.finally
