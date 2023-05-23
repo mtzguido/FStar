@@ -290,7 +290,8 @@ let (load_checked_file_with_tc_result :
              "Trying to load checked file with tc result %s\n" checked_fn
          else ());
         (let load_tc_result fn1 =
-           let entry = FStar_Compiler_Util.load_2values_from_file checked_fn in
+           let entry =
+             FStar_Compiler_Util.load_2_zipped_values_from_file checked_fn in
            match entry with
            | FStar_Pervasives_Native.Some (uu___1, s2) ->
                ((s2.deps_dig), (s2.tc_res))
@@ -595,7 +596,7 @@ let (unsafe_raw_load_checked_file :
     (Prims.string Prims.list * tc_result) FStar_Pervasives_Native.option)
   =
   fun checked_fn ->
-    let entry = FStar_Compiler_Util.load_2values_from_file checked_fn in
+    let entry = FStar_Compiler_Util.load_2_zipped_values_from_file checked_fn in
     match entry with
     | FStar_Pervasives_Native.Some (s1, s2) ->
         let uu___ =
