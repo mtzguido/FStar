@@ -40,7 +40,21 @@ module Util  = FStar.Extraction.ML.Util
 
 exception Unsupported of string
 
+let splitlast s = let x::xs = List.rev s in (List.rev xs, x)
+
 let mk e = with_ty MLTY_Top e
+
+let ml_name : Ident.lid -> mlexpr =
+  fun l ->
+    let s = Ident.path_of_lid l in
+    let ns, id = splitlast s in
+    mk (MLE_Name (ns, id))
+let ml_ctor : Ident.lid -> list mlexpr -> mlexpr =
+  fun l args ->
+    let s = Ident.path_of_lid l in
+    let ns, id = splitlast s in
+    mk (MLE_CTor ((ns, id), args))
+
 let ml_none : mlexpr = mk (MLE_Name (["FStar"; "Pervasives"; "Native"], "None"))
 let ml_some : mlexpr = mk (MLE_Name (["FStar"; "Pervasives"; "Native"], "Some"))
 
@@ -48,6 +62,21 @@ let tm_fvar_lid    = Ident.lid_of_str "FStar.Syntax.Syntax.Tm_fvar"
 let fv_eq_lid_lid  = Ident.lid_of_str "FStar.Syntax.Syntax.fv_eq_lid"
 let s_fvar_lid     = Ident.lid_of_str "FStar.Syntax.Syntax.fvar"
 let lid_of_str_lid = Ident.lid_of_str "FStar.Ident.lid_of_str" // :^)
+let mk_app_lid     = Ident.lid_of_str "FStar.Syntax.Util.mk_app"
+let nil_lid        = Ident.lid_of_str "Prims.Nil"
+let cons_lid       = Ident.lid_of_str "Prims.Cons"
+let embed_lid      = Ident.lid_of_str "FStar.Syntax.Embeddings.Base.extracted_embed"
+
+let ml_magic : mlexpr =
+  mk (MLE_Coerce (ml_unit, MLTY_Top, MLTY_Top))
+
+let embedding_for (a:S.typ) : mlexpr =
+  ml_magic
+
+let rec as_ml_list (ts : list mlexpr) : mlexpr =
+  match ts with
+  | [] -> ml_ctor nil_lid []
+  | t::ts -> ml_ctor cons_lid [t; as_ml_list ts]
 
 let fresh : string -> string =
   let r = BU.mk_ref 0 in
@@ -55,8 +84,6 @@ let fresh : string -> string =
     let v = !r in
     r := v+1;
     s^"_"^(string_of_int v)
-
-let splitlast s = let x::xs = List.rev s in (List.rev xs, x)
 
 let mk_unembed (ctors: list sigelt) : mlexpr =
   let e_branches : ref (list mlbranch) = BU.mk_ref [] in
@@ -66,13 +93,14 @@ let mk_unembed (ctors: list sigelt) : mlexpr =
     | Sig_datacon {lid; us; t; ty_lid; num_ty_params; mutuals} ->
       let fv = fresh "fv" in
       let bs, c = U.arrow_formals t in
-      (* let vs = List.map (fun b -> fresh (Ident.string_of_id b.binder_bv.ppname)) bs in *)
+      let vs = List.map (fun b -> fresh (Ident.string_of_id b.binder_bv.ppname), b.binder_bv.sort) bs in
 
       let pat_s = MLP_Const (MLC_String (Ident.string_of_lid lid)) in
-      let pat_args = MLP_CTor ((["Prims"], "Nil"), []) in
+      let pat_args = MLP_CTor ((["Prims"], "Nil"), List.map (fun (v, _) -> MLP_Var v) vs) in
       let pat_both = MLP_Tuple [pat_s; pat_args] in
 
-      let ret = mk (MLE_Name (splitlast (Ident.path_of_lid lid))) in
+      let head = ml_name lid in
+      let ret = mk (MLE_App (head, List.map (fun (v, _) -> mk (MLE_Var v)) vs)) in
       let ret = mk (MLE_App (ml_some, [ret])) in
       let br = (pat_both, None, ret) in
 
@@ -94,15 +122,24 @@ let mk_embed (ctors: list sigelt) : mlexpr =
     | Sig_datacon {lid; us; t; ty_lid; num_ty_params; mutuals} ->
       let fv = fresh "fv" in
       let bs, c = U.arrow_formals t in
-      (* let vs = List.map (fun b -> fresh (Ident.string_of_id b.binder_bv.ppname)) bs in *)
-
-      let pat = MLP_CTor (splitlast (Ident.path_of_lid lid), []) in
-      let fvar = mk (MLE_Name (splitlast (Ident.path_of_lid s_fvar_lid))) in
-      let lid_of_str = mk (MLE_Name (splitlast (Ident.path_of_lid lid_of_str_lid))) in
-      let ret = mk (MLE_App (fvar, [
+      let vs = List.map (fun b -> fresh (Ident.string_of_id b.binder_bv.ppname), b.binder_bv.sort) bs in
+      let pat = MLP_CTor (splitlast (Ident.path_of_lid lid), List.map (fun v -> MLP_Var (fst v)) vs) in
+      let fvar = ml_name s_fvar_lid in
+      let lid_of_str = ml_name lid_of_str_lid in
+      let head = mk (MLE_App (fvar, [
                     mk (MLE_App (lid_of_str, [mk (MLE_Const (MLC_String (Ident.string_of_lid lid)))]));
                     ml_none]))
       in
+      let mk_mk_app t ts =
+        mk (MLE_App (ml_name mk_app_lid, [t; as_ml_list ts]))
+      in
+      let args =
+        vs |> List.map (fun (v, ty) ->
+          let vt = mk (MLE_Var v) in
+          mk (MLE_App (ml_name embed_lid, [embedding_for ty; vt]))
+        )
+      in
+      let ret = mk_mk_app head args in
       let br = (pat, None, ret) in
 
       e_branches := br :: !e_branches
