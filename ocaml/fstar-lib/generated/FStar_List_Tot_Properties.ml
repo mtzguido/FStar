@@ -10,9 +10,9 @@ let rev'T : 'uuuuu . unit -> 'uuuuu Prims.list -> 'uuuuu Prims.list =
 let rec sorted : 'a . ('a -> 'a -> Prims.bool) -> 'a Prims.list -> Prims.bool
   =
   fun f ->
-    fun uu___ ->
-      match uu___ with
+    fun l ->
+      match l with
       | [] -> true
-      | uu___1::[] -> true
+      | uu___::[] -> true
       | x::y::tl -> (f x y) && (sorted f (y :: tl))
 type ('a, 'f) total_order = unit
