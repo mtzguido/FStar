@@ -107,23 +107,19 @@ val lemma_equal_refl: #a:Type -> s1:set a -> s2:set a -> Lemma
     (ensures  (equal s1 s2))
     [SMTPat (equal s1 s2)]
 
-let disjoint_not_in_both (a:Type) (s1:set a) (s2:set a) :
+val disjoint_not_in_both (a:Type) (s1:set a) (s2:set a) :
   Lemma
     (requires (disjoint s1 s2))
     (ensures (forall (x:a).{:pattern (mem x s1) \/ (mem x s2)} mem x s1 ==> ~(mem x s2)))
   [SMTPat (disjoint s1 s2)]
-= let f (x:a) : Lemma (~(mem x (intersect s1 s2))) = () in
-  FStar.Classical.forall_intro f
 
 (* Converting lists to sets *)
-#reset-options //restore fuel usage here
 
 let rec as_set' (#a:Type) (l:list a) : set a = 
   match l with
   | [] -> empty
   | hd::tl -> union (singleton hd) (as_set' tl)
 
-let lemma_disjoint_subset (#a:Type) (s1:set a) (s2:set a) (s3:set a)
+val lemma_disjoint_subset (#a:Type) (s1:set a) (s2:set a) (s3:set a)
   : Lemma (requires (disjoint s1 s2 /\ subset s3 s1))
           (ensures  (disjoint s3 s2))
-  = ()
