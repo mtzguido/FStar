@@ -2323,87 +2323,101 @@ let rec check_erased (env:Env.env) (t:term) : isErased =
   (*      | No -> "No"); *)
   r
 
+let find_coercion (env:Env.env) (checked: lcomp) (exp_t: typ) : option (lid & typ & (typ -> comp)) =
+ Errors.with_ctx "find_coercion" (fun () ->
+  let is_t_term      t = U.is_fvar C.term_lid      (N.unfold_whnf env t) in
+  let is_t_term_view t = U.is_fvar C.term_view_lid (N.unfold_whnf env t) in
+  let is_type t =
+      let t = N.unfold_whnf env t in
+      let t = U.unrefine t in (* mostly to catch `prop` too *)
+      match (SS.compress t).n with
+      | Tm_type _ -> true
+      | _ -> false
+  in
+  let in_scope lid = Some? (Env.try_lookup_lid env lid) in
+  let res_typ = U.unrefine checked.res_typ in
+  let head, args = U.head_and_args res_typ in
+  match (U.un_uinst head).n, args with
+  | Tm_fvar fv, [] when S.fv_eq_lid fv C.bool_lid && is_type exp_t ->
+    Some (C.b2t_lid, U.ktype0, S.mk_Total)
+
+  | Tm_fvar fv, [] when S.fv_eq_lid fv C.term_lid && is_t_term_view exp_t ->
+    Some (C.inspect_v1, S.t_term_view, S.mk_Tac)
+
+  | Tm_fvar fv, [] when S.fv_eq_lid fv C.term_view_lid && is_t_term exp_t ->
+    Some (C.pack_v1, S.t_term, S.mk_Tac)
+
+  | Tm_fvar fv, [] when S.fv_eq_lid fv C.binder_lid && is_t_term exp_t ->
+    Some (C.binder_to_term_v1, S.t_term, S.mk_Tac)
+
+  | _ when not env.intactics
+        && in_scope (Ident.lid_of_str "FStar.Tactics.Typeclasses.tcresolve")
+        && in_scope (Ident.lid_of_str "FStar.Tactics.V2.Coercions.coercible") ->
+    begin
+      let tx = UF.new_transaction () in
+      match Errors.catch_errors_and_ignore_rest (fun () ->
+      let goal = S.fvar (Ident.lid_of_str "FStar.Tactics.V2.Coercions.coercible") None in
+      let goal = U.mk_app goal [S.as_arg checked.res_typ; S.as_arg exp_t] in
+      let env', _ = Env.clear_expected_typ env in
+      let goal, _, _ = env.typeof_tot_or_gtot_term {env' with intactics=true} goal true in // elaborate
+      Errors.diag checked.res_typ.pos (BU.format2 "calling for %s and %s" (Print.term_to_string checked.res_typ) (Print.term_to_string exp_t));
+      let r = env.synth_hook env goal (S.fvar (Ident.lid_of_str "FStar.Tactics.Typeclasses.tcresolve") None) in
+      Errors.diag checked.res_typ.pos (BU.format1 "found coercion = %s\n" (Print.term_to_string r));
+      None
+    )
+    with
+    | [], Some r -> UF.commit tx; r
+    | is, _ ->
+      UF.rollback tx;
+      Errors.diag checked.res_typ.pos (BU.format1 "that didn't work; issues = %s\n" (FStar.Common.string_of_list Errors.issue_message is));
+      None
+    end
+
+  | _ -> None
+)
+
 let maybe_coerce_lc env (e:term) (lc:lcomp) (exp_t:term) : term * lcomp * guard_t =
-    let should_coerce =
-        env.phase1
-      || env.lax
-      || Options.lax ()
-    in
-    if not should_coerce
-    then (e, lc, Env.trivial_guard)
-    else
-    let is_t_term t =
-        let t = N.unfold_whnf env t in
-        match (SS.compress t).n with
-        | Tm_fvar fv -> S.fv_eq_lid fv C.term_lid
-        | _ -> false
-    in
-    let is_t_term_view t =
-        let t = N.unfold_whnf env t in
-        match (SS.compress t).n with
-        | Tm_fvar fv -> S.fv_eq_lid fv C.term_view_lid
-        | _ -> false
-    in
-    let is_type t =
-        let t = N.unfold_whnf env t in
-        let t = U.unrefine t in (* mostly to catch `prop` too *)
-        match (SS.compress t).n with
-        | Tm_type _ -> true
-        | _ -> false
-    in
-    let res_typ = U.unrefine lc.res_typ in
-    let head, args = U.head_and_args res_typ in
-    if Env.debug env (Options.Other "Coercions") then
+  let should_coerce =
+      env.phase1
+    || env.lax
+    || Options.lax ()
+  in
+  if not should_coerce
+  then (e, lc, Env.trivial_guard)
+  else
+    let _ = if Env.debug env (Options.Other "Coercions") then
             BU.print4 "(%s) Trying to coerce %s from type (%s) to type (%s)\n"
                     (Range.string_of_range e.pos)
                     (Print.term_to_string e)
-                    (Print.term_to_string res_typ)
-                    (Print.term_to_string exp_t);
-
-    let mk_erased u t =
-      U.mk_app
-        (S.mk_Tm_uinst (fvar_env env C.erased_lid) [u])
-        [S.as_arg t]
+                    (Print.term_to_string lc.res_typ)
+                    (Print.term_to_string exp_t)
     in
-    match (U.un_uinst head).n, args with
-    | Tm_fvar fv, [] when S.fv_eq_lid fv C.bool_lid && is_type exp_t ->
-        let e, lc = coerce_with env e lc U.ktype0 C.b2t_lid [] [] S.mk_Total in
-        e, lc, Env.trivial_guard
+    match find_coercion env lc exp_t with
+    | Some (f, res, mkC) ->
+      let e, lc = coerce_with env e lc res f [] [] mkC in
+      e, lc, Env.trivial_guard // explain
+    | None ->
+      (* TODO: also coercions? it's trickier for sure *)
+      match check_erased env lc.res_typ, check_erased env exp_t with
+      | No, Yes ty ->
+          begin
+          let u = env.universe_of env ty in
+          match Rel.get_subtyping_predicate env lc.res_typ ty with
+          | None ->
+            e, lc, Env.trivial_guard
+          | Some g ->
+            let g = Env.apply_guard g e in
+            let e, lc = coerce_with env e lc exp_t C.hide [u] [S.iarg ty] S.mk_Total in
+            e, lc, g
+          end
 
-
-    | Tm_fvar fv, [] when S.fv_eq_lid fv C.term_lid && is_t_term_view exp_t ->
-        let e, lc = coerce_with env e lc S.t_term_view C.inspect_v1 [] [] S.mk_Tac in
-        e, lc, Env.trivial_guard
-
-    | Tm_fvar fv, [] when S.fv_eq_lid fv C.term_view_lid && is_t_term exp_t ->
-        let e, lc = coerce_with env e lc S.t_term C.pack_v1 [] [] S.mk_Tac in
-        e, lc, Env.trivial_guard
-
-    | Tm_fvar fv, [] when S.fv_eq_lid fv C.binder_lid && is_t_term exp_t ->
-        let e, lc = coerce_with env e lc S.t_term C.binder_to_term_v1 [] [] S.mk_Tac in
-        e, lc, Env.trivial_guard
-
-    | _ ->
-    match check_erased env res_typ, check_erased env exp_t with
-    | No, Yes ty ->
-        begin
-        let u = env.universe_of env ty in
-        match Rel.get_subtyping_predicate env res_typ ty with
-        | None ->
+      | Yes ty, No ->
+          let u = env.universe_of env ty in
+          let e, lc = coerce_with env e lc ty C.reveal [u] [S.iarg ty] S.mk_GTotal in
           e, lc, Env.trivial_guard
-        | Some g ->
-          let g = Env.apply_guard g e in
-          let e, lc = coerce_with env e lc exp_t C.hide [u] [S.iarg ty] S.mk_Total in
-          e, lc, g
-        end
 
-    | Yes ty, No ->
-        let u = env.universe_of env ty in
-        let e, lc = coerce_with env e lc ty C.reveal [u] [S.iarg ty] S.mk_GTotal in
+      | _ ->
         e, lc, Env.trivial_guard
-
-    | _ ->
-      e, lc, Env.trivial_guard
 
 (* Coerces regardless of expected type if a view exists, useful for matches *)
 (* Returns `None` if no coercion was applied. *)
