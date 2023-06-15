@@ -68,7 +68,7 @@ let fstar_tactics_const ns =
 
 
 
-let fstar_tactics_proofstate    = fstar_tactics_const ["Types"; "proofstate"]
+let fstar_tactics_proofstate    = fstar_tactics_const ["Result"; "proofstate"]
 let fstar_tactics_goal          = fstar_tactics_const ["Types"; "goal"]
 
 let fstar_tactics_TacticFailure = fstar_tactics_data  ["Common"; "TacticFailure"]

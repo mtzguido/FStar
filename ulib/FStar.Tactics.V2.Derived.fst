@@ -17,10 +17,10 @@ module FStar.Tactics.V2.Derived
 
 open FStar.Reflection.V2
 open FStar.Reflection.V2.Formula
-open FStar.Tactics.Types
 open FStar.Tactics.Effect
-open FStar.Tactics.V2.Builtins
+open FStar.Tactics.Types
 open FStar.Tactics.Result
+open FStar.Tactics.V2.Builtins
 open FStar.Tactics.Util
 open FStar.Tactics.V2.SyntaxHelpers
 open FStar.VConfig

@@ -19,13 +19,10 @@ open FStar.Compiler.Effect
 open FStar.Syntax.Syntax
 open FStar.TypeChecker.Env
 open FStar.Tactics.Common
+
 module Cfg = FStar.TypeChecker.Cfg
-module N = FStar.TypeChecker.Normalize
 module Range = FStar.Compiler.Range
 module BU = FStar.Compiler.Util
-module O = FStar.Options
-
-module Core = FStar.TypeChecker.Core
 
 (*
    f: x:int -> P
@@ -115,8 +112,6 @@ type direction =
 
 val check_goal_solved' : goal -> option term
 val check_goal_solved  : goal -> bool
-val get_phi            : goal -> option term
-val is_irrelevant      : goal -> bool
 
 type unfold_side =
   | Left

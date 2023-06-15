@@ -17,8 +17,8 @@ module FStar.Tactics.V1.Derived
 
 open FStar.Reflection.V1
 open FStar.Reflection.V1.Formula
-open FStar.Tactics.Types
 open FStar.Tactics.Effect
+open FStar.Tactics.Types
 open FStar.Tactics.Result
 open FStar.Tactics.Util
 open FStar.Tactics.V1.Builtins

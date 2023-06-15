@@ -19,14 +19,13 @@ Every tactic primitive, i.e., those built into the compiler
 *)
 module FStar.Tactics.V1.Builtins
 
-open FStar.Tactics.Effect
+open FStar.VConfig
 open FStar.Reflection.V1.Builtins
 open FStar.Reflection.Types
 open FStar.Reflection.V1.Data
 open FStar.Reflection.Const
+open FStar.Tactics.Effect
 open FStar.Tactics.Types
-open FStar.Tactics.Result
-open FStar.VConfig
 
 include FStar.Tactics.Unseal
 

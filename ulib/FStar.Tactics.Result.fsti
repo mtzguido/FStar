@@ -19,9 +19,7 @@ module FStar.Tactics.Result
 // the compiler.  It lives here so that one doesn't need to adjust their load
 // path to use tactics from ulib.
 
-// This refers to FStar.Tactics.Types.fsti in ulib, which just has an abstract
-// definition of proofstate.
-open FStar.Tactics.Types
+assume new type proofstate
 
 noeq type __result a =
     | Success : v:a -> ps:proofstate -> __result a

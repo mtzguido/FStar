@@ -16,9 +16,9 @@
 module FStar.Tactics.Types
 
 open FStar.Reflection.Types
+open FStar.Tactics.Result
 include FStar.Tactics.Common
 
-assume new type proofstate
 assume new type goal
 
 (* Returns the active goals *)
