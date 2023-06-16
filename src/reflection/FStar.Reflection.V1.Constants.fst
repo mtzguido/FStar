@@ -45,9 +45,9 @@ let refl_constant_lid rc = rc.lid
 let refl_constant_term rc = rc.t
 let fstar_refl_lid s = Ident.lid_of_path (["FStar"; "Reflection"]@s) Range.dummyRange
 
-let fstar_refl_types_lid     s = fstar_refl_lid ["Types";     s]
-let fstar_refl_builtins_lid  s = fstar_refl_lid ["V1"; "Builtins";  s]
-let fstar_refl_data_lid      s = fstar_refl_lid ["V1"; "Data";      s]
+let fstar_refl_types_lid     s = fstar_refl_lid ["Stubs"; "Types";     s]
+let fstar_refl_builtins_lid  s = fstar_refl_lid ["V1"; "Stubs"; "Builtins";  s]
+let fstar_refl_data_lid      s = fstar_refl_lid ["V1"; "Stubs"; "Data";      s]
 
 let fstar_refl_data_const s =
     let lid = fstar_refl_data_lid s in

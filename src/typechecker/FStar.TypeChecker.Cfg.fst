@@ -1,25 +1,26 @@
 module FStar.TypeChecker.Cfg
+
+open FStar
+open FStar.Char
+open FStar.Compiler
 open FStar.Compiler.Effect
 open FStar.Compiler.List
-open FStar
-open FStar.Compiler
-open FStar.String
+open FStar.Compiler.String
 open FStar.Const
-open FStar.Char
 open FStar.Syntax
 open FStar.Syntax.Syntax
 open FStar.TypeChecker
 open FStar.TypeChecker.Env
 
-module S  = FStar.Syntax.Syntax
-module SS = FStar.Syntax.Subst
-module BU = FStar.Compiler.Util
-module FC = FStar.Const
-module PC = FStar.Parser.Const
-module U  = FStar.Syntax.Util
-module I  = FStar.Ident
+module S   = FStar.Syntax.Syntax
+module SS  = FStar.Syntax.Subst
+module BU  = FStar.Compiler.Util
+module FC  = FStar.Const
+module PC  = FStar.Parser.Const
+module U   = FStar.Syntax.Util
+module I   = FStar.Ident
 module EMB = FStar.Syntax.Embeddings
-module Z = FStar.BigInt
+module Z   = FStar.BigInt
 module NBE = FStar.TypeChecker.NBETerm
 
 friend FStar.Pervasives (* to expose norm_step *)
@@ -690,12 +691,12 @@ let built_in_primitive_steps : prim_step_set =
                    (fun (x:arg) -> arg_as_int x <: option Z.t)
                    (fun (x:arg) -> arg_as_char x <: option char)
                    (fun (r:Range.range) (s:string) -> embed_simple EMB.e_string r s)
-                   (fun (r:Range.range) _us (x:BigInt.t) (y:char) -> Some (FStar.String.make (BigInt.to_int_fs x) y)),
+                   (fun (r:Range.range) _us (x:BigInt.t) (y:char) -> Some (String.make (BigInt.to_int_fs x) y)),
              NBETerm.mixed_binary_op
                    NBETerm.arg_as_int
                    NBETerm.arg_as_char
                    (NBETerm.embed NBETerm.e_string bogus_cbs)
-                   (fun _us (x:BigInt.t) (y:char) -> Some (FStar.String.make (BigInt.to_int_fs x) y)));
+                   (fun _us (x:BigInt.t) (y:char) -> Some (String.make (BigInt.to_int_fs x) y)));
          (PC.string_split_lid,
              2,
              0,

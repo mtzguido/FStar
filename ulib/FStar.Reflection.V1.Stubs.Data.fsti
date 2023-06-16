@@ -13,15 +13,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 *)
-module FStar.Reflection.V1.Data
+module FStar.Reflection.V1.Stubs.Data
 
 (* What's this!? Well, the compiler now works fully with V2, so whenever
 we need to reason/extract a term, we need things like V2.Tv_App and V2.pack_ln
 in scope. So, force them into scope here. *)
-module X = FStar.Reflection.V2.Data
-module X = FStar.Reflection.V2.Builtins
+module X = FStar.Reflection.V2.Stubs.Data
+module X = FStar.Reflection.V2.Stubs.Builtins
 
-open FStar.Reflection.Types
+open FStar.Reflection.Stubs.Types
 
 (* V1 does not really use the primitive ident type, but this
 explicit pair of string & range *)

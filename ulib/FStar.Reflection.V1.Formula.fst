@@ -17,12 +17,12 @@ module FStar.Reflection.V1.Formula
 
 open FStar.List.Tot.Base
 open FStar.Tactics.Effect
-open FStar.Tactics.V1.Builtins
-open FStar.Reflection.Types
+open FStar.Tactics.V1.Stubs.Builtins
+open FStar.Reflection.Stubs.Types
 open FStar.Reflection.Const
-open FStar.Reflection.V1.Builtins
+open FStar.Reflection.V1.Stubs.Builtins
 open FStar.Reflection.V1.Derived
-open FStar.Reflection.V1.Data
+open FStar.Reflection.V1.Stubs.Data
 
 ///// Cannot open FStar.Tactics.Derived here /////
 private let bv_to_string (bv : bv) : Tac string =

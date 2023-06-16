@@ -68,39 +68,39 @@ let fstar_tactics_const ns =
 
 
 
-let fstar_tactics_proofstate    = fstar_tactics_const ["Result"; "proofstate"]
-let fstar_tactics_goal          = fstar_tactics_const ["Types"; "goal"]
+let fstar_tactics_proofstate    = fstar_tactics_const ["Stubs"; "Types"; "proofstate"]
+let fstar_tactics_goal          = fstar_tactics_const ["Stubs"; "Types"; "goal"]
 
-let fstar_tactics_TacticFailure = fstar_tactics_data  ["Common"; "TacticFailure"]
+let fstar_tactics_TacticFailure = fstar_tactics_data  ["Stubs"; "Common"; "TacticFailure"]
 
-let fstar_tactics_result        = fstar_tactics_const ["Types"; "result"]
-let fstar_tactics_Success       = fstar_tactics_data  ["Result"; "Success"]
-let fstar_tactics_Failed        = fstar_tactics_data  ["Result"; "Failed"]
+let fstar_tactics_result        = fstar_tactics_const ["Stubs"; "Result"; "__result"]
+let fstar_tactics_Success       = fstar_tactics_data  ["Stubs"; "Result"; "Success"]
+let fstar_tactics_Failed        = fstar_tactics_data  ["Stubs"; "Result"; "Failed"]
 
-let fstar_tactics_direction     = fstar_tactics_const ["Types"; "direction"]
-let fstar_tactics_topdown       = fstar_tactics_data  ["Types"; "TopDown"]
-let fstar_tactics_bottomup      = fstar_tactics_data  ["Types"; "BottomUp"]
+let fstar_tactics_direction     = fstar_tactics_const ["Stubs"; "Types"; "direction"]
+let fstar_tactics_topdown       = fstar_tactics_data  ["Stubs"; "Types"; "TopDown"]
+let fstar_tactics_bottomup      = fstar_tactics_data  ["Stubs"; "Types"; "BottomUp"]
 
-let fstar_tactics_ctrl_flag     = fstar_tactics_const ["Types"; "ctrl_flag"]
-let fstar_tactics_Continue      = fstar_tactics_data  ["Types"; "Continue"]
-let fstar_tactics_Skip          = fstar_tactics_data  ["Types"; "Skip"]
-let fstar_tactics_Abort         = fstar_tactics_data  ["Types"; "Abort"]
+let fstar_tactics_ctrl_flag     = fstar_tactics_const ["Stubs"; "Types"; "ctrl_flag"]
+let fstar_tactics_Continue      = fstar_tactics_data  ["Stubs"; "Types"; "Continue"]
+let fstar_tactics_Skip          = fstar_tactics_data  ["Stubs"; "Types"; "Skip"]
+let fstar_tactics_Abort         = fstar_tactics_data  ["Stubs"; "Types"; "Abort"]
 
-let fstar_tactics_unfold_side         = fstar_tactics_const ["Types"; "unfold_side"]
-let fstar_tactics_unfold_side_Left    = fstar_tactics_data  ["Types"; "Left"]
-let fstar_tactics_unfold_side_Right   = fstar_tactics_data  ["Types"; "Right"]
-let fstar_tactics_unfold_side_Both    = fstar_tactics_data  ["Types"; "Both"]
-let fstar_tactics_unfold_side_Neither = fstar_tactics_data  ["Types"; "Neither"]
+let fstar_tactics_unfold_side         = fstar_tactics_const ["Stubs"; "Types"; "unfold_side"]
+let fstar_tactics_unfold_side_Left    = fstar_tactics_data  ["Stubs"; "Types"; "Left"]
+let fstar_tactics_unfold_side_Right   = fstar_tactics_data  ["Stubs"; "Types"; "Right"]
+let fstar_tactics_unfold_side_Both    = fstar_tactics_data  ["Stubs"; "Types"; "Both"]
+let fstar_tactics_unfold_side_Neither = fstar_tactics_data  ["Stubs"; "Types"; "Neither"]
 
-let fstar_tactics_tot_or_ghost        = fstar_tactics_const ["Types"; "tot_or_ghost"]
-let fstar_tactics_tot_or_ghost_ETotal = fstar_tactics_data ["Types"; "E_Total"]
-let fstar_tactics_tot_or_ghost_EGhost = fstar_tactics_data ["Types"; "E_Ghost"]
+let fstar_tactics_tot_or_ghost        = fstar_tactics_const ["Stubs"; "Types"; "tot_or_ghost"]
+let fstar_tactics_tot_or_ghost_ETotal = fstar_tactics_data ["Stubs"; "Types"; "E_Total"]
+let fstar_tactics_tot_or_ghost_EGhost = fstar_tactics_data ["Stubs"; "Types"; "E_Ghost"]
 
-let fstar_tactics_guard_policy  = fstar_tactics_const ["Types"; "guard_policy"]
-let fstar_tactics_SMT           = fstar_tactics_data  ["Types"; "SMT"]
-let fstar_tactics_Goal          = fstar_tactics_data  ["Types"; "Goal"]
-let fstar_tactics_Drop          = fstar_tactics_data  ["Types"; "Drop"]
-let fstar_tactics_Force         = fstar_tactics_data  ["Types"; "Force"]
+let fstar_tactics_guard_policy  = fstar_tactics_const ["Stubs"; "Types"; "guard_policy"]
+let fstar_tactics_SMT           = fstar_tactics_data  ["Stubs"; "Types"; "SMT"]
+let fstar_tactics_Goal          = fstar_tactics_data  ["Stubs"; "Types"; "Goal"]
+let fstar_tactics_Drop          = fstar_tactics_data  ["Stubs"; "Types"; "Drop"]
+let fstar_tactics_Force         = fstar_tactics_data  ["Stubs"; "Types"; "Force"]
 
 
 let mk_emb (em: Range.range -> 'a -> term)

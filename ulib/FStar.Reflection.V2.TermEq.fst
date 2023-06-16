@@ -1,8 +1,8 @@
 module FStar.Reflection.V2.TermEq
 
-open FStar.Reflection.Types
-open FStar.Reflection.V2.Data
-open FStar.Reflection.V2.Builtins
+open FStar.Reflection.Stubs.Types
+open FStar.Reflection.V2.Stubs.Data
+open FStar.Reflection.V2.Stubs.Builtins
 module L = FStar.List.Tot
 
 

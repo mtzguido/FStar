@@ -1,5 +1,5 @@
-module FStar.Syntax.Syntax
-open FStar.Reflection.Types
+module FStar.Stubs.Syntax.Syntax
+open FStar.Reflection.Stubs.Types
 
 noeq
 type subst_elt =

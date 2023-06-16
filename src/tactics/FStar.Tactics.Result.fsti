@@ -29,8 +29,6 @@ each other. *)
 // interface that hides those definitions).
 open FStar.Tactics.Types
 
-let proofstate = Types.proofstate
-
 type __result 'a =
     | Success of 'a * proofstate
     | Failed  of exn       //error

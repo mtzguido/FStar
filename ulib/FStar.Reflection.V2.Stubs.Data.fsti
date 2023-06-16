@@ -13,10 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 *)
-module FStar.Reflection.V2.Data
+module FStar.Reflection.V2.Stubs.Data
 
-include FStar.Syntax.Syntax
-open FStar.Reflection.Types
+include FStar.Stubs.Syntax.Syntax
+open FStar.Reflection.Stubs.Types
 
 (* The type of a string observable only with a tactic.
    All values of type ppname_t are provably equal *)

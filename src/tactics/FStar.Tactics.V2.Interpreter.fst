@@ -81,15 +81,15 @@ let native_tactics_steps () =
  * are in other modules: *)
 let mk_total_step_1' uarity nm f ea er nf ena enr =
   { mk_total_step_1  uarity nm f ea er nf ena enr
-    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Types." ^ nm) }
+    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Stubs.Types." ^ nm) }
 
 let mk_total_step_1'_psc uarity nm f ea er nf ena enr =
   { mk_total_step_1_psc  uarity nm f ea er nf ena enr
-    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Types." ^ nm) }
+    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Stubs.Types." ^ nm) }
 
 let mk_total_step_2' uarity nm f ea eb er nf ena enb enr =
   { mk_total_step_2  uarity nm f ea eb er nf ena enb enr
-    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Types." ^ nm) }
+    with Cfg.name = Ident.lid_of_str ("FStar.Tactics.Stubs.Types." ^ nm) }
 
 (* This reference keeps all of the tactic primitives. *)
 let __primitive_steps_ref : ref (list Cfg.primitive_step) =

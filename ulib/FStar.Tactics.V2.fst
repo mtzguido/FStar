@@ -17,13 +17,13 @@ module FStar.Tactics.V2
 
 (* REVISIT THIS LIST! *)
 
-include FStar.Reflection.Types
+include FStar.Reflection.Stubs.Types
 include FStar.Reflection.V2
 include FStar.Reflection.V2.Formula
 
-include FStar.Tactics.Types
+include FStar.Tactics.Stubs.Types
 include FStar.Tactics.Effect
-include FStar.Tactics.V2.Builtins
+include FStar.Tactics.V2.Stubs.Builtins
 include FStar.Tactics.V2.Derived
 include FStar.Tactics.V2.SyntaxHelpers
 include FStar.Tactics.V2.Logic

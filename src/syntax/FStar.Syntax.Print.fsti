@@ -14,11 +14,13 @@ See the License for the specific language governing permissions and
    limitations under the License.
 *)
 module FStar.Syntax.Print
+
 open FStar.Compiler.Effect
-open FStar.Syntax.Syntax
-open FStar.Ident
-open FStar.Const
 open FStar.Compiler.Util
+open FStar.Const
+open FStar.Ident
+open FStar.Syntax.Syntax
+(* open FStar.Class.Printable *)
 
 module DsEnv = FStar.Syntax.DsEnv
 module Json = FStar.Json
@@ -79,3 +81,6 @@ val ctx_uvar_to_string_no_reason    : ctx_uvar -> string
 val emb_typ_to_string: emb_typ -> string
 
 val fv_qual_to_string : fv_qual -> string
+
+(* instance _ : printable sigelt = { to_string = sigelt_to_string; } *)
+(* instance _ : printable term = { to_string = term_to_string; } *)

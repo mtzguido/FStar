@@ -15,9 +15,9 @@
 *)
 module FStar.Reflection.V2
 
-include FStar.Reflection.Types
-include FStar.Reflection.V2.Data
-include FStar.Reflection.V2.Builtins
+include FStar.Reflection.Stubs.Types
+include FStar.Reflection.V2.Stubs.Data
+include FStar.Reflection.V2.Stubs.Builtins
 include FStar.Reflection.V2.Derived
 include FStar.Reflection.V2.Derived.Lemmas
 include FStar.Reflection.Const

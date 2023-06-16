@@ -13,13 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 *)
-module FStar.Tactics.Types
+module FStar.Tactics.Stubs.Types
 
-open FStar.Reflection.Types
-open FStar.Tactics.Result
-include FStar.Tactics.Common
+open FStar.Reflection.Stubs.Types
+include FStar.Tactics.Stubs.Common
 
 assume new type goal
+assume new type proofstate
 
 (* Returns the active goals *)
 val goals_of     : proofstate -> list goal

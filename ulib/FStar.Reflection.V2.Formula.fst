@@ -17,15 +17,15 @@ module FStar.Reflection.V2.Formula
 
 open FStar.List.Tot.Base
 
-open FStar.Reflection.Types
+open FStar.Reflection.Stubs.Types
 open FStar.Reflection.Const
-open FStar.Reflection.V2.Builtins
+open FStar.Reflection.V2.Stubs.Builtins
 open FStar.Reflection.V2.Derived
-open FStar.Reflection.V2.Data
+open FStar.Reflection.V2.Stubs.Data
 
-open FStar.Tactics.Common
+open FStar.Tactics.Stubs.Common
 open FStar.Tactics.Effect
-open FStar.Tactics.V2.Builtins
+open FStar.Tactics.V2.Stubs.Builtins
 open FStar.Tactics.NamedView
 
 ///// Helpers (we cannot use the ones in Tactics.V2.Derived, those are for named views /////

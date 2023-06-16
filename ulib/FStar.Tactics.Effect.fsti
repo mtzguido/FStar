@@ -17,9 +17,9 @@ module FStar.Tactics.Effect
 
 open FStar.Monotonic.Pure
 
-open FStar.Reflection.Types
-open FStar.Tactics.Types
-open FStar.Tactics.Result
+open FStar.Reflection.Stubs.Types
+open FStar.Tactics.Stubs.Types
+open FStar.Tactics.Stubs.Result
 
 (* This module is extracted, don't add any `assume val`s or extraction
  * will break. (`synth_by_tactic` is fine) *)

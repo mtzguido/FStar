@@ -1,4 +1,4 @@
-module FStar.Tactics.Common
+module FStar.Tactics.Stubs.Common
 
 (* This module is realized by FStar.Tactics.Common in the F* sources.
 Any change must be reflected there. *)

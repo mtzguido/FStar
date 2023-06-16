@@ -261,7 +261,9 @@ let lookup_record_field_name g (type_name, fn) =
     let key = Ident.lid_of_ids (ids_of_lid type_name @ [fn]) in
     match BU.psmap_try_find g.mlpath_of_fieldname (string_of_lid key) with
     | None -> failwith ("Field name not found: " ^ string_of_lid key)
-    | Some mlp -> mlp
+    | Some mlp -> 
+      let ns, id = mlp in
+      List.filter (fun s -> s <> "Stubs") ns, id
 
 (**** Naming conventions and freshness (internal) *)
 
@@ -362,7 +364,9 @@ let find_uniq ml_ident_map root_name is_local_type_variable =
 
 (** The ML namespace corresponding to an F* qualified name
     is just all the identifiers in the F* namespace (as strings) *)
-let mlns_of_lid (x:lident) = List.map string_of_id (ns_of_lid x)
+let mlns_of_lid (x:lident) =
+  List.map string_of_id (ns_of_lid x) |> List.filter (fun s -> s <> "Stubs")
+
 
 (**** Extending context with identifiers *)
 

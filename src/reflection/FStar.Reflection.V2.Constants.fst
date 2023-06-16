@@ -48,9 +48,9 @@ let fstar_syntax_syntax_lid s = Ident.lid_of_path (["FStar"; "Syntax"; "Syntax"]
 
 let fstar_refl_lid s = Ident.lid_of_path (["FStar"; "Reflection"]@s) Range.dummyRange
 
-let fstar_refl_types_lid     s = fstar_refl_lid ["Types";     s]
-let fstar_refl_builtins_lid  s = fstar_refl_lid ["V2"; "Builtins";  s]
-let fstar_refl_data_lid      s = fstar_refl_lid ["V2"; "Data";      s]
+let fstar_refl_types_lid     s = fstar_refl_lid ["Stubs"; "Types";     s]
+let fstar_refl_builtins_lid  s = fstar_refl_lid ["V2"; "Stubs"; "Builtins";  s]
+let fstar_refl_data_lid      s = fstar_refl_lid ["V2"; "Stubs"; "Data";      s]
 
 let fstar_syntax_syntax_const s =
     let lid = fstar_syntax_syntax_lid s in

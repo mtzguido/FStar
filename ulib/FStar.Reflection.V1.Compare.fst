@@ -15,9 +15,9 @@
 *)
 module FStar.Reflection.V1.Compare
 
-open FStar.Reflection.Types
-open FStar.Reflection.V1.Data
-open FStar.Reflection.V1.Builtins
+open FStar.Reflection.Stubs.Types
+open FStar.Reflection.V1.Stubs.Data
+open FStar.Reflection.V1.Stubs.Builtins
 open FStar.Reflection.V1.Derived
 open FStar.Order
 

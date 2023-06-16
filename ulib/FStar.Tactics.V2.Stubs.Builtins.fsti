@@ -17,16 +17,16 @@
 Every tactic primitive, i.e., those built into the compiler
 @summary Tactic primitives
 *)
-module FStar.Tactics.V2.Builtins
+module FStar.Tactics.V2.Stubs.Builtins
 
 open FStar.VConfig
-open FStar.Reflection.Types
+open FStar.Reflection.Stubs.Types
 open FStar.Reflection.Const
-open FStar.Reflection.V2.Data
-open FStar.Reflection.V2.Builtins
+open FStar.Reflection.V2.Stubs.Data
+open FStar.Reflection.V2.Stubs.Builtins
 open FStar.Tactics.Effect
 open FStar.Tactics.Effect
-open FStar.Tactics.Types
+open FStar.Tactics.Stubs.Types
 
 include FStar.Tactics.Unseal
 

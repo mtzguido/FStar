@@ -14,15 +14,16 @@
    limitations under the License.
 *)
 module FStar.Options
-open FStar.Compiler
-open FStar.Compiler.List
-open FStar.Pervasives
-open FStar.String
-open FStar.Compiler.Effect
+
 open FStar
+open FStar.BaseTypes
+open FStar.Compiler
+open FStar.Compiler.Effect
+open FStar.Compiler.List
+open FStar.Compiler.String
 open FStar.Compiler.Util
 open FStar.Getopt
-open FStar.BaseTypes
+open FStar.Pervasives
 open FStar.VConfig
 
 module Option = FStar.Compiler.Option

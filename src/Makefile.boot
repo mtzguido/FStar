@@ -37,7 +37,7 @@ EXTRACT_NAMESPACES=FStar.Extraction FStar.Parser		\
 # from src/basic are *not* extracted?
 EXTRACT_MODULES=FStar.Pervasives FStar.Common FStar.Thunk		\
 		FStar.VConfig FStar.Options FStar.Ident FStar.Errors FStar.Errors.Codes FStar.Const	\
-		FStar.Order FStar.Dependencies		\
+		FStar.Compiler.Order FStar.Order FStar.Dependencies		\
 		FStar.Interactive.CompletionTable			\
 		FStar.Interactive.JsonHelper FStar.Interactive.QueryHelper \
 		FStar.Interactive.PushHelper FStar.Interactive.Lsp	\
@@ -64,7 +64,7 @@ EXTRACT = $(addprefix --extract_module , $(EXTRACT_MODULES))		\
 %.checked.lax:
 	$(call msg, "LAXCHECK", $(basename $(basename $(notdir $@))))
 	$(Q)$(BENCHMARK_PRE) $(FSTAR_C) --already_cached '*,'-$(basename $(notdir $<)) \
-		$(if $(findstring Stubs,$<),,--MLish) \
+		$(if $(findstring /ulib/,$<),,--MLish) \
 		$<
 	$(Q)@touch -c $@
 

@@ -13,12 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 *)
-module FStar.Reflection.V1
+module FStar.Tactics.Builtins
 
-include FStar.Reflection.Stubs.Types
-include FStar.Reflection.V1.Stubs.Data
-include FStar.Reflection.V1.Stubs.Builtins
-include FStar.Reflection.V1.Derived
-include FStar.Reflection.V1.Derived.Lemmas
-include FStar.Reflection.Const
-include FStar.Reflection.V1.Compare
+(* This module is a temporary for Meta-F* migration *)
+include FStar.Tactics.V1.Stubs.Builtins
