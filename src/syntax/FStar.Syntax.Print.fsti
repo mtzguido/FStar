@@ -20,7 +20,7 @@ open FStar.Compiler.Util
 open FStar.Const
 open FStar.Ident
 open FStar.Syntax.Syntax
-(* open FStar.Class.Printable *)
+open FStar.Compiler.Show
 
 module DsEnv = FStar.Syntax.DsEnv
 module Json = FStar.Json
@@ -82,5 +82,7 @@ val emb_typ_to_string: emb_typ -> string
 
 val fv_qual_to_string : fv_qual -> string
 
-(* instance _ : printable sigelt = { to_string = sigelt_to_string; } *)
-(* instance _ : printable term = { to_string = term_to_string; } *)
+[@@FStar.Tactics.Typeclasses.tcinstance]
+val showable_term : showable term
+[@@FStar.Tactics.Typeclasses.tcinstance]
+val showable_sigelt : showable sigelt

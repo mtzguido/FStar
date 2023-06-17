@@ -930,3 +930,6 @@ let fv_qual_to_string fvq =
   | Record_ctor _ -> "Record_ctor _"
   | Unresolved_projector _ -> "Unresolved_projector _"
   | Unresolved_constructor _ -> "Unresolved_constructor _"
+
+instance showable_sigelt : showable sigelt = { show = sigelt_to_string; }
+instance showable_term : showable term = { show = term_to_string; }
