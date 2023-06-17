@@ -9,7 +9,8 @@ let subst_to_string :
               match uu___1 with
               | (b, uu___2) ->
                   FStar_Ident.string_of_id b.FStar_Syntax_Syntax.ppname)) in
-    FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat ", ")
+    FStar_Compiler_Effect.op_Bar_Greater uu___
+      (FStar_Compiler_String.concat ", ")
 let rec apply_until_some :
   'uuuuu 'uuuuu1 .
     ('uuuuu -> 'uuuuu1 FStar_Pervasives_Native.option) ->
@@ -759,7 +760,8 @@ let rec (push_subst_aux :
           FStar_Syntax_Syntax.mk t' uu___ in
         match t.FStar_Syntax_Syntax.n with
         | FStar_Syntax_Syntax.Tm_delayed uu___ ->
-            failwith "Impossible (delayed node in push_subst)"
+            FStar_Compiler_Effect.failwith
+              "Impossible (delayed node in push_subst)"
         | FStar_Syntax_Syntax.Tm_lazy i ->
             (match i.FStar_Syntax_Syntax.lkind with
              | FStar_Syntax_Syntax.Lazy_embedding uu___ ->
@@ -1712,7 +1714,7 @@ let (open_term_1 :
       let uu___ = open_term [b] t in
       match uu___ with
       | (b1::[], t1) -> (b1, t1)
-      | uu___1 -> failwith "impossible: open_term_1"
+      | uu___1 -> FStar_Compiler_Effect.failwith "impossible: open_term_1"
 let (open_term_bvs :
   FStar_Syntax_Syntax.bv Prims.list ->
     FStar_Syntax_Syntax.term ->
@@ -1740,4 +1742,4 @@ let (open_term_bv :
       let uu___ = open_term_bvs [bv] t in
       match uu___ with
       | (bv1::[], t1) -> (bv1, t1)
-      | uu___1 -> failwith "impossible: open_term_bv"
+      | uu___1 -> FStar_Compiler_Effect.failwith "impossible: open_term_bv"

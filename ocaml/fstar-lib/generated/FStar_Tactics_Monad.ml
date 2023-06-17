@@ -283,7 +283,7 @@ let fail : 'a . Prims.string -> 'a tac =
           if uu___1
           then
             FStar_Tactics_Printing.do_dump_proofstate ps
-              (Prims.op_Hat "TACTIC FAILING: " msg)
+              (Prims.strcat "TACTIC FAILING: " msg)
           else ());
          FStar_Tactics_Result.Failed
            ((FStar_Tactics_Common.TacticFailure msg), ps))
@@ -882,7 +882,7 @@ let wrap_err : 'a . Prims.string -> 'a tac -> 'a tac =
                (FStar_Tactics_Common.TacticFailure msg, q) ->
                FStar_Tactics_Result.Failed
                  ((FStar_Tactics_Common.TacticFailure
-                     (Prims.op_Hat pref (Prims.op_Hat ": " msg))), q)
+                     (Prims.strcat pref (Prims.strcat ": " msg))), q)
            | FStar_Tactics_Result.Failed (e, q) ->
                FStar_Tactics_Result.Failed (e, q))
 let mlog : 'a . (unit -> unit) -> (unit -> 'a tac) -> 'a tac =

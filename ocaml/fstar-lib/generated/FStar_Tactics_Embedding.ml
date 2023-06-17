@@ -39,56 +39,57 @@ let (fstar_tactics_const : Prims.string Prims.list -> tac_constant) =
     let uu___1 = FStar_Syntax_Syntax.tconst lid in
     { lid; fv = uu___; t = uu___1 }
 let (fstar_tactics_proofstate : tac_constant) =
-  fstar_tactics_const ["Types"; "proofstate"]
+  fstar_tactics_const ["Stubs"; "Types"; "proofstate"]
 let (fstar_tactics_goal : tac_constant) =
-  fstar_tactics_const ["Types"; "goal"]
+  fstar_tactics_const ["Stubs"; "Types"; "goal"]
 let (fstar_tactics_TacticFailure : tac_constant) =
-  fstar_tactics_data ["Common"; "TacticFailure"]
+  fstar_tactics_data ["Stubs"; "Common"; "TacticFailure"]
 let (fstar_tactics_result : tac_constant) =
-  fstar_tactics_const ["Types"; "result"]
+  fstar_tactics_const ["Stubs"; "Result"; "__result"]
 let (fstar_tactics_Success : tac_constant) =
-  fstar_tactics_data ["Result"; "Success"]
+  fstar_tactics_data ["Stubs"; "Result"; "Success"]
 let (fstar_tactics_Failed : tac_constant) =
-  fstar_tactics_data ["Result"; "Failed"]
+  fstar_tactics_data ["Stubs"; "Result"; "Failed"]
 let (fstar_tactics_direction : tac_constant) =
-  fstar_tactics_const ["Types"; "direction"]
+  fstar_tactics_const ["Stubs"; "Types"; "direction"]
 let (fstar_tactics_topdown : tac_constant) =
-  fstar_tactics_data ["Types"; "TopDown"]
+  fstar_tactics_data ["Stubs"; "Types"; "TopDown"]
 let (fstar_tactics_bottomup : tac_constant) =
-  fstar_tactics_data ["Types"; "BottomUp"]
+  fstar_tactics_data ["Stubs"; "Types"; "BottomUp"]
 let (fstar_tactics_ctrl_flag : tac_constant) =
-  fstar_tactics_const ["Types"; "ctrl_flag"]
+  fstar_tactics_const ["Stubs"; "Types"; "ctrl_flag"]
 let (fstar_tactics_Continue : tac_constant) =
-  fstar_tactics_data ["Types"; "Continue"]
+  fstar_tactics_data ["Stubs"; "Types"; "Continue"]
 let (fstar_tactics_Skip : tac_constant) =
-  fstar_tactics_data ["Types"; "Skip"]
+  fstar_tactics_data ["Stubs"; "Types"; "Skip"]
 let (fstar_tactics_Abort : tac_constant) =
-  fstar_tactics_data ["Types"; "Abort"]
+  fstar_tactics_data ["Stubs"; "Types"; "Abort"]
 let (fstar_tactics_unfold_side : tac_constant) =
-  fstar_tactics_const ["Types"; "unfold_side"]
+  fstar_tactics_const ["Stubs"; "Types"; "unfold_side"]
 let (fstar_tactics_unfold_side_Left : tac_constant) =
-  fstar_tactics_data ["Types"; "Left"]
+  fstar_tactics_data ["Stubs"; "Types"; "Left"]
 let (fstar_tactics_unfold_side_Right : tac_constant) =
-  fstar_tactics_data ["Types"; "Right"]
+  fstar_tactics_data ["Stubs"; "Types"; "Right"]
 let (fstar_tactics_unfold_side_Both : tac_constant) =
-  fstar_tactics_data ["Types"; "Both"]
+  fstar_tactics_data ["Stubs"; "Types"; "Both"]
 let (fstar_tactics_unfold_side_Neither : tac_constant) =
-  fstar_tactics_data ["Types"; "Neither"]
+  fstar_tactics_data ["Stubs"; "Types"; "Neither"]
 let (fstar_tactics_tot_or_ghost : tac_constant) =
-  fstar_tactics_const ["Types"; "tot_or_ghost"]
+  fstar_tactics_const ["Stubs"; "Types"; "tot_or_ghost"]
 let (fstar_tactics_tot_or_ghost_ETotal : tac_constant) =
-  fstar_tactics_data ["Types"; "E_Total"]
+  fstar_tactics_data ["Stubs"; "Types"; "E_Total"]
 let (fstar_tactics_tot_or_ghost_EGhost : tac_constant) =
-  fstar_tactics_data ["Types"; "E_Ghost"]
+  fstar_tactics_data ["Stubs"; "Types"; "E_Ghost"]
 let (fstar_tactics_guard_policy : tac_constant) =
-  fstar_tactics_const ["Types"; "guard_policy"]
-let (fstar_tactics_SMT : tac_constant) = fstar_tactics_data ["Types"; "SMT"]
+  fstar_tactics_const ["Stubs"; "Types"; "guard_policy"]
+let (fstar_tactics_SMT : tac_constant) =
+  fstar_tactics_data ["Stubs"; "Types"; "SMT"]
 let (fstar_tactics_Goal : tac_constant) =
-  fstar_tactics_data ["Types"; "Goal"]
+  fstar_tactics_data ["Stubs"; "Types"; "Goal"]
 let (fstar_tactics_Drop : tac_constant) =
-  fstar_tactics_data ["Types"; "Drop"]
+  fstar_tactics_data ["Stubs"; "Types"; "Drop"]
 let (fstar_tactics_Force : tac_constant) =
-  fstar_tactics_data ["Types"; "Force"]
+  fstar_tactics_data ["Stubs"; "Types"; "Force"]
 let mk_emb :
   'a .
     (FStar_Compiler_Range_Type.range -> 'a -> FStar_Syntax_Syntax.term) ->
@@ -324,7 +325,7 @@ let (e_exn : Prims.exn FStar_Syntax_Embeddings_Base.embedding) =
     | e1 ->
         let s =
           let uu___2 = FStar_Compiler_Util.message_of_exn e1 in
-          Prims.op_Hat "uncaught exception: " uu___2 in
+          Prims.strcat "uncaught exception: " uu___2 in
         let uu___2 =
           let uu___3 =
             let uu___4 = embed FStar_Syntax_Embeddings.e_string rng s in
@@ -368,7 +369,7 @@ let (e_exn_nbe : Prims.exn FStar_TypeChecker_NBETerm.embedding) =
         let uu___1 =
           let uu___2 = FStar_Compiler_Util.message_of_exn e in
           FStar_Compiler_Util.format1 "cannot embed exn (NBE) : %s" uu___2 in
-        failwith uu___1 in
+        FStar_Compiler_Effect.failwith uu___1 in
   let unembed_exn cb t =
     let uu___ = FStar_TypeChecker_NBETerm.nbe_t_of_t t in
     match uu___ with

@@ -2106,13 +2106,13 @@ let (order_ident : FStar_Ident.ident -> FStar_Ident.ident -> Prims.int) =
     fun y ->
       let uu___ = FStar_Ident.string_of_id x in
       let uu___1 = FStar_Ident.string_of_id y in
-      FStar_String.compare uu___ uu___1
+      FStar_Compiler_String.compare uu___ uu___1
 let (order_fv : FStar_Ident.lident -> FStar_Ident.lident -> Prims.int) =
   fun x ->
     fun y ->
       let uu___ = FStar_Ident.string_of_lid x in
       let uu___1 = FStar_Ident.string_of_lid y in
-      FStar_String.compare uu___ uu___1
+      FStar_Compiler_String.compare uu___ uu___1
 let (range_of_lbname : lbname -> FStar_Compiler_Range_Type.range) =
   fun l ->
     match l with
@@ -2146,7 +2146,8 @@ let (lookup_aq : bv -> antiquotations -> term) =
                       - Prims.int_one)
                      - bv1.index)
                     + (FStar_Pervasives_Native.fst aq))) ()
-      with | uu___ -> failwith "antiquotation out of bounds"
+      with
+      | uu___ -> FStar_Compiler_Effect.failwith "antiquotation out of bounds"
 let syn :
   'uuuuu 'uuuuu1 'uuuuu2 .
     'uuuuu -> 'uuuuu1 -> ('uuuuu1 -> 'uuuuu -> 'uuuuu2) -> 'uuuuu2
@@ -2170,7 +2171,7 @@ let (order_univ_name : univ_name -> univ_name -> Prims.int) =
     fun y ->
       let uu___ = FStar_Ident.string_of_id x in
       let uu___1 = FStar_Ident.string_of_id y in
-      FStar_String.compare uu___ uu___1
+      FStar_Compiler_String.compare uu___ uu___1
 let (new_universe_names_set : unit -> univ_name FStar_Compiler_Util.set) =
   fun uu___ -> FStar_Compiler_Util.new_set order_univ_name
 let (eq_binding : binding -> binding -> Prims.bool) =
@@ -2220,7 +2221,8 @@ let (mk_Tm_uinst : term -> universes -> term) =
       match t.n with
       | Tm_fvar uu___ ->
           (match us with | [] -> t | us1 -> mk (Tm_uinst (t, us1)) t.pos)
-      | uu___ -> failwith "Unexpected universe instantiation"
+      | uu___ ->
+          FStar_Compiler_Effect.failwith "Unexpected universe instantiation"
 let (extend_app_n : term -> args -> FStar_Compiler_Range_Type.range -> term)
   =
   fun t ->
@@ -2461,7 +2463,7 @@ let (new_univ_name :
     let uu___ =
       let uu___1 =
         let uu___2 = FStar_Compiler_Util.string_of_int id in
-        Prims.op_Hat FStar_Ident.reserved_prefix uu___2 in
+        Prims.strcat FStar_Ident.reserved_prefix uu___2 in
       (uu___1, (range_of_ropt ropt)) in
     FStar_Ident.mk_ident uu___
 let (lbname_eq :

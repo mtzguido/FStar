@@ -212,8 +212,10 @@ let (on_sub_term :
       let mk t = FStar_Syntax_Syntax.mk t tm.FStar_Syntax_Syntax.pos in
       let tm1 = compress tm in
       match tm1.FStar_Syntax_Syntax.n with
-      | FStar_Syntax_Syntax.Tm_lazy uu___ -> failwith "impos"
-      | FStar_Syntax_Syntax.Tm_delayed uu___ -> failwith "impos"
+      | FStar_Syntax_Syntax.Tm_lazy uu___ ->
+          FStar_Compiler_Effect.failwith "impos"
+      | FStar_Syntax_Syntax.Tm_delayed uu___ ->
+          FStar_Compiler_Effect.failwith "impos"
       | FStar_Syntax_Syntax.Tm_fvar uu___ -> tm1
       | FStar_Syntax_Syntax.Tm_constant uu___ -> tm1
       | FStar_Syntax_Syntax.Tm_unknown -> tm1
@@ -807,10 +809,12 @@ let rec (on_sub_sigelt' :
               FStar_Syntax_Syntax.kind2 = k
             }
       | FStar_Syntax_Syntax.Sig_fail uu___ ->
-          failwith "Sig_fail and Sig_splice not supported in visit"
+          FStar_Compiler_Effect.failwith
+            "Sig_fail and Sig_splice not supported in visit"
       | FStar_Syntax_Syntax.Sig_splice uu___ ->
-          failwith "Sig_fail and Sig_splice not supported in visit"
-      | uu___ -> failwith "sorry"
+          FStar_Compiler_Effect.failwith
+            "Sig_fail and Sig_splice not supported in visit"
+      | uu___ -> FStar_Compiler_Effect.failwith "sorry"
 and (on_sub_sigelt :
   vfs_t -> FStar_Syntax_Syntax.sigelt -> FStar_Syntax_Syntax.sigelt) =
   fun vfs ->

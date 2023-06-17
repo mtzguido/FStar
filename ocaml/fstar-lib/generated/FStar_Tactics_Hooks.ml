@@ -581,7 +581,8 @@ let (preprocess :
               | Unchanged t' -> (t', [])
               | Simplified (t', gs) -> (t', gs)
               | uu___5 ->
-                  failwith "preprocess: impossible, traverse returned a Dual" in
+                  FStar_Compiler_Effect.failwith
+                    "preprocess: impossible, traverse returned a Dual" in
             match uu___3 with
             | (t', gs) ->
                 ((let uu___5 =
@@ -652,7 +653,7 @@ let (preprocess :
                                    then
                                      let uu___8 =
                                        FStar_Compiler_Util.string_of_int n in
-                                     Prims.op_Hat "Could not prove goal #"
+                                     Prims.strcat "Could not prove goal #"
                                        uu___8
                                    else
                                      (let uu___9 =
@@ -662,10 +663,10 @@ let (preprocess :
                                           let uu___12 =
                                             let uu___13 =
                                               FStar_Tactics_Types.get_label g in
-                                            Prims.op_Hat uu___13 ")" in
-                                          Prims.op_Hat " (" uu___12 in
-                                        Prims.op_Hat uu___10 uu___11 in
-                                      Prims.op_Hat "Could not prove goal #"
+                                            Prims.strcat uu___13 ")" in
+                                          Prims.strcat " (" uu___12 in
+                                        Prims.strcat uu___10 uu___11 in
+                                      Prims.strcat "Could not prove goal #"
                                         uu___9) in
                                  let gt' =
                                    FStar_TypeChecker_Util.label label
@@ -1395,7 +1396,8 @@ let (spinoff_strictly_positive_goals :
              | Unchanged t' -> (t', [])
              | Simplified (t', gs) -> (t', gs)
              | uu___4 ->
-                 failwith "preprocess: impossible, traverse returned a Dual" in
+                 FStar_Compiler_Effect.failwith
+                   "preprocess: impossible, traverse returned a Dual" in
            match uu___2 with
            | (t', gs) ->
                let t'1 =
@@ -1689,12 +1691,13 @@ let (handle_smt_goal :
                        match uu___3 with
                        | FStar_Pervasives_Native.Some dd1 -> dd1
                        | FStar_Pervasives_Native.None ->
-                           failwith "Expected a dd" in
+                           FStar_Compiler_Effect.failwith "Expected a dd" in
                      let uu___3 =
                        FStar_Syntax_Syntax.lid_as_fv lid
                          FStar_Pervasives_Native.None in
                      FStar_Syntax_Syntax.fv_to_tm uu___3
-                 | uu___2 -> failwith "Resolve_tac not found" in
+                 | uu___2 ->
+                     FStar_Compiler_Effect.failwith "Resolve_tac not found" in
                let gs =
                  FStar_Errors.with_ctx
                    "While handling an SMT goal with a tactic"
@@ -2088,8 +2091,8 @@ let (splice :
                                                     FStar_Ident.string_of_lid
                                                     lids' in
                                                 FStar_Compiler_Effect.op_Less_Bar
-                                                  (FStar_String.concat ", ")
-                                                  uu___14 in
+                                                  (FStar_Compiler_String.concat
+                                                     ", ") uu___14 in
                                               FStar_Compiler_Util.format2
                                                 "Splice declared the name %s but it was not defined.\nThose defined were: %s"
                                                 uu___12 uu___13 in

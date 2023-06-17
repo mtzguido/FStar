@@ -72,9 +72,9 @@ let (load_native_tactics : unit -> unit) =
         (FStar_Compiler_List.map FStar_Ident.lid_of_str) in
     let ml_module_name m = FStar_Extraction_ML_Util.ml_module_name_of_lid m in
     let ml_file m =
-      let uu___1 = ml_module_name m in Prims.op_Hat uu___1 ".ml" in
+      let uu___1 = ml_module_name m in Prims.strcat uu___1 ".ml" in
     let cmxs_file m =
-      let cmxs = let uu___1 = ml_module_name m in Prims.op_Hat uu___1 ".cmxs" in
+      let cmxs = let uu___1 = ml_module_name m in Prims.strcat uu___1 ".cmxs" in
       let uu___1 = FStar_Options.find_file cmxs in
       match uu___1 with
       | FStar_Pervasives_Native.Some f -> f
@@ -124,7 +124,7 @@ let (load_native_tactics : unit -> unit) =
      if uu___2
      then
        FStar_Compiler_Util.print1 "Will try to load cmxs files: [%s]\n"
-         (FStar_String.concat ", " cmxs_files)
+         (FStar_Compiler_String.concat ", " cmxs_files)
      else ());
     FStar_Tactics_Load.load_tactics cmxs_files;
     (let uu___4 = FStar_Options.use_native_tactics () in
@@ -185,7 +185,7 @@ let go : 'uuuuu . 'uuuuu -> unit =
                          else FStar_Prettyprint.FromTempToFile in
                        FStar_Prettyprint.generate printing_mode filenames
                      else
-                       failwith
+                       FStar_Compiler_Effect.failwith
                          "You seem to be using the F#-generated version ofthe compiler ; \\o\n                         reindenting is not known to work yet with this version")
                   else
                     (let uu___8 = FStar_Options.lsp_server () in
@@ -260,7 +260,8 @@ let (lazy_chooser :
   fun k ->
     fun i ->
       match k with
-      | FStar_Syntax_Syntax.BadLazy -> failwith "lazy chooser: got a BadLazy"
+      | FStar_Syntax_Syntax.BadLazy ->
+          FStar_Compiler_Effect.failwith "lazy chooser: got a BadLazy"
       | FStar_Syntax_Syntax.Lazy_bv ->
           FStar_Reflection_V2_Embeddings.unfold_lazy_bv i
       | FStar_Syntax_Syntax.Lazy_namedv ->
@@ -343,7 +344,7 @@ let main : 'uuuuu . unit -> 'uuuuu =
                        let uu___7 = FStar_Compiler_Util.string_of_int time in
                        let uu___8 =
                          let uu___9 = FStar_Getopt.cmdline () in
-                         FStar_String.concat " " uu___9 in
+                         FStar_Compiler_String.concat " " uu___9 in
                        FStar_Compiler_Util.print2_error
                          "TOTAL TIME %s ms: %s\n" uu___7 uu___8
                      else ());

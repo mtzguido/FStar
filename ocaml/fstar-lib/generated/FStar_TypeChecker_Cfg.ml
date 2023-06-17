@@ -377,8 +377,9 @@ let (steps_to_string : fsteps -> Prims.string) =
       match o with
       | FStar_Pervasives_Native.None -> "None"
       | FStar_Pervasives_Native.Some x ->
-          let uu___ = let uu___1 = f1 x in FStar_String.op_Hat uu___1 ")" in
-          FStar_String.op_Hat "Some (" uu___ in
+          let uu___ =
+            let uu___1 = f1 x in FStar_Compiler_String.op_Hat uu___1 ")" in
+          FStar_Compiler_String.op_Hat "Some (" uu___ in
     let b = FStar_Compiler_Util.string_of_bool in
     let uu___ =
       let uu___1 = FStar_Compiler_Effect.op_Bar_Greater f.beta b in
@@ -413,7 +414,8 @@ let (steps_to_string : fsteps -> Prims.string) =
                                     FStar_Compiler_List.map
                                       FStar_Ident.string_of_lid x in
                                   FStar_Compiler_Effect.op_Bar_Greater
-                                    uu___20 (FStar_String.concat ", "))) in
+                                    uu___20
+                                    (FStar_Compiler_String.concat ", "))) in
                         let uu___20 =
                           let uu___21 =
                             FStar_Compiler_Effect.op_Bar_Greater
@@ -424,7 +426,8 @@ let (steps_to_string : fsteps -> Prims.string) =
                                       FStar_Compiler_List.map
                                         FStar_Ident.string_of_lid x in
                                     FStar_Compiler_Effect.op_Bar_Greater
-                                      uu___22 (FStar_String.concat ", "))) in
+                                      uu___22
+                                      (FStar_Compiler_String.concat ", "))) in
                           let uu___22 =
                             let uu___23 =
                               FStar_Compiler_Effect.op_Bar_Greater
@@ -435,17 +438,20 @@ let (steps_to_string : fsteps -> Prims.string) =
                                         FStar_Compiler_List.map
                                           FStar_Ident.string_of_lid x in
                                       FStar_Compiler_Effect.op_Bar_Greater
-                                        uu___24 (FStar_String.concat ", "))) in
+                                        uu___24
+                                        (FStar_Compiler_String.concat ", "))) in
                             let uu___24 =
                               let uu___25 =
                                 FStar_Compiler_Effect.op_Bar_Greater
                                   f.unfold_qual
-                                  (format_opt (FStar_String.concat ", ")) in
+                                  (format_opt
+                                     (FStar_Compiler_String.concat ", ")) in
                               let uu___26 =
                                 let uu___27 =
                                   FStar_Compiler_Effect.op_Bar_Greater
                                     f.unfold_namespace
-                                    (format_opt (FStar_String.concat ", ")) in
+                                    (format_opt
+                                       (FStar_Compiler_String.concat ", ")) in
                                 let uu___28 =
                                   let uu___29 =
                                     FStar_Compiler_Effect.op_Bar_Greater
@@ -818,7 +824,8 @@ let (fstep_add_one : FStar_TypeChecker_Env.step -> fsteps -> fsteps) =
             for_extraction = (fs.for_extraction);
             unrefine = (fs.unrefine)
           }
-      | FStar_TypeChecker_Env.Exclude uu___ -> failwith "Bad exclude"
+      | FStar_TypeChecker_Env.Exclude uu___ ->
+          FStar_Compiler_Effect.failwith "Bad exclude"
       | FStar_TypeChecker_Env.Weak ->
           {
             beta = (fs.beta);
@@ -1956,7 +1963,7 @@ let (cfg_to_string : cfg -> Prims.string) =
           FStar_Compiler_Util.format1 "  steps = %s" uu___3 in
         [uu___2; "}"] in
       "{" :: uu___1 in
-    FStar_String.concat "\n" uu___
+    FStar_Compiler_String.concat "\n" uu___
 let (cfg_env : cfg -> FStar_TypeChecker_Env.env) = fun cfg1 -> cfg1.tcenv
 let (find_prim_step :
   cfg ->
@@ -2186,14 +2193,15 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
       FStar_Syntax_Syntax.mk
         (FStar_Syntax_Syntax.Tm_constant (FStar_Const.Const_char c)) rng in
     let uu___ =
-      let uu___1 = FStar_String.list_of_string s in
+      let uu___1 = FStar_Compiler_String.list_of_string s in
       FStar_Compiler_List.map charterm uu___1 in
     FStar_Compiler_Effect.op_Less_Bar (FStar_Syntax_Util.mk_list char_t rng)
       uu___ in
   let string_of_list' rng l =
-    let s = FStar_String.string_of_list l in FStar_Syntax_Util.exp_string s in
+    let s = FStar_Compiler_String.string_of_list l in
+    FStar_Syntax_Util.exp_string s in
   let string_compare' rng s1 s2 =
-    let r = FStar_String.compare s1 s2 in
+    let r = FStar_Compiler_String.compare s1 s2 in
     let uu___ =
       let uu___1 = FStar_Compiler_Util.string_of_int r in
       FStar_BigInt.big_int_of_string uu___1 in
@@ -2207,7 +2215,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
              let uu___1 = arg_as_list FStar_Syntax_Embeddings.e_string a2 in
              (match uu___1 with
               | FStar_Pervasives_Native.Some s2 ->
-                  let r = FStar_String.concat s1 s2 in
+                  let r = FStar_Compiler_String.concat s1 s2 in
                   let uu___2 =
                     embed_simple FStar_Syntax_Embeddings.e_string
                       psc1.psc_range r in
@@ -2224,7 +2232,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
              let uu___1 = arg_as_string a2 in
              (match uu___1 with
               | FStar_Pervasives_Native.Some s2 ->
-                  let r = FStar_String.split s1 s2 in
+                  let r = FStar_Compiler_String.split s1 s2 in
                   let uu___2 =
                     let uu___3 =
                       FStar_Syntax_Embeddings.e_list
@@ -2250,7 +2258,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                 (fun uu___1 ->
                    match () with
                    | () ->
-                       let r = FStar_String.substring s1 n11 n21 in
+                       let r = FStar_Compiler_String.substring s1 n11 n21 in
                        let uu___2 =
                          embed_simple FStar_Syntax_Embeddings.e_string
                            psc1.psc_range r in
@@ -2266,10 +2274,10 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
       (if b then "true" else "false") in
   let lowercase rng s =
     embed_simple FStar_Syntax_Embeddings.e_string rng
-      (FStar_String.lowercase s) in
+      (FStar_Compiler_String.lowercase s) in
   let uppercase rng s =
     embed_simple FStar_Syntax_Embeddings.e_string rng
-      (FStar_String.uppercase s) in
+      (FStar_Compiler_String.uppercase s) in
   let string_index psc1 _norm_cb _us args =
     match args with
     | a1::a2::[] ->
@@ -2283,7 +2291,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                 (fun uu___1 ->
                    match () with
                    | () ->
-                       let r = FStar_String.index s i in
+                       let r = FStar_Compiler_String.index s i in
                        let uu___2 =
                          embed_simple FStar_Syntax_Embeddings.e_char
                            psc1.psc_range r in
@@ -2304,7 +2312,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                 (fun uu___1 ->
                    match () with
                    | () ->
-                       let r = FStar_String.index_of s c in
+                       let r = FStar_Compiler_String.index_of s c in
                        let uu___2 =
                          embed_simple FStar_Syntax_Embeddings.e_int
                            psc1.psc_range r in
@@ -2359,7 +2367,8 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
          | FStar_Syntax_Util.NotEqual ->
              FStar_Pervasives_Native.Some (if neg then tru else fal)
          | uu___4 -> FStar_Pervasives_Native.None)
-    | uu___ -> failwith "Unexpected number of arguments" in
+    | uu___ ->
+        FStar_Compiler_Effect.failwith "Unexpected number of arguments" in
   let and_op psc1 _norm_cb _us args =
     match args with
     | (a1, FStar_Pervasives_Native.None)::(a2, FStar_Pervasives_Native.None)::[]
@@ -2374,7 +2383,8 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
          | FStar_Pervasives_Native.Some (true) ->
              FStar_Pervasives_Native.Some a2
          | uu___1 -> FStar_Pervasives_Native.None)
-    | uu___ -> failwith "Unexpected number of arguments" in
+    | uu___ ->
+        FStar_Compiler_Effect.failwith "Unexpected number of arguments" in
   let or_op psc1 _norm_cb _us args =
     match args with
     | (a1, FStar_Pervasives_Native.None)::(a2, FStar_Pervasives_Native.None)::[]
@@ -2389,7 +2399,8 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
          | FStar_Pervasives_Native.Some (false) ->
              FStar_Pervasives_Native.Some a2
          | uu___1 -> FStar_Pervasives_Native.None)
-    | uu___ -> failwith "Unexpected number of arguments" in
+    | uu___ ->
+        FStar_Compiler_Effect.failwith "Unexpected number of arguments" in
   let division_op psc1 _norm_cb _us args =
     match args with
     | (a1, FStar_Pervasives_Native.None)::(a2, FStar_Pervasives_Native.None)::[]
@@ -2413,12 +2424,13 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                FStar_Pervasives_Native.Some uu___2
              else FStar_Pervasives_Native.None
          | uu___1 -> FStar_Pervasives_Native.None)
-    | uu___ -> failwith "Unexpected number of arguments" in
+    | uu___ ->
+        FStar_Compiler_Effect.failwith "Unexpected number of arguments" in
   let bogus_cbs =
     {
       FStar_TypeChecker_NBETerm.iapp = (fun h -> fun _args -> h);
       FStar_TypeChecker_NBETerm.translate =
-        (fun uu___ -> failwith "bogus_cbs translate")
+        (fun uu___ -> FStar_Compiler_Effect.failwith "bogus_cbs translate")
     } in
   let int_as_bounded r int_to_t n =
     let c = embed_simple FStar_Syntax_Embeddings.e_int r n in
@@ -2660,16 +2672,16 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                                                 FStar_TypeChecker_NBETerm.binary_string_op
                                                   (fun x ->
                                                      fun y ->
-                                                       FStar_String.op_Hat x
-                                                         y) in
+                                                       FStar_Compiler_String.op_Hat
+                                                         x y) in
                                               (FStar_Parser_Const.prims_strcat_lid,
                                                 (Prims.of_int (2)),
                                                 Prims.int_zero,
                                                 (binary_string_op
                                                    (fun x ->
                                                       fun y ->
-                                                        FStar_String.op_Hat x
-                                                          y)), uu___36) in
+                                                        FStar_Compiler_String.op_Hat
+                                                          x y)), uu___36) in
                                             let uu___36 =
                                               let uu___37 =
                                                 let uu___38 =
@@ -2805,7 +2817,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                                                         let uu___35 =
                                                           FStar_BigInt.to_int_fs
                                                             x in
-                                                        FStar_String.make
+                                                        FStar_Compiler_String.make
                                                           uu___35 y in
                                                       FStar_Pervasives_Native.Some
                                                         uu___34)),
@@ -2822,7 +2834,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
                                                       let uu___35 =
                                                         FStar_BigInt.to_int_fs
                                                           x in
-                                                      FStar_String.make
+                                                      FStar_Compiler_String.make
                                                         uu___35 y in
                                                     FStar_Pervasives_Native.Some
                                                       uu___34)))
@@ -3351,7 +3363,7 @@ let (built_in_primitive_steps : primitive_step FStar_Compiler_Util.psmap) =
           let uu___1 =
             FStar_Compiler_Util.format1
               "Impossible: bad string on mask: %s\n" m in
-          failwith uu___1 in
+          FStar_Compiler_Effect.failwith uu___1 in
     let bitwise =
       FStar_Compiler_Effect.op_Bar_Greater bounded_unsigned_int_types
         (FStar_Compiler_List.collect
@@ -4125,7 +4137,8 @@ let (equality_ops : primitive_step FStar_Compiler_Util.psmap) =
                    (FStar_Syntax_Util.t_false.FStar_Syntax_Syntax.hash_code)
                }
          | uu___4 -> FStar_Pervasives_Native.None)
-    | uu___ -> failwith "Unexpected number of arguments" in
+    | uu___ ->
+        FStar_Compiler_Effect.failwith "Unexpected number of arguments" in
   let propositional_equality =
     {
       name = FStar_Parser_Const.eq2_lid;
@@ -4155,10 +4168,12 @@ let (primop_time_count : Prims.string -> Prims.int -> unit) =
 let (fixto : Prims.int -> Prims.string -> Prims.string) =
   fun n ->
     fun s ->
-      if (FStar_String.length s) < n
+      if (FStar_Compiler_String.length s) < n
       then
-        let uu___ = FStar_String.make (n - (FStar_String.length s)) 32 in
-        FStar_String.op_Hat uu___ s
+        let uu___ =
+          FStar_Compiler_String.make (n - (FStar_Compiler_String.length s))
+            32 in
+        FStar_Compiler_String.op_Hat uu___ s
       else s
 let (primop_time_report : unit -> Prims.string) =
   fun uu___ ->
@@ -4181,7 +4196,7 @@ let (primop_time_report : unit -> Prims.string) =
                    let uu___4 = FStar_Compiler_Util.string_of_int ms in
                    fixto (Prims.of_int (10)) uu___4 in
                  FStar_Compiler_Util.format2 "%sms --- %s\n" uu___3 nm in
-               FStar_String.op_Hat uu___2 rest) pairs1 ""
+               FStar_Compiler_String.op_Hat uu___2 rest) pairs1 ""
 let (extendable_primops_dirty : Prims.bool FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref true
 type register_prim_step_t = primitive_step -> unit

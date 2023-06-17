@@ -11,7 +11,8 @@ let (string_of_univs :
               let uu___2 = FStar_Syntax_Unionfind.univ_uvar_id u in
               FStar_Compiler_Effect.op_Bar_Greater uu___2
                 FStar_Compiler_Util.string_of_int)) in
-    FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat ", ")
+    FStar_Compiler_Effect.op_Bar_Greater uu___
+      (FStar_Compiler_String.concat ", ")
 let (gen_univs :
   FStar_TypeChecker_Env.env ->
     FStar_Syntax_Syntax.universe_uvar FStar_Compiler_Util.set ->
@@ -97,7 +98,7 @@ let (check_universe_generalization :
             let uu___1 =
               let uu___2 =
                 let uu___3 = FStar_Syntax_Print.term_to_string t in
-                Prims.op_Hat
+                Prims.strcat
                   "Generalized universe in a term containing explicit universe annotation : "
                   uu___3 in
               (FStar_Errors_Codes.Fatal_UnexpectedGeneralizedUniverse,
@@ -231,7 +232,7 @@ let (gen :
                                  FStar_Syntax_Print.univ_to_string
                                    (FStar_Syntax_Syntax.U_unif u))) in
                        FStar_Compiler_Effect.op_Bar_Greater uu___6
-                         (FStar_String.concat ", ") in
+                         (FStar_Compiler_String.concat ", ") in
                      let uu___6 =
                        let uu___7 =
                          let uu___8 = FStar_Compiler_Util.set_elements uvt in
@@ -248,7 +249,7 @@ let (gen :
                                  FStar_Compiler_Util.format2 "(%s : %s)"
                                    uu___9 uu___10)) in
                        FStar_Compiler_Effect.op_Bar_Greater uu___7
-                         (FStar_String.concat ", ") in
+                         (FStar_Compiler_String.concat ", ") in
                      FStar_Compiler_Util.print2
                        "^^^^\n\tFree univs = %s\n\tFree uvt=%s\n" uu___5
                        uu___6
@@ -280,7 +281,7 @@ let (gen :
                                   FStar_Syntax_Print.univ_to_string
                                     (FStar_Syntax_Syntax.U_unif u))) in
                         FStar_Compiler_Effect.op_Bar_Greater uu___7
-                          (FStar_String.concat ", ") in
+                          (FStar_Compiler_String.concat ", ") in
                       let uu___7 =
                         let uu___8 =
                           FStar_Compiler_Effect.op_Bar_Greater uvs
@@ -297,7 +298,7 @@ let (gen :
                                   FStar_Compiler_Util.format2 "(%s : %s)"
                                     uu___9 uu___10)) in
                         FStar_Compiler_Effect.op_Bar_Greater uu___8
-                          (FStar_String.concat ", ") in
+                          (FStar_Compiler_String.concat ", ") in
                       FStar_Compiler_Util.print2
                         "^^^^\n\tFree univs = %s\n\tgen_uvars =%s" uu___6
                         uu___7
@@ -410,7 +411,7 @@ let (gen :
                              u.FStar_Syntax_Syntax.ctx_uvar_head in
                          match uu___3 with
                          | FStar_Pervasives_Native.Some uu___4 ->
-                             failwith
+                             FStar_Compiler_Effect.failwith
                                "Unexpected instantiation of mutually recursive uvar"
                          | uu___4 ->
                              let k =
@@ -611,7 +612,7 @@ let (generalize' :
                     | (lb, uu___6, uu___7) ->
                         FStar_Syntax_Print.lbname_to_string lb) lecs in
              FStar_Compiler_Effect.op_Bar_Greater uu___4
-               (FStar_String.concat ", ") in
+               (FStar_Compiler_String.concat ", ") in
            FStar_Compiler_Util.print1 "Generalizing: %s\n" uu___3
          else ());
         (let univnames_lecs =

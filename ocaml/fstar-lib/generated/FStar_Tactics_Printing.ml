@@ -37,8 +37,8 @@ let (unshadow :
           let t1 =
             let uu___ =
               let uu___1 = FStar_Compiler_Util.string_of_int i in
-              Prims.op_Hat "'" uu___1 in
-            Prims.op_Hat b uu___ in
+              Prims.strcat "'" uu___1 in
+            Prims.strcat b uu___ in
           let uu___ = f t1 in if uu___ then t1 else aux (i + Prims.int_one) in
         let uu___ = f b in if uu___ then b else aux Prims.int_zero in
       let rec go seen subst bs1 bs' t1 =
@@ -51,7 +51,9 @@ let (unshadow :
               let uu___ = FStar_Syntax_Subst.subst_binders subst [b] in
               match uu___ with
               | b2::[] -> b2
-              | uu___1 -> failwith "impossible: unshadow subst_binders" in
+              | uu___1 ->
+                  FStar_Compiler_Effect.failwith
+                    "impossible: unshadow subst_binders" in
             let uu___ =
               ((b1.FStar_Syntax_Syntax.binder_bv),
                 (b1.FStar_Syntax_Syntax.binder_qual)) in
@@ -113,7 +115,7 @@ let (goal_to_string :
           let maybe_label =
             match g.FStar_Tactics_Types.label with
             | "" -> ""
-            | l -> Prims.op_Hat " (" (Prims.op_Hat l ")") in
+            | l -> Prims.strcat " (" (Prims.strcat l ")") in
           let uu___ =
             let rename_binders subst bs =
               FStar_Compiler_Effect.op_Bar_Greater bs
@@ -149,7 +151,8 @@ let (goal_to_string :
                             FStar_Syntax_Syntax.binder_attrs =
                               (uu___1.FStar_Syntax_Syntax.binder_attrs)
                           }
-                      | uu___3 -> failwith "Not a renaming")) in
+                      | uu___3 ->
+                          FStar_Compiler_Effect.failwith "Not a renaming")) in
             let goal_binders =
               (g.FStar_Tactics_Types.goal_ctx_uvar).FStar_Syntax_Syntax.ctx_uvar_binders in
             let goal_ty = FStar_Tactics_Types.goal_type g in
@@ -247,7 +250,7 @@ let (ps_to_string :
                 ps.FStar_Tactics_Types.smt_goals in
             FStar_Compiler_List.op_At uu___4 uu___5 in
           FStar_Compiler_List.op_At uu___2 uu___3 in
-        FStar_String.concat "" uu___1
+        FStar_Compiler_String.concat "" uu___1
 let (goal_to_json : FStar_Tactics_Types.goal -> FStar_Json.json) =
   fun g ->
     let g_binders =

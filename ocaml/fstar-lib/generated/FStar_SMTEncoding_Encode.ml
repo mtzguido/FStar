@@ -86,7 +86,7 @@ let (prims : prims_t) =
                       (x1, uu___4, FStar_SMTEncoding_Term.Term_sort,
                         FStar_Pervasives_Native.None) in
                     FStar_SMTEncoding_Term.DeclFun uu___3 in
-                  let xtok = Prims.op_Hat x1 "@tok" in
+                  let xtok = Prims.strcat x1 "@tok" in
                   let xtok_decl =
                     FStar_SMTEncoding_Term.DeclFun
                       (xtok, [], FStar_SMTEncoding_Term.Term_sort,
@@ -106,7 +106,7 @@ let (prims : prims_t) =
                       FStar_Compiler_Effect.op_Bar_Greater
                         (FStar_Compiler_Util.prefix vars)
                         FStar_Pervasives_Native.fst in
-                    let axiom_name = Prims.op_Hat "primitive_tot_fun_" x1 in
+                    let axiom_name = Prims.strcat "primitive_tot_fun_" x1 in
                     let tot_fun_axiom_for_x =
                       let uu___3 =
                         let uu___4 = FStar_SMTEncoding_Term.mk_IsTotFun xtok1 in
@@ -130,8 +130,8 @@ let (prims : prims_t) =
                                          FStar_Compiler_Effect.op_Bar_Greater
                                            vars2 FStar_Compiler_List.length in
                                        Prims.string_of_int uu___7 in
-                                     Prims.op_Hat "." uu___6 in
-                                   Prims.op_Hat axiom_name uu___5 in
+                                     Prims.strcat "." uu___6 in
+                                   Prims.strcat axiom_name uu___5 in
                                  let uu___5 =
                                    let uu___6 =
                                      let uu___7 =
@@ -166,7 +166,7 @@ let (prims : prims_t) =
                                   ([[xapp]], vars, uu___11) in
                                 FStar_SMTEncoding_Term.mkForall rng uu___10 in
                               (uu___9, FStar_Pervasives_Native.None,
-                                (Prims.op_Hat "primitive_" x1)) in
+                                (Prims.strcat "primitive_" x1)) in
                             FStar_SMTEncoding_Util.mkAssume uu___8 in
                           [uu___7] in
                         xtok_decl :: uu___6 in
@@ -185,7 +185,7 @@ let (prims : prims_t) =
                             (uu___9,
                               (FStar_Pervasives_Native.Some
                                  "Name-token correspondence"),
-                              (Prims.op_Hat "token_correspondence_" x1)) in
+                              (Prims.strcat "token_correspondence_" x1)) in
                           FStar_SMTEncoding_Util.mkAssume uu___8 in
                         [uu___7] in
                       FStar_Compiler_List.op_At tot_fun_axioms uu___6 in
@@ -780,8 +780,8 @@ let (pretype_axiom :
                          let uu___6 =
                            let uu___7 =
                              FStar_Compiler_Util.digest_of_string tapp_hash in
-                           Prims.op_Hat "_pretyping_" uu___7 in
-                         Prims.op_Hat module_name uu___6 in
+                           Prims.strcat "_pretyping_" uu___7 in
+                         Prims.strcat module_name uu___6 in
                        FStar_SMTEncoding_Env.varops.FStar_SMTEncoding_Env.mk_unique
                          uu___5 in
                      (uu___3, (FStar_Pervasives_Native.Some "pretyping"),
@@ -1358,11 +1358,11 @@ let (encode_smt_lemma :
                     let uu___5 =
                       let uu___6 =
                         let uu___7 = FStar_Ident.string_of_lid lid in
-                        Prims.op_Hat "Lemma: " uu___7 in
+                        Prims.strcat "Lemma: " uu___7 in
                       FStar_Pervasives_Native.Some uu___6 in
                     let uu___6 =
                       let uu___7 = FStar_Ident.string_of_lid lid in
-                      Prims.op_Hat "lemma_" uu___7 in
+                      Prims.strcat "lemma_" uu___7 in
                     (form, uu___5, uu___6) in
                   FStar_SMTEncoding_Util.mkAssume uu___4 in
                 [uu___3] in
@@ -1652,7 +1652,7 @@ let (encode_free_var :
                                                        d in
                                                    FStar_SMTEncoding_Env.escape
                                                      uu___13 in
-                                                 Prims.op_Hat
+                                                 Prims.strcat
                                                    "disc_equation_" uu___12 in
                                                (uu___10,
                                                  (FStar_Pervasives_Native.Some
@@ -1709,7 +1709,7 @@ let (encode_free_var :
                                                (uu___10,
                                                  (FStar_Pervasives_Native.Some
                                                     "Projector equation"),
-                                                 (Prims.op_Hat
+                                                 (Prims.strcat
                                                     "proj_equation_" tp_name)) in
                                              FStar_SMTEncoding_Util.mkAssume
                                                uu___9 in
@@ -1933,7 +1933,7 @@ let (encode_free_var :
                                                             (tok_typing,
                                                               (FStar_Pervasives_Native.Some
                                                                  "function token typing"),
-                                                              (Prims.op_Hat
+                                                              (Prims.strcat
                                                                  "function_token_typing_"
                                                                  vname)) in
                                                         let uu___13 =
@@ -1989,7 +1989,7 @@ let (encode_free_var :
                                                             (uu___15,
                                                               (FStar_Pervasives_Native.Some
                                                                  "Name-token correspondence"),
-                                                              (Prims.op_Hat
+                                                              (Prims.strcat
                                                                  "token_correspondence_"
                                                                  vname)) in
                                                           FStar_SMTEncoding_Util.mkAssume
@@ -2041,7 +2041,7 @@ let (encode_free_var :
                                                             (guarded_tok_typing,
                                                               (FStar_Pervasives_Native.Some
                                                                  "function token typing"),
-                                                              (Prims.op_Hat
+                                                              (Prims.strcat
                                                                  "function_token_typing_"
                                                                  vname)) in
                                                         let uu___14 =
@@ -2103,7 +2103,7 @@ let (encode_free_var :
                                                           (uu___13,
                                                             (FStar_Pervasives_Native.Some
                                                                "free var typing"),
-                                                            (Prims.op_Hat
+                                                            (Prims.strcat
                                                                "typing_"
                                                                vname)) in
                                                         FStar_SMTEncoding_Util.mkAssume
@@ -2683,7 +2683,9 @@ let (encode_top_level_let :
                                          let uu___12 =
                                            match e_t with
                                            | e1::t_norm1::[] -> (e1, t_norm1)
-                                           | uu___13 -> failwith "Impossible" in
+                                           | uu___13 ->
+                                               FStar_Compiler_Effect.failwith
+                                                 "Impossible" in
                                          (match uu___12 with
                                           | (e1, t_norm1) ->
                                               ({
@@ -2853,9 +2855,9 @@ let (encode_top_level_let :
                                                                 uu___18 in
                                                             (uu___16,
                                                               uu___17,
-                                                              (Prims.op_Hat
+                                                              (Prims.strcat
                                                                  name
-                                                                 (Prims.op_Hat
+                                                                 (Prims.strcat
                                                                     "_"
                                                                     fvb.FStar_SMTEncoding_Env.smt_id))) in
                                                           FStar_SMTEncoding_Util.mkAssume
@@ -2963,7 +2965,9 @@ let (encode_top_level_let :
                                                                  decls1
                                                                  uu___17 in
                                                              (uu___16, env2)))))))
-                               | uu___5 -> failwith "Impossible" in
+                               | uu___5 ->
+                                   FStar_Compiler_Effect.failwith
+                                     "Impossible" in
                              let encode_rec_lbdefs bindings1 typs2 toks1 env2
                                =
                                let fuel =
@@ -3042,7 +3046,8 @@ let (encode_top_level_let :
                                                  | e1::t_norm1::[] ->
                                                      (e1, t_norm1)
                                                  | uu___16 ->
-                                                     failwith "Impossible" in
+                                                     FStar_Compiler_Effect.failwith
+                                                       "Impossible" in
                                                (match uu___15 with
                                                 | (e1, t_norm1) ->
                                                     ({
@@ -3357,7 +3362,7 @@ let (encode_top_level_let :
                                                                     uu___24 in
                                                                     (uu___22,
                                                                     uu___23,
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "equation_with_fuel_"
                                                                     g)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -3388,7 +3393,7 @@ let (encode_top_level_let :
                                                                     (uu___22,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "Correspondence of recursive function to instrumented version"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "@fuel_correspondence_"
                                                                     g)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -3437,7 +3442,7 @@ let (encode_top_level_let :
                                                                     (uu___22,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "Fuel irrelevance"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "@fuel_irrelevance_"
                                                                     g)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -3534,7 +3539,7 @@ let (encode_top_level_let :
                                                                     (uu___23,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "Fuel token correspondence"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "fuel_token_correspondence_"
                                                                     gtok)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -3582,7 +3587,7 @@ let (encode_top_level_let :
                                                                     (uu___27,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "Typing correspondence of token to term"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "token_correspondence_"
                                                                     g)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -3801,7 +3806,8 @@ let (encode_top_level_let :
                                                   names in
                                               FStar_Compiler_Effect.op_Bar_Greater
                                                 uu___13
-                                                (FStar_String.concat ",") in
+                                                (FStar_Compiler_String.concat
+                                                   ",") in
                                             FStar_Compiler_Util.format3
                                               "Definitions of inner let-rec%s %s and %s enclosing top-level letbinding are not encoded to the solver, you will only be able to reason with their types"
                                               (if plural then "s" else "")
@@ -3828,10 +3834,10 @@ let (encode_top_level_let :
                              FStar_Syntax_Print.lbname_to_string
                                lb.FStar_Syntax_Syntax.lbname)) in
                    FStar_Compiler_Effect.op_Bar_Greater uu___2
-                     (FStar_String.concat " and ") in
+                     (FStar_Compiler_String.concat " and ") in
                  let decl =
                    FStar_SMTEncoding_Term.Caption
-                     (Prims.op_Hat "let rec unencodeable: Skipping: " msg) in
+                     (Prims.strcat "let rec unencodeable: Skipping: " msg) in
                  let uu___2 =
                    FStar_Compiler_Effect.op_Bar_Greater [decl]
                      FStar_SMTEncoding_Term.mk_decls_trivial in
@@ -3933,9 +3939,10 @@ and (encode_sigelt' :
          | uu___2 -> false in
        match se.FStar_Syntax_Syntax.sigel with
        | FStar_Syntax_Syntax.Sig_splice uu___1 ->
-           failwith "impossible -- splice should have been removed by Tc.fs"
+           FStar_Compiler_Effect.failwith
+             "impossible -- splice should have been removed by Tc.fs"
        | FStar_Syntax_Syntax.Sig_fail uu___1 ->
-           failwith
+           FStar_Compiler_Effect.failwith
              "impossible -- Sig_fail should have been removed by Tc.fs"
        | FStar_Syntax_Syntax.Sig_pragma uu___1 -> ([], env)
        | FStar_Syntax_Syntax.Sig_effect_abbrev uu___1 -> ([], env)
@@ -4058,7 +4065,7 @@ and (encode_sigelt' :
                                        (uu___10,
                                          (FStar_Pervasives_Native.Some
                                             "Action equality"),
-                                         (Prims.op_Hat aname "_equality")) in
+                                         (Prims.strcat aname "_equality")) in
                                      FStar_SMTEncoding_Util.mkAssume uu___9 in
                                    let tok_correspondence =
                                      let tok_term =
@@ -4087,7 +4094,7 @@ and (encode_sigelt' :
                                        (uu___10,
                                          (FStar_Pervasives_Native.Some
                                             "Action token correspondence"),
-                                         (Prims.op_Hat aname
+                                         (Prims.strcat aname
                                             "_token_correspondence")) in
                                      FStar_SMTEncoding_Util.mkAssume uu___9 in
                                    let uu___9 =
@@ -4211,7 +4218,7 @@ and (encode_sigelt' :
                              let uu___7 =
                                let uu___8 =
                                  let uu___9 = FStar_Ident.string_of_lid l in
-                                 Prims.op_Hat "assumption_" uu___9 in
+                                 Prims.strcat "assumption_" uu___9 in
                                FStar_SMTEncoding_Env.varops.FStar_SMTEncoding_Env.mk_unique
                                  uu___8 in
                              (f3, uu___6, uu___7) in
@@ -4694,7 +4701,8 @@ and (encode_sigelt' :
                                              FStar_Compiler_Util.format3
                                                "Impossible: Unresolved or unknown universe in inductive type %s (%s, %s)"
                                                uu___12 uu___13 uu___14 in
-                                           failwith uu___11
+                                           FStar_Compiler_Effect.failwith
+                                             uu___11
                                        | (uu___10,
                                           FStar_Syntax_Syntax.U_unknown) ->
                                            let uu___11 =
@@ -4709,7 +4717,8 @@ and (encode_sigelt' :
                                              FStar_Compiler_Util.format3
                                                "Impossible: Unresolved or unknown universe in inductive type %s (%s, %s)"
                                                uu___12 uu___13 uu___14 in
-                                           failwith uu___11
+                                           FStar_Compiler_Effect.failwith
+                                             uu___11
                                        | (FStar_Syntax_Syntax.U_unif uu___10,
                                           uu___11) ->
                                            let uu___12 =
@@ -4724,7 +4733,8 @@ and (encode_sigelt' :
                                              FStar_Compiler_Util.format3
                                                "Impossible: Unresolved or unknown universe in inductive type %s (%s, %s)"
                                                uu___13 uu___14 uu___15 in
-                                           failwith uu___12
+                                           FStar_Compiler_Effect.failwith
+                                             uu___12
                                        | (uu___10, FStar_Syntax_Syntax.U_unif
                                           uu___11) ->
                                            let uu___12 =
@@ -4739,7 +4749,8 @@ and (encode_sigelt' :
                                              FStar_Compiler_Util.format3
                                                "Impossible: Unresolved or unknown universe in inductive type %s (%s, %s)"
                                                uu___13 uu___14 uu___15 in
-                                           failwith uu___12
+                                           FStar_Compiler_Effect.failwith
+                                             uu___12
                                        | uu___10 -> false in
                                      let u_leq_u_k u =
                                        let uu___10 =
@@ -4899,7 +4910,8 @@ and (encode_sigelt' :
                                                           (FStar_Compiler_List.length
                                                              vars)
                                                       then
-                                                        failwith "Impossible"
+                                                        FStar_Compiler_Effect.failwith
+                                                          "Impossible"
                                                       else ();
                                                       (let eqs =
                                                          if is_injective
@@ -4992,7 +5004,7 @@ and (encode_sigelt' :
                                       let uu___12 =
                                         let uu___13 =
                                           FStar_Ident.string_of_lid t in
-                                        Prims.op_Hat
+                                        Prims.strcat
                                           "fuel_guarded_inversion_" uu___13 in
                                       FStar_SMTEncoding_Env.varops.FStar_SMTEncoding_Env.mk_unique
                                         uu___12 in
@@ -5055,7 +5067,7 @@ and (encode_sigelt' :
                                              let uu___12 =
                                                FStar_SMTEncoding_Term.fv_name
                                                  fv in
-                                             Prims.op_Hat tname uu___12 in
+                                             Prims.strcat tname uu___12 in
                                            let uu___12 =
                                              FStar_SMTEncoding_Term.fv_sort
                                                fv in
@@ -5118,7 +5130,7 @@ and (encode_sigelt' :
                                        (uu___12,
                                          (FStar_Pervasives_Native.Some
                                             "name-token correspondence"),
-                                         (Prims.op_Hat
+                                         (Prims.strcat
                                             "token_correspondence_" ttok)) in
                                      FStar_SMTEncoding_Util.mkAssume uu___11 in
                                    ([ttok_decl; ttok_fresh; name_tok_corr],
@@ -5152,7 +5164,7 @@ and (encode_sigelt' :
                                               (uu___12,
                                                 (FStar_Pervasives_Native.Some
                                                    "kinding"),
-                                                (Prims.op_Hat "pre_kinding_"
+                                                (Prims.strcat "pre_kinding_"
                                                    ttok)) in
                                             FStar_SMTEncoding_Util.mkAssume
                                               uu___11 in
@@ -5188,7 +5200,7 @@ and (encode_sigelt' :
                                                     uu___16 in
                                                 (uu___15,
                                                   FStar_Pervasives_Native.None,
-                                                  (Prims.op_Hat "kinding_"
+                                                  (Prims.strcat "kinding_"
                                                      ttok)) in
                                               FStar_SMTEncoding_Util.mkAssume
                                                 uu___14 in
@@ -5590,7 +5602,7 @@ and (encode_sigelt' :
                                                                     FStar_Pervasives_Native.Some
                                                                     "data constructor typing elim"),
                                                                     (
-                                                                    Prims.op_Hat
+                                                                    Prims.strcat
                                                                     "data_elim_"
                                                                     ddconstrsym)) in
                                                                 FStar_SMTEncoding_Util.mkAssume
@@ -5684,7 +5696,7 @@ and (encode_sigelt' :
                                                                     FStar_Pervasives_Native.Some
                                                                     "subterm ordering"),
                                                                     (
-                                                                    Prims.op_Hat
+                                                                    Prims.strcat
                                                                     "subterm_ordering_"
                                                                     ddconstrsym)) in
                                                                 FStar_SMTEncoding_Util.mkAssume
@@ -6036,7 +6048,7 @@ and (encode_sigelt' :
                                                                     (uu___30,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "well-founded ordering on codomain"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "well_founded_ordering_on_codomain_"
                                                                     ddconstrsym)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -6263,7 +6275,7 @@ and (encode_sigelt' :
                                                                     FStar_Pervasives_Native.Some
                                                                     "data constructor typing elim"),
                                                                     (
-                                                                    Prims.op_Hat
+                                                                    Prims.strcat
                                                                     "data_elim_"
                                                                     ddconstrsym)) in
                                                                 FStar_SMTEncoding_Util.mkAssume
@@ -6357,7 +6369,7 @@ and (encode_sigelt' :
                                                                     FStar_Pervasives_Native.Some
                                                                     "subterm ordering"),
                                                                     (
-                                                                    Prims.op_Hat
+                                                                    Prims.strcat
                                                                     "subterm_ordering_"
                                                                     ddconstrsym)) in
                                                                 FStar_SMTEncoding_Util.mkAssume
@@ -6709,7 +6721,7 @@ and (encode_sigelt' :
                                                                     (uu___26,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "well-founded ordering on codomain"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "well_founded_ordering_on_codomain_"
                                                                     ddconstrsym)) in
                                                                     FStar_SMTEncoding_Util.mkAssume
@@ -6869,7 +6881,7 @@ and (encode_sigelt' :
                                                       (uu___12,
                                                         (FStar_Pervasives_Native.Some
                                                            "data constructor typing intro"),
-                                                        (Prims.op_Hat
+                                                        (Prims.strcat
                                                            "data_typing_intro_"
                                                            ddtok)) in
                                                     FStar_SMTEncoding_Util.mkAssume
@@ -6918,7 +6930,7 @@ and (encode_sigelt' :
                                                                     FStar_Pervasives_Native.Some
                                                                     "typing for data constructor proxy"),
                                                                     (
-                                                                    Prims.op_Hat
+                                                                    Prims.strcat
                                                                     "typing_tok_"
                                                                     ddtok)) in
                                                               let uu___19 =
@@ -6947,7 +6959,7 @@ and (encode_sigelt' :
                                                                     (uu___22,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "equality for proxy"),
-                                                                    (Prims.op_Hat
+                                                                    (Prims.strcat
                                                                     "equality_tok_"
                                                                     ddtok)) in
                                                                   FStar_SMTEncoding_Util.mkAssume
@@ -7037,9 +7049,9 @@ let (encode_env_bindings :
                            let uu___5 =
                              let uu___6 =
                                FStar_Compiler_Util.digest_of_string t_hash in
-                             Prims.op_Hat uu___6
-                               (Prims.op_Hat "_" (Prims.string_of_int i)) in
-                           Prims.op_Hat "x_" uu___5 in
+                             Prims.strcat uu___6
+                               (Prims.strcat "_" (Prims.string_of_int i)) in
+                           Prims.strcat "x_" uu___5 in
                          FStar_SMTEncoding_Env.new_term_constant_from_string
                            env1 x uu___4 in
                        (match uu___3 with
@@ -7064,7 +7076,7 @@ let (encode_env_bindings :
                                 FStar_Pervasives_Native.Some uu___5
                               else FStar_Pervasives_Native.None in
                             let ax =
-                              let a_name = Prims.op_Hat "binder_" xxsym in
+                              let a_name = Prims.strcat "binder_" xxsym in
                               FStar_SMTEncoding_Util.mkAssume
                                 (t2, (FStar_Pervasives_Native.Some a_name),
                                   a_name) in
@@ -7172,7 +7184,7 @@ let (get_env :
     fun tcenv ->
       let uu___ = FStar_Compiler_Effect.op_Bang last_env in
       match uu___ with
-      | [] -> failwith "No env; call init first!"
+      | [] -> FStar_Compiler_Effect.failwith "No env; call init first!"
       | e::uu___1 ->
           let uu___2 = FStar_Ident.string_of_lid cmn in
           {
@@ -7199,14 +7211,14 @@ let (set_env : FStar_SMTEncoding_Env.env_t -> unit) =
   fun env ->
     let uu___ = FStar_Compiler_Effect.op_Bang last_env in
     match uu___ with
-    | [] -> failwith "Empty env stack"
+    | [] -> FStar_Compiler_Effect.failwith "Empty env stack"
     | uu___1::tl ->
         FStar_Compiler_Effect.op_Colon_Equals last_env (env :: tl)
 let (push_env : unit -> unit) =
   fun uu___ ->
     let uu___1 = FStar_Compiler_Effect.op_Bang last_env in
     match uu___1 with
-    | [] -> failwith "Empty env stack"
+    | [] -> FStar_Compiler_Effect.failwith "Empty env stack"
     | hd::tl ->
         let top = copy_env hd in
         FStar_Compiler_Effect.op_Colon_Equals last_env (top :: hd :: tl)
@@ -7214,7 +7226,7 @@ let (pop_env : unit -> unit) =
   fun uu___ ->
     let uu___1 = FStar_Compiler_Effect.op_Bang last_env in
     match uu___1 with
-    | [] -> failwith "Popping an empty stack"
+    | [] -> FStar_Compiler_Effect.failwith "Popping an empty stack"
     | uu___2::tl -> FStar_Compiler_Effect.op_Colon_Equals last_env tl
 let (snapshot_env : unit -> (Prims.int * unit)) =
   fun uu___ -> FStar_Common.snapshot push_env last_env ()
@@ -7396,8 +7408,8 @@ let (encode_sig :
                     (FStar_Syntax_Util.lids_of_sigelt se)
                     (FStar_Compiler_List.map FStar_Syntax_Print.lid_to_string) in
                 FStar_Compiler_Effect.op_Bar_Greater uu___4
-                  (FStar_String.concat ", ") in
-              Prims.op_Hat "encoding sigelt " uu___3 in
+                  (FStar_Compiler_String.concat ", ") in
+              Prims.strcat "encoding sigelt " uu___3 in
             FStar_SMTEncoding_Term.Caption uu___2 in
           uu___1 :: decls
         else decls in
@@ -7434,12 +7446,12 @@ let (give_decls_to_z3_and_set_env :
           let uu___ = FStar_Options.log_queries () in
           if uu___
           then
-            let msg = Prims.op_Hat "Externals for " name in
+            let msg = Prims.strcat "Externals for " name in
             [FStar_SMTEncoding_Term.Module
                (name,
                  (FStar_Compiler_List.op_At
                     ((FStar_SMTEncoding_Term.Caption msg) :: decls1)
-                    [FStar_SMTEncoding_Term.Caption (Prims.op_Hat "End " msg)]))]
+                    [FStar_SMTEncoding_Term.Caption (Prims.strcat "End " msg)]))]
           else [FStar_SMTEncoding_Term.Module (name, decls1)] in
         set_env
           {
@@ -7737,7 +7749,7 @@ let (encode_query :
                                                let uu___11 =
                                                  FStar_Syntax_Print.term_to_string
                                                    q1 in
-                                               Prims.op_Hat
+                                               Prims.strcat
                                                  "Encoding query formula : "
                                                  uu___11 in
                                              FStar_SMTEncoding_Term.Caption

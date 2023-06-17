@@ -167,7 +167,8 @@ let (fsharpkeywords : Prims.string Prims.list) =
 let (string_of_mlpath : mlpath -> mlsymbol) =
   fun uu___ ->
     match uu___ with
-    | (p, s) -> FStar_String.concat "." (FStar_Compiler_List.op_At p [s])
+    | (p, s) ->
+        FStar_Compiler_String.concat "." (FStar_Compiler_List.op_At p [s])
 type mlidents = mlident Prims.list
 type mlsymbols = mlsymbol Prims.list
 type e_tag =
@@ -729,5 +730,9 @@ let (pop_unit : mltyscheme -> mltyscheme) =
          | MLTY_Fun (l, E_PURE, t) ->
              if l = ml_unit_ty
              then (vs, t)
-             else failwith "unexpected: pop_unit: domain was not unit"
-         | uu___1 -> failwith "unexpected: pop_unit: not a function type")
+             else
+               FStar_Compiler_Effect.failwith
+                 "unexpected: pop_unit: domain was not unit"
+         | uu___1 ->
+             FStar_Compiler_Effect.failwith
+               "unexpected: pop_unit: not a function type")

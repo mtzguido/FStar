@@ -74,7 +74,7 @@ let mk_total_step_1' :
                       ea er nf ena enr in
                   let uu___1 =
                     FStar_Ident.lid_of_str
-                      (Prims.op_Hat "FStar.Tactics.Types." nm) in
+                      (Prims.strcat "FStar.Tactics.Stubs.Types." nm) in
                   {
                     FStar_TypeChecker_Cfg.name = uu___1;
                     FStar_TypeChecker_Cfg.arity =
@@ -117,7 +117,7 @@ let mk_total_step_1'_psc :
                       f ea er nf ena enr in
                   let uu___1 =
                     FStar_Ident.lid_of_str
-                      (Prims.op_Hat "FStar.Tactics.Types." nm) in
+                      (Prims.strcat "FStar.Tactics.Stubs.Types." nm) in
                   {
                     FStar_TypeChecker_Cfg.name = uu___1;
                     FStar_TypeChecker_Cfg.arity =
@@ -164,7 +164,7 @@ let mk_total_step_2' :
                           f ea eb er nf ena enb enr in
                       let uu___1 =
                         FStar_Ident.lid_of_str
-                          (Prims.op_Hat "FStar.Tactics.Types." nm) in
+                          (Prims.strcat "FStar.Tactics.Stubs.Types." nm) in
                       {
                         FStar_TypeChecker_Cfg.name = uu___1;
                         FStar_TypeChecker_Cfg.arity =
@@ -417,7 +417,9 @@ let e_tactic_thunk :
       (fun uu___1 ->
          fun uu___2 ->
            fun uu___3 ->
-             fun uu___4 -> failwith "Impossible: embedding tactic (thunk)?")
+             fun uu___4 ->
+               FStar_Compiler_Effect.failwith
+                 "Impossible: embedding tactic (thunk)?")
       (fun t ->
          fun cb ->
            let uu___1 =
@@ -438,7 +440,9 @@ let e_tactic_nbe_thunk :
       FStar_Syntax_Embeddings_Base.emb_typ_of FStar_Syntax_Embeddings.e_unit in
     FStar_TypeChecker_NBETerm.mk_emb
       (fun cb ->
-         fun uu___2 -> failwith "Impossible: NBE embedding tactic (thunk)?")
+         fun uu___2 ->
+           FStar_Compiler_Effect.failwith
+             "Impossible: NBE embedding tactic (thunk)?")
       (fun cb ->
          fun t ->
            let uu___2 =
@@ -461,7 +465,9 @@ let e_tactic_1 :
         (fun uu___1 ->
            fun uu___2 ->
              fun uu___3 ->
-               fun uu___4 -> failwith "Impossible: embedding tactic (1)?")
+               fun uu___4 ->
+                 FStar_Compiler_Effect.failwith
+                   "Impossible: embedding tactic (1)?")
         (fun t ->
            fun cb ->
              let uu___1 = unembed_tactic_1 ea er t cb in
@@ -483,7 +489,9 @@ let e_tactic_nbe_1 :
           FStar_Syntax_Embeddings.e_unit in
       FStar_TypeChecker_NBETerm.mk_emb
         (fun cb ->
-           fun uu___2 -> failwith "Impossible: NBE embedding tactic (1)?")
+           fun uu___2 ->
+             FStar_Compiler_Effect.failwith
+               "Impossible: NBE embedding tactic (1)?")
         (fun cb ->
            fun t ->
              let uu___2 = unembed_tactic_nbe_1 ea er cb t in
@@ -1013,7 +1021,7 @@ let (uu___193 : unit) =
                                                                     fun
                                                                     uu___76
                                                                     ->
-                                                                    failwith
+                                                                    FStar_Compiler_Effect.failwith
                                                                     "NBE unquote")
                                                                     FStar_TypeChecker_NBETerm.e_any
                                                                     FStar_Reflection_V2_NBEEmbeddings.e_term
@@ -2584,7 +2592,7 @@ let e_tactic_1_alt :
   fun ea ->
     fun er ->
       let em uu___ uu___1 uu___2 uu___3 =
-        failwith "Impossible: embedding tactic (1)?" in
+        FStar_Compiler_Effect.failwith "Impossible: embedding tactic (1)?" in
       let un t0 n =
         let uu___ = unembed_tactic_1_alt ea er t0 n in
         match uu___ with
@@ -2881,7 +2889,7 @@ let run_tactic_on_ps' :
                                  FStar_Tactics_V2_Basic.mark_goal_implicit_already_checked
                                    g1;
                                  (let uu___7 =
-                                    FStar_Tactics_Types.is_irrelevant g1 in
+                                    FStar_Tactics_V2_Basic.is_irrelevant g1 in
                                   if uu___7
                                   then
                                     ((let uu___9 =
@@ -2919,7 +2927,8 @@ let run_tactic_on_ps' :
                                            FStar_Compiler_Util.format1
                                              "Irrelevant tactic witness does not unify with (): %s"
                                              uu___12 in
-                                         failwith uu___11)))
+                                         FStar_Compiler_Effect.failwith
+                                           uu___11)))
                                   else ())) remaining_smt_goals;
                             (let uu___7 =
                                FStar_Compiler_Effect.op_Bang tacdbg in
@@ -3010,7 +3019,7 @@ let run_tactic_on_ps' :
                                | FStar_Tactics_Common.EExn t ->
                                    let uu___6 =
                                      FStar_Syntax_Print.term_to_string t in
-                                   Prims.op_Hat "uncaught exception: " uu___6
+                                   Prims.strcat "uncaught exception: " uu___6
                                | e2 -> FStar_Compiler_Effect.raise e2 in
                              let rng =
                                if background

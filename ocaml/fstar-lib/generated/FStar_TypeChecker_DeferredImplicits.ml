@@ -21,7 +21,7 @@ let (flex_uvar_head :
           uu___2.FStar_Syntax_Syntax.n in
         (match uu___1 with
          | FStar_Syntax_Syntax.Tm_uvar (u, uu___2) -> u
-         | uu___2 -> failwith "Not a flex-uvar")
+         | uu___2 -> FStar_Compiler_Effect.failwith "Not a flex-uvar")
 type goal_type =
   | FlexRigid of (FStar_Syntax_Syntax.ctx_uvar * FStar_Syntax_Syntax.term) 
   | FlexFlex of (FStar_Syntax_Syntax.ctx_uvar * FStar_Syntax_Syntax.ctx_uvar)
@@ -117,8 +117,9 @@ let (print_uvar_set :
                     u.FStar_Syntax_Syntax.ctx_uvar_head in
                 FStar_Compiler_Effect.op_Less_Bar
                   FStar_Compiler_Util.string_of_int uu___3 in
-              Prims.op_Hat "?" uu___2)) in
-    FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat "; ")
+              Prims.strcat "?" uu___2)) in
+    FStar_Compiler_Effect.op_Bar_Greater uu___
+      (FStar_Compiler_String.concat "; ")
 let (print_goal_dep : goal_dep -> Prims.string) =
   fun gd ->
     let uu___ = FStar_Compiler_Util.string_of_int gd.goal_dep_id in
@@ -129,7 +130,8 @@ let (print_goal_dep : goal_dep -> Prims.string) =
         FStar_Compiler_List.map
           (fun gd1 -> FStar_Compiler_Util.string_of_int gd1.goal_dep_id)
           uu___4 in
-      FStar_Compiler_Effect.op_Bar_Greater uu___3 (FStar_String.concat "; ") in
+      FStar_Compiler_Effect.op_Bar_Greater uu___3
+        (FStar_Compiler_String.concat "; ") in
     let uu___3 =
       FStar_Syntax_Print.ctx_uvar_to_string
         (gd.goal_imp).FStar_TypeChecker_Common.imp_uvar in
@@ -194,7 +196,8 @@ let (find_user_tac_for_uvar :
               candidates in
           FStar_Compiler_Effect.op_Bar_Greater uu___1
             (FStar_Compiler_List.map FStar_Ident.string_of_lid) in
-        FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat ", ") in
+        FStar_Compiler_Effect.op_Bar_Greater uu___
+          (FStar_Compiler_String.concat ", ") in
       match u.FStar_Syntax_Syntax.ctx_uvar_meta with
       | FStar_Pervasives_Native.Some (FStar_Syntax_Syntax.Ctx_uvar_meta_attr
           a) ->
@@ -356,14 +359,15 @@ let solve_goals_with_tac :
                        match uu___3 with
                        | FStar_Pervasives_Native.Some dd1 -> dd1
                        | FStar_Pervasives_Native.None ->
-                           failwith "Expected a dd" in
+                           FStar_Compiler_Effect.failwith "Expected a dd" in
                      let term =
                        let uu___3 =
                          FStar_Syntax_Syntax.lid_as_fv lid
                            FStar_Pervasives_Native.None in
                        FStar_Syntax_Syntax.fv_to_tm uu___3 in
                      term
-                 | uu___2 -> failwith "Resolve_tac not found" in
+                 | uu___2 ->
+                     FStar_Compiler_Effect.failwith "Resolve_tac not found" in
                let env1 =
                  {
                    FStar_TypeChecker_Env.solver =
@@ -781,11 +785,13 @@ let (solve_deferred_to_tactic_goals :
                                         else FStar_Pervasives_Native.None) in
                                    (match sigelt with
                                     | FStar_Pervasives_Native.None ->
-                                        failwith
+                                        FStar_Compiler_Effect.failwith
                                           "Impossible: No tactic associated with deferred problem"
                                     | FStar_Pervasives_Native.Some se ->
                                         (imp, se)))))
-                | uu___3 -> failwith "Unexpected problem deferred to tactic") in
+                | uu___3 ->
+                    FStar_Compiler_Effect.failwith
+                      "Unexpected problem deferred to tactic") in
          let eqs =
            FStar_Compiler_List.map prob_as_implicit
              g.FStar_TypeChecker_Common.deferred_to_tac in
@@ -822,7 +828,8 @@ let (solve_deferred_to_tactic_goals :
                         let uu___4 = FStar_Syntax_Util.lid_of_sigelt s in
                         (match uu___4 with
                          | FStar_Pervasives_Native.None ->
-                             failwith "Unexpected: tactic without a name"
+                             FStar_Compiler_Effect.failwith
+                               "Unexpected: tactic without a name"
                          | FStar_Pervasives_Native.Some l ->
                              let lstr = FStar_Ident.string_of_lid l in
                              let uu___5 =

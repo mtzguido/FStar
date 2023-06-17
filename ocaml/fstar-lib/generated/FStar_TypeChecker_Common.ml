@@ -112,7 +112,9 @@ let (__proj__CProb__item___0 : prob -> FStar_Syntax_Syntax.comp problem) =
   fun projectee -> match projectee with | CProb _0 -> _0
 let (as_tprob : prob -> FStar_Syntax_Syntax.typ problem) =
   fun uu___ ->
-    match uu___ with | TProb p -> p | uu___1 -> failwith "Expected a TProb"
+    match uu___ with
+    | TProb p -> p
+    | uu___1 -> FStar_Compiler_Effect.failwith "Expected a TProb"
 type probs = prob Prims.list
 type guard_formula =
   | Trivial 
@@ -473,15 +475,15 @@ let (check_uvar_ctx_invariant :
                         match uu___1 with
                         | FStar_Syntax_Syntax.Binding_var x ->
                             let uu___2 = FStar_Syntax_Print.bv_to_string x in
-                            Prims.op_Hat "Binding_var " uu___2
+                            Prims.strcat "Binding_var " uu___2
                         | FStar_Syntax_Syntax.Binding_univ u ->
                             let uu___2 = FStar_Ident.string_of_id u in
-                            Prims.op_Hat "Binding_univ " uu___2
+                            Prims.strcat "Binding_univ " uu___2
                         | FStar_Syntax_Syntax.Binding_lid (l, uu___2) ->
                             let uu___3 = FStar_Ident.string_of_lid l in
-                            Prims.op_Hat "Binding_lid " uu___3)) in
+                            Prims.strcat "Binding_lid " uu___3)) in
               FStar_Compiler_Effect.op_Bar_Greater uu___
-                (FStar_String.concat "::\n") in
+                (FStar_Compiler_String.concat "::\n") in
             let fail uu___ =
               let uu___1 =
                 let uu___2 = FStar_Compiler_Range_Ops.string_of_range r in
@@ -491,7 +493,7 @@ let (check_uvar_ctx_invariant :
                   "Invariant violation: gamma and binders are out of sync\n\treason=%s, range=%s, should_check=%s\n\t\n                               gamma=%s\n\tbinders=%s\n"
                   reason uu___2 (if should_check then "true" else "false")
                   uu___3 uu___4 in
-              failwith uu___1 in
+              FStar_Compiler_Effect.failwith uu___1 in
             if Prims.op_Negation should_check
             then ()
             else
@@ -1389,7 +1391,7 @@ let (simplify :
                                                             = uu___32;_}
                                                         -> hd
                                                     | uu___32 ->
-                                                        failwith
+                                                        FStar_Compiler_Effect.failwith
                                                           "Impossible! We have already checked that this is a Tm_app" in
                                                   let uu___31 =
                                                     let uu___32 =
@@ -1761,7 +1763,7 @@ let (simplify :
                                                             = uu___28;_}
                                                         -> hd
                                                     | uu___28 ->
-                                                        failwith
+                                                        FStar_Compiler_Effect.failwith
                                                           "Impossible! We have already checked that this is a Tm_app" in
                                                   let uu___27 =
                                                     let uu___28 =

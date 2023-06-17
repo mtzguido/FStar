@@ -1,6 +1,6 @@
 open Prims
 let (string_compare : Prims.string -> Prims.string -> Prims.int) =
-  fun s1 -> fun s2 -> FStar_String.compare s1 s2
+  fun s1 -> fun s2 -> FStar_Compiler_String.compare s1 s2
 type 'a heap =
   | EmptyHeap 
   | Heap of ('a * 'a heap Prims.list) 
@@ -101,8 +101,10 @@ let merge_increasing_lists_rev :
     fun lists ->
       let cmp v1 v2 =
         match (v1, v2) with
-        | ((uu___, []), uu___1) -> failwith "impossible"
-        | (uu___, (uu___1, [])) -> failwith "impossible"
+        | ((uu___, []), uu___1) ->
+            FStar_Compiler_Effect.failwith "impossible"
+        | (uu___, (uu___1, [])) ->
+            FStar_Compiler_Effect.failwith "impossible"
         | ((pr1, h1::uu___), (pr2, h2::uu___1)) ->
             let cmp_h =
               let uu___2 = key_fn h1 in
@@ -113,7 +115,7 @@ let merge_increasing_lists_rev :
         match uu___ with
         | FStar_Pervasives_Native.None -> acc
         | FStar_Pervasives_Native.Some ((pr, []), uu___1) ->
-            failwith "impossible"
+            FStar_Compiler_Effect.failwith "impossible"
         | FStar_Pervasives_Native.Some ((pr, v::[]), lists2) ->
             let uu___1 = push_nodup key_fn v acc in aux lists2 uu___1
         | FStar_Pervasives_Native.Some ((pr, v::tl), lists2) ->
@@ -166,7 +168,9 @@ let rec btree_from_list :
          match uu___1 with
          | (lbt, nodes_left) ->
              (match nodes_left with
-              | [] -> failwith "Invalid size passed to btree_from_list"
+              | [] ->
+                  FStar_Compiler_Effect.failwith
+                    "Invalid size passed to btree_from_list"
               | (k, v)::nodes_left1 ->
                   let uu___2 = btree_from_list nodes_left1 rbt_size in
                   (match uu___2 with
@@ -332,7 +336,7 @@ let rec btree_fold :
             let uu___ = let uu___1 = btree_fold rbt f acc in f k v uu___1 in
             btree_fold lbt f uu___
 let (query_to_string : Prims.string Prims.list -> Prims.string) =
-  fun q -> FStar_String.concat "." q
+  fun q -> FStar_Compiler_String.concat "." q
 type 'a name_collection =
   | Names of 'a btree 
   | ImportedNames of (Prims.string * 'a name_collection Prims.list) 
@@ -392,7 +396,7 @@ let rec trie_find_exact :
   fun tr ->
     fun query1 ->
       match query1 with
-      | [] -> failwith "Empty query in trie_find_exact"
+      | [] -> FStar_Compiler_Effect.failwith "Empty query in trie_find_exact"
       | name::[] -> names_find_exact tr.bindings name
       | ns::query2 ->
           let uu___ = names_find_exact tr.namespaces ns in
@@ -732,7 +736,7 @@ let (register_module_path :
                    mod_loaded = loaded1
                  }) in
           let name_of_revq query1 =
-            FStar_String.concat "." (FStar_Compiler_List.rev query1) in
+            FStar_Compiler_String.concat "." (FStar_Compiler_List.rev query1) in
           let ins id q revq bindings loaded1 =
             let name = name_of_revq (id :: revq) in
             match q with
@@ -753,7 +757,7 @@ let (string_of_path : path -> Prims.string) =
   fun path1 ->
     let uu___ =
       FStar_Compiler_List.map (fun el -> (el.segment).completion) path1 in
-    FStar_String.concat "." uu___
+    FStar_Compiler_String.concat "." uu___
 let (match_length_of_path : path -> Prims.int) =
   fun path1 ->
     let uu___ =
@@ -766,7 +770,8 @@ let (match_length_of_path : path -> Prims.int) =
                  (match (elem.segment).prefix with
                   | FStar_Pervasives_Native.Some prefix ->
                       let completion_len =
-                        FStar_String.length (elem.segment).completion in
+                        FStar_Compiler_String.length
+                          (elem.segment).completion in
                       (((acc_len + Prims.int_one) + completion_len),
                         (prefix, completion_len))
                   | FStar_Pervasives_Native.None -> acc))
@@ -774,7 +779,7 @@ let (match_length_of_path : path -> Prims.int) =
     match uu___ with
     | (length, (last_prefix, last_completion_length)) ->
         ((length - Prims.int_one) - last_completion_length) +
-          (FStar_String.length last_prefix)
+          (FStar_Compiler_String.length last_prefix)
 let (first_import_of_path :
   path -> Prims.string FStar_Pervasives_Native.option) =
   fun path1 ->

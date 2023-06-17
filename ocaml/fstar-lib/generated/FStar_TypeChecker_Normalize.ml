@@ -199,7 +199,8 @@ let set_memo :
           let uu___ = FStar_Compiler_Effect.op_Bang r in
           match uu___ with
           | FStar_Pervasives_Native.Some uu___1 ->
-              failwith "Unexpected set_memo: thunk already evaluated"
+              FStar_Compiler_Effect.failwith
+                "Unexpected set_memo: thunk already evaluated"
           | FStar_Pervasives_Native.None ->
               FStar_Compiler_Effect.op_Colon_Equals r
                 (FStar_Pervasives_Native.Some t)
@@ -233,7 +234,8 @@ let (env_to_string :
                      FStar_Syntax_Print.binder_to_string x in
                let uu___3 = closure_to_string c in
                FStar_Compiler_Util.format2 "(%s, %s)" uu___2 uu___3) env1 in
-    FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat "; ")
+    FStar_Compiler_Effect.op_Bar_Greater uu___
+      (FStar_Compiler_String.concat "; ")
 let (stack_elt_to_string : stack_elt -> Prims.string) =
   fun uu___ ->
     match uu___ with
@@ -260,7 +262,8 @@ let (stack_elt_to_string : stack_elt -> Prims.string) =
 let (stack_to_string : stack_elt Prims.list -> Prims.string) =
   fun s ->
     let uu___ = FStar_Compiler_List.map stack_elt_to_string s in
-    FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat "; ")
+    FStar_Compiler_Effect.op_Bar_Greater uu___
+      (FStar_Compiler_String.concat "; ")
 let is_empty : 'uuuuu . 'uuuuu Prims.list -> Prims.bool =
   fun uu___ -> match uu___ with | [] -> true | uu___1 -> false
 let (lookup_bvar :
@@ -283,7 +286,7 @@ let (lookup_bvar :
             let uu___3 = env_to_string env1 in
             FStar_Compiler_Util.format2 "Failed to find %s\nEnv is %s\n"
               uu___2 uu___3 in
-          failwith uu___1
+          FStar_Compiler_Effect.failwith uu___1
 let (downgrade_ghost_effect_name :
   FStar_Ident.lident -> FStar_Ident.lident FStar_Pervasives_Native.option) =
   fun l ->
@@ -364,18 +367,17 @@ let (norm_universe :
                                FStar_Compiler_Util.format1
                                  "Impossible: universe variable u@%s bound to a term"
                                  uu___4 in
-                             failwith uu___3)) ()
+                             FStar_Compiler_Effect.failwith uu___3)) ()
                with
-               | uu___1 ->
+               | uu___ ->
                    if
                      (cfg.FStar_TypeChecker_Cfg.steps).FStar_TypeChecker_Cfg.allow_unbound_universes
                    then [FStar_Syntax_Syntax.U_unknown]
                    else
-                     (let uu___3 =
-                        let uu___4 = FStar_Compiler_Util.string_of_int x in
-                        FStar_String.op_Hat "Universe variable not found: u@"
-                          uu___4 in
-                      failwith uu___3))
+                     (let uu___2 =
+                        let uu___3 = FStar_Compiler_Util.string_of_int x in
+                        Prims.strcat "Universe variable not found: u@" uu___3 in
+                      FStar_Compiler_Effect.failwith uu___2))
           | FStar_Syntax_Syntax.U_unif uu___ when
               (cfg.FStar_TypeChecker_Cfg.steps).FStar_TypeChecker_Cfg.check_no_uvars
               -> [FStar_Syntax_Syntax.U_zero]
@@ -474,7 +476,7 @@ let rec (inline_closure_env :
                              FStar_Compiler_Util.format2
                                "(%s): CheckNoUvars: Unexpected unification variable remains: %s"
                                uu___4 uu___5 in
-                           failwith uu___3
+                           FStar_Compiler_Effect.failwith uu___3
                        | uu___2 -> inline_closure_env cfg env1 stack1 t1)
                     else
                       (let s' =
@@ -519,7 +521,7 @@ let rec (inline_closure_env :
                                                   FStar_Syntax_Syntax.NT
                                                     (x, t1))
                                          | uu___4 ->
-                                             failwith
+                                             FStar_Compiler_Effect.failwith
                                                "Impossible: subst invariant of uvar nodes")))) in
                        let t1 =
                          {
@@ -551,7 +553,7 @@ let rec (inline_closure_env :
                     let uu___2 = lookup_bvar env1 x in
                     (match uu___2 with
                      | Univ uu___3 ->
-                         failwith
+                         FStar_Compiler_Effect.failwith
                            "Impossible: term variable is bound to a universe"
                      | Dummy ->
                          let x1 =
@@ -1051,7 +1053,9 @@ and (rebuild_closure :
                         FStar_Syntax_Syntax.meta = m1
                       }) r in
                rebuild_closure cfg env1 stack2 t1
-           | uu___1 -> failwith "Impossible: unexpected stack element")
+           | uu___1 ->
+               FStar_Compiler_Effect.failwith
+                 "Impossible: unexpected stack element")
 and (close_match_returns :
   FStar_TypeChecker_Cfg.cfg ->
     env ->
@@ -1717,7 +1721,7 @@ let (rejig_norm_request :
                let uu___1 = FStar_Syntax_Util.mk_app hd [t1; t2] in
                FStar_Syntax_Util.mk_app uu___1 rest
            | uu___1 ->
-               failwith
+               FStar_Compiler_Effect.failwith
                  "Impossible! invalid rejig_norm_request for normalize_term")
       | FStar_Syntax_Syntax.Tm_fvar fv when
           FStar_Syntax_Syntax.fv_eq_lid fv FStar_Parser_Const.normalize ->
@@ -1727,7 +1731,7 @@ let (rejig_norm_request :
                let uu___1 = FStar_Syntax_Util.mk_app hd [t] in
                FStar_Syntax_Util.mk_app uu___1 rest
            | uu___1 ->
-               failwith
+               FStar_Compiler_Effect.failwith
                  "Impossible! invalid rejig_norm_request for normalize")
       | FStar_Syntax_Syntax.Tm_fvar fv when
           FStar_Syntax_Syntax.fv_eq_lid fv FStar_Parser_Const.norm ->
@@ -1737,13 +1741,14 @@ let (rejig_norm_request :
                let uu___1 = FStar_Syntax_Util.mk_app hd [t1; t2; t3] in
                FStar_Syntax_Util.mk_app uu___1 rest
            | uu___1 ->
-               failwith "Impossible! invalid rejig_norm_request for norm")
+               FStar_Compiler_Effect.failwith
+                 "Impossible! invalid rejig_norm_request for norm")
       | uu___1 ->
           let uu___2 =
             let uu___3 = FStar_Syntax_Print.term_to_string hd in
-            FStar_String.op_Hat
-              "Impossible! invalid rejig_norm_request for: %s" uu___3 in
-          failwith uu___2
+            Prims.strcat "Impossible! invalid rejig_norm_request for: %s"
+              uu___3 in
+          FStar_Compiler_Effect.failwith uu___2
 let (is_nbe_request : FStar_TypeChecker_Env.step Prims.list -> Prims.bool) =
   fun s ->
     FStar_Compiler_Util.for_some
@@ -1897,7 +1902,8 @@ let rec (maybe_weakly_reduced :
                ct.FStar_Syntax_Syntax.effect_args) in
     let t = FStar_Syntax_Subst.compress tm in
     match t.FStar_Syntax_Syntax.n with
-    | FStar_Syntax_Syntax.Tm_delayed uu___ -> failwith "Impossible"
+    | FStar_Syntax_Syntax.Tm_delayed uu___ ->
+        FStar_Compiler_Effect.failwith "Impossible"
     | FStar_Syntax_Syntax.Tm_name uu___ -> false
     | FStar_Syntax_Syntax.Tm_uvar uu___ -> false
     | FStar_Syntax_Syntax.Tm_type uu___ -> false
@@ -2675,7 +2681,8 @@ let (should_unfold :
                    let uu___3 = string_of_res res in
                    FStar_Compiler_Util.format1
                      "Unexpected unfolding result: %s" uu___3 in
-                 FStar_Compiler_Effect.op_Less_Bar failwith uu___2 in
+                 FStar_Compiler_Effect.op_Less_Bar
+                   FStar_Compiler_Effect.failwith uu___2 in
            (let uu___2 =
               ((((cfg.FStar_TypeChecker_Cfg.steps).FStar_TypeChecker_Cfg.unfold_tac
                    &&
@@ -3380,9 +3387,10 @@ let rec (norm :
                let uu___2 = lookup_bvar env1 x in
                (match uu___2 with
                 | Univ uu___3 ->
-                    failwith
+                    FStar_Compiler_Effect.failwith
                       "Impossible: term variable is bound to a universe"
-                | Dummy -> failwith "Term variable not found"
+                | Dummy ->
+                    FStar_Compiler_Effect.failwith "Term variable not found"
                 | Clos (env2, t0, r, fix) ->
                     if
                       ((Prims.op_Negation fix) ||
@@ -3515,7 +3523,7 @@ let rec (norm :
                             body1))) in
                (match stack2 with
                 | (UnivArgs uu___2)::uu___3 ->
-                    failwith
+                    FStar_Compiler_Effect.failwith
                       "Ill-typed term: universes cannot be applied to term abstraction"
                 | (Arg (c, uu___2, uu___3))::stack_rest ->
                     (match c with
@@ -3524,7 +3532,7 @@ let rec (norm :
                            stack_rest t1
                      | uu___4 ->
                          (match bs with
-                          | [] -> failwith "Impossible"
+                          | [] -> FStar_Compiler_Effect.failwith "Impossible"
                           | b::[] ->
                               (FStar_TypeChecker_Cfg.log cfg
                                  (fun uu___6 ->
@@ -4603,7 +4611,8 @@ let rec (norm :
                                    }) t1.FStar_Syntax_Syntax.pos in
                             rebuild cfg env1 stack2 t2)))
            | FStar_Syntax_Syntax.Tm_delayed uu___2 ->
-               failwith "impossible: Tm_delayed on norm"
+               FStar_Compiler_Effect.failwith
+                 "impossible: Tm_delayed on norm"
            | FStar_Syntax_Syntax.Tm_uvar uu___2 ->
                if
                  (cfg.FStar_TypeChecker_Cfg.steps).FStar_TypeChecker_Cfg.check_no_uvars
@@ -4616,7 +4625,7 @@ let rec (norm :
                    FStar_Compiler_Util.format2
                      "(%s) CheckNoUvars: Unexpected unification variable remains: %s"
                      uu___4 uu___5 in
-                 failwith uu___3
+                 FStar_Compiler_Effect.failwith uu___3
                else
                  (let uu___4 = inline_closure_env cfg env1 [] t1 in
                   rebuild cfg env1 stack2 uu___4))
@@ -4702,7 +4711,7 @@ and (do_unfold_fv :
                           FStar_Compiler_Util.format1
                             "Impossible: missing universe instantiation on %s"
                             uu___4 in
-                        failwith uu___3
+                        FStar_Compiler_Effect.failwith uu___3
                   else norm cfg empty_env stack1 t1))
 and (reduce_impure_comp :
   FStar_TypeChecker_Cfg.cfg ->
@@ -4764,7 +4773,7 @@ and (do_reify_monadic :
                        FStar_Compiler_Util.format1
                          "INTERNAL ERROR: do_reify_monadic: bad stack: %s"
                          uu___3 in
-                     failwith uu___2);
+                     FStar_Compiler_Effect.failwith uu___2);
                 (let top0 = top in
                  let top1 = FStar_Syntax_Util.unascribe top in
                  FStar_TypeChecker_Cfg.log cfg
@@ -4806,7 +4815,7 @@ and (do_reify_monadic :
                             | (uu___6, bind_repr) ->
                                 (match lb.FStar_Syntax_Syntax.lbname with
                                  | FStar_Pervasives.Inr uu___7 ->
-                                     failwith
+                                     FStar_Compiler_Effect.failwith
                                        "Cannot reify a top-level let binding"
                                  | FStar_Pervasives.Inl x ->
                                      let is_return e =
@@ -4993,7 +5002,7 @@ and (do_reify_monadic :
                                                    FStar_Syntax_Syntax.mk
                                                      uu___13 rng
                                                | uu___11 ->
-                                                   failwith
+                                                   FStar_Compiler_Effect.failwith
                                                      "NIY : Reification of indexed effects" in
                                              let bind_inst_args f_arg =
                                                let uu___10 =
@@ -5560,7 +5569,8 @@ and (reify_lift :
                               FStar_Syntax_Syntax.mk uu___8
                                 e.FStar_Syntax_Syntax.pos
                           | uu___7 ->
-                              failwith "NIY : Reification of indexed effects" in
+                              FStar_Compiler_Effect.failwith
+                                "NIY : Reification of indexed effects" in
                         let uu___6 =
                           let bv =
                             FStar_Syntax_Syntax.new_bv
@@ -5633,7 +5643,7 @@ and (reify_lift :
                       FStar_Compiler_Util.format2
                         "Impossible : trying to reify a lift between unrelated effects (%s and %s)"
                         uu___5 uu___6 in
-                    failwith uu___4
+                    FStar_Compiler_Effect.failwith uu___4
                 | FStar_Pervasives_Native.Some
                     { FStar_TypeChecker_Env.msource = uu___4;
                       FStar_TypeChecker_Env.mtarget = uu___5;
@@ -5649,7 +5659,7 @@ and (reify_lift :
                       FStar_Compiler_Util.format2
                         "Impossible : trying to reify a non-reifiable lift (from %s to %s)"
                         uu___9 uu___10 in
-                    failwith uu___8
+                    FStar_Compiler_Effect.failwith uu___8
                 | FStar_Pervasives_Native.Some
                     { FStar_TypeChecker_Env.msource = uu___4;
                       FStar_TypeChecker_Env.mtarget = uu___5;
@@ -6658,7 +6668,7 @@ and (maybe_simplify_aux :
                                                                     = uu___35;_}
                                                                     -> hd
                                                                 | uu___35 ->
-                                                                    failwith
+                                                                    FStar_Compiler_Effect.failwith
                                                                     "Impossible! We have already checked that this is a Tm_app" in
                                                               let uu___34 =
                                                                 let uu___35 =
@@ -7132,7 +7142,7 @@ and (maybe_simplify_aux :
                                                                     = uu___31;_}
                                                                     -> hd
                                                                 | uu___31 ->
-                                                                    failwith
+                                                                    FStar_Compiler_Effect.failwith
                                                                     "Impossible! We have already checked that this is a Tm_app" in
                                                               let uu___30 =
                                                                 let uu___31 =
@@ -7254,11 +7264,11 @@ and (rebuild :
                               (FStar_Compiler_List.map
                                  FStar_Syntax_Print.bv_to_string) in
                           FStar_Compiler_Effect.op_Bar_Greater uu___9
-                            (FStar_String.concat ", ") in
+                            (FStar_Compiler_String.concat ", ") in
                         FStar_Compiler_Util.print3
                           "!!! Rebuild (%s) %s, free vars=%s\n" uu___6 uu___7
                           uu___8);
-                       failwith "DIE!")
+                       FStar_Compiler_Effect.failwith "DIE!")
                 else ()));
           (let f_opt = is_fext_on_domain t in
            let uu___1 =
@@ -7349,9 +7359,9 @@ and (rebuild :
                     } in
                   rebuild cfg env1 stack2 uu___3
               | (Arg (Univ uu___3, uu___4, uu___5))::uu___6 ->
-                  failwith "Impossible"
+                  FStar_Compiler_Effect.failwith "Impossible"
               | (Arg (Dummy, uu___3, uu___4))::uu___5 ->
-                  failwith "Impossible"
+                  FStar_Compiler_Effect.failwith "Impossible"
               | (UnivArgs (us, r))::stack2 ->
                   let t2 = FStar_Syntax_Syntax.mk_Tm_uinst t1 us in
                   rebuild cfg env1 stack2 t2
@@ -7668,7 +7678,7 @@ and (rebuild :
                                        | (p, uu___11, uu___12) ->
                                            FStar_Syntax_Print.pat_to_string p)) in
                              FStar_Compiler_Effect.op_Bar_Greater uu___9
-                               (FStar_String.concat "\n\t") in
+                               (FStar_Compiler_String.concat "\n\t") in
                            FStar_Compiler_Util.print2
                              "match is irreducible: scrutinee=%s\nbranches=%s\n"
                              uu___7 uu___8);
@@ -8171,7 +8181,8 @@ and (rebuild :
                                                   FStar_Syntax_Print.term_to_string
                                                     t2) s in
                                        FStar_Compiler_Effect.op_Bar_Greater
-                                         uu___9 (FStar_String.concat "; ") in
+                                         uu___9
+                                         (FStar_Compiler_String.concat "; ") in
                                      FStar_Compiler_Util.print2
                                        "Matches pattern %s with subst = %s\n"
                                        uu___7 uu___8);
@@ -9119,7 +9130,8 @@ let (elim_uvars_aux_tc :
             match (binders, tc) with
             | ([], FStar_Pervasives.Inl t1) -> t1
             | ([], FStar_Pervasives.Inr c) ->
-                failwith "Impossible: empty bindes with a comp"
+                FStar_Compiler_Effect.failwith
+                  "Impossible: empty bindes with a comp"
             | (uu___, FStar_Pervasives.Inr c) ->
                 FStar_Syntax_Syntax.mk
                   (FStar_Syntax_Syntax.Tm_arrow
@@ -9166,7 +9178,7 @@ let (elim_uvars_aux_tc :
                               (FStar_Syntax_Util.comp_result c)))
                      | (uu___4, FStar_Pervasives.Inl uu___5) ->
                          ([], (FStar_Pervasives.Inl t3))
-                     | uu___4 -> failwith "Impossible") in
+                     | uu___4 -> FStar_Compiler_Effect.failwith "Impossible") in
               (match uu___1 with
                | (binders1, tc1) -> (univ_names1, binders1, tc1))
 let (elim_uvars_aux_t :
@@ -9543,7 +9555,8 @@ let rec (elim_uvars :
                                    FStar_Syntax_Syntax.eff_opt =
                                      FStar_Pervasives_Native.None;_}
                                  -> (defn, typ)
-                             | uu___5 -> failwith "Impossible" in
+                             | uu___5 ->
+                                 FStar_Compiler_Effect.failwith "Impossible" in
                            let destruct_action_typ_templ t =
                              let uu___4 =
                                let uu___5 = FStar_Syntax_Subst.compress t in
@@ -9870,7 +9883,7 @@ let (maybe_unfold_head_fv :
         | FStar_Syntax_Syntax.Tm_fvar fv ->
             FStar_Pervasives_Native.Some (fv, [])
         | uu___1 ->
-            failwith
+            FStar_Compiler_Effect.failwith
               "Impossible: maybe_unfold_head_fv is called with a non fvar/uinst" in
       match fv_us_opt with
       | FStar_Pervasives_Native.None -> FStar_Pervasives_Native.None

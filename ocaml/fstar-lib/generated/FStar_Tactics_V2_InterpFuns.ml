@@ -26,7 +26,7 @@ let rec drop : 'uuuuu . Prims.int -> 'uuuuu Prims.list -> 'uuuuu Prims.list =
       then l
       else
         (match l with
-         | [] -> failwith "drop: impossible"
+         | [] -> FStar_Compiler_Effect.failwith "drop: impossible"
          | uu___1::xs -> drop (n - Prims.int_one) xs)
 let timing_int :
   'uuuuu 'uuuuu1 'uuuuu2 'uuuuu3 .
@@ -61,7 +61,8 @@ let (mk :
         fun interp ->
           fun nbe_interp ->
             let nm1 =
-              FStar_Parser_Const.fstar_tactics_lid' ["V2"; "Builtins"; nm] in
+              FStar_Parser_Const.fstar_tactics_lid'
+                ["V2"; "Stubs"; "Builtins"; nm] in
             {
               FStar_TypeChecker_Cfg.name = nm1;
               FStar_TypeChecker_Cfg.arity = arity;
@@ -99,7 +100,8 @@ let (mkt :
         fun interp ->
           fun nbe_interp ->
             let nm1 =
-              FStar_Parser_Const.fstar_tactics_lid' ["V2"; "Builtins"; nm] in
+              FStar_Parser_Const.fstar_tactics_lid'
+                ["V2"; "Stubs"; "Builtins"; nm] in
             {
               FStar_TypeChecker_Cfg.name = nm1;
               FStar_TypeChecker_Cfg.arity = arity;

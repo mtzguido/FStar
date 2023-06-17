@@ -21,11 +21,11 @@ let (fstar_refl_lid : Prims.string Prims.list -> FStar_Ident.lident) =
       (FStar_Compiler_List.op_At ["FStar"; "Reflection"] s)
       FStar_Compiler_Range_Type.dummyRange
 let (fstar_refl_types_lid : Prims.string -> FStar_Ident.lident) =
-  fun s -> fstar_refl_lid ["Types"; s]
+  fun s -> fstar_refl_lid ["Stubs"; "Types"; s]
 let (fstar_refl_builtins_lid : Prims.string -> FStar_Ident.lident) =
-  fun s -> fstar_refl_lid ["V1"; "Builtins"; s]
+  fun s -> fstar_refl_lid ["V1"; "Stubs"; "Builtins"; s]
 let (fstar_refl_data_lid : Prims.string -> FStar_Ident.lident) =
-  fun s -> fstar_refl_lid ["V1"; "Data"; s]
+  fun s -> fstar_refl_lid ["V1"; "Stubs"; "Data"; s]
 let (fstar_refl_data_const : Prims.string -> refl_constant) =
   fun s ->
     let lid = fstar_refl_data_lid s in
@@ -49,8 +49,8 @@ let (mk_refl_data_lid_as_fv : Prims.string -> FStar_Syntax_Syntax.fv) =
 let (mk_inspect_pack_pair : Prims.string -> (refl_constant * refl_constant))
   =
   fun s ->
-    let inspect_lid = fstar_refl_builtins_lid (Prims.op_Hat "inspect" s) in
-    let pack_lid = fstar_refl_builtins_lid (Prims.op_Hat "pack" s) in
+    let inspect_lid = fstar_refl_builtins_lid (Prims.strcat "inspect" s) in
+    let pack_lid = fstar_refl_builtins_lid (Prims.strcat "pack" s) in
     let inspect_fv =
       FStar_Syntax_Syntax.lid_as_fv inspect_lid FStar_Pervasives_Native.None in
     let pack_fv =

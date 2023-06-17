@@ -51,18 +51,20 @@ let print_discrepancy :
           | (h1::t1, h2::t2) ->
               ((Prims.op_Negation h1) || h2) && (blist_leq t1 t2)
           | ([], []) -> true
-          | uu___ -> failwith "print_discrepancy: bad lists" in
+          | uu___ ->
+              FStar_Compiler_Effect.failwith "print_discrepancy: bad lists" in
         let rec succ l =
           match l with
           | (false)::t -> true :: t
           | (true)::t -> let uu___ = succ t in false :: uu___
-          | [] -> failwith "" in
+          | [] -> FStar_Compiler_Effect.failwith "" in
         let full l = FStar_Compiler_List.for_all (fun b -> b) l in
         let get_bool_option s =
           let uu___ = FStar_Options.get_option s in
           match uu___ with
           | FStar_Options.Bool b -> b
-          | uu___1 -> failwith "print_discrepancy: impossible" in
+          | uu___1 ->
+              FStar_Compiler_Effect.failwith "print_discrepancy: impossible" in
         let set_bool_option s b =
           FStar_Options.set_option s (FStar_Options.Bool b) in
         let get uu___ =
@@ -77,16 +79,18 @@ let print_discrepancy :
                set_bool_option "print_universes" pu;
                set_bool_option "print_effect_args" pea;
                set_bool_option "print_full_names " pf)
-          | uu___ -> failwith "impossible: print_discrepancy" in
+          | uu___ ->
+              FStar_Compiler_Effect.failwith "impossible: print_discrepancy" in
         let bas = get () in
         let rec go cur =
-          match () with
-          | () when full cur ->
-              let uu___ = print () in
-              (match uu___ with | (xs, ys, uu___1) -> (xs, ys))
-          | () when let uu___ = blist_leq bas cur in Prims.op_Negation uu___
-              -> let uu___ = succ cur in go uu___
-          | () ->
+          if full cur
+          then
+            let uu___ = print () in
+            match uu___ with | (xs, ys, uu___1) -> (xs, ys)
+          else
+            if (let uu___ = blist_leq bas cur in Prims.op_Negation uu___)
+            then (let uu___ = succ cur in go uu___)
+            else
               (set cur;
                (let uu___1 = print () in
                 match uu___1 with
@@ -105,10 +109,10 @@ let (errors_smt_detail :
         let maybe_add_smt_detail msg =
           match smt_detail with
           | FStar_Pervasives.Inr d ->
-              Prims.op_Hat msg (Prims.op_Hat "\n\t" d)
+              Prims.strcat msg (Prims.strcat "\n\t" d)
           | FStar_Pervasives.Inl d when
               (FStar_Compiler_Util.trim_string d) <> "" ->
-              Prims.op_Hat msg (Prims.op_Hat "; " d)
+              Prims.strcat msg (Prims.strcat "; " d)
           | uu___ -> msg in
         let errs1 =
           FStar_Compiler_Effect.op_Bar_Greater errs
@@ -158,15 +162,15 @@ let (errors_smt_detail :
                                            let uu___12 =
                                              FStar_Compiler_Range_Ops.string_of_def_range
                                                r in
-                                           Prims.op_Hat uu___12 ")" in
-                                         Prims.op_Hat
+                                           Prims.strcat uu___12 ")" in
+                                         Prims.strcat
                                            "(Other related locations: "
                                            uu___11
                                        else "" in
-                                     Prims.op_Hat ")" uu___9 in
-                                   Prims.op_Hat uu___7 uu___8 in
-                                 Prims.op_Hat " (Also see: " uu___6 in
-                               Prims.op_Hat msg uu___5 in
+                                     Prims.strcat ")" uu___9 in
+                                   Prims.strcat uu___7 uu___8 in
+                                 Prims.strcat " (Also see: " uu___6 in
+                               Prims.strcat msg uu___5 in
                              let uu___5 = FStar_TypeChecker_Env.get_range env in
                              (e, uu___4, uu___5, ctx)
                            else (e, msg, r, ctx)) in
@@ -430,7 +434,8 @@ let (disjunctive_pattern_vars :
         let uu___ =
           FStar_Compiler_Effect.op_Bar_Greater v
             (FStar_Compiler_List.map FStar_Syntax_Print.bv_to_string) in
-        FStar_Compiler_Effect.op_Bar_Greater uu___ (FStar_String.concat ", ") in
+        FStar_Compiler_Effect.op_Bar_Greater uu___
+          (FStar_Compiler_String.concat ", ") in
       let uu___ =
         let uu___1 = vars v1 in
         let uu___2 = vars v2 in
@@ -521,7 +526,7 @@ let (expected_pure_expression :
         let msg1 =
           if reason = ""
           then msg
-          else FStar_Compiler_Util.format1 (Prims.op_Hat msg " (%s)") reason in
+          else FStar_Compiler_Util.format1 (Prims.strcat msg " (%s)") reason in
         let uu___ =
           let uu___1 = FStar_Syntax_Print.term_to_string e in
           let uu___2 =
@@ -529,7 +534,7 @@ let (expected_pure_expression :
             FStar_Compiler_Effect.op_Less_Bar FStar_Pervasives_Native.fst
               uu___3 in
           FStar_Compiler_Util.format2
-            (Prims.op_Hat msg1
+            (Prims.strcat msg1
                "; got an expression \"%s\" with effect \"%s\"") uu___1 uu___2 in
         (FStar_Errors_Codes.Fatal_ExpectedPureExpression, uu___)
 let (expected_ghost_expression :
@@ -544,7 +549,7 @@ let (expected_ghost_expression :
         let msg1 =
           if reason = ""
           then msg
-          else FStar_Compiler_Util.format1 (Prims.op_Hat msg " (%s)") reason in
+          else FStar_Compiler_Util.format1 (Prims.strcat msg " (%s)") reason in
         let uu___ =
           let uu___1 = FStar_Syntax_Print.term_to_string e in
           let uu___2 =
@@ -552,7 +557,7 @@ let (expected_ghost_expression :
             FStar_Compiler_Effect.op_Less_Bar FStar_Pervasives_Native.fst
               uu___3 in
           FStar_Compiler_Util.format2
-            (Prims.op_Hat msg1
+            (Prims.strcat msg1
                "; got an expression \"%s\" with effect \"%s\"") uu___1 uu___2 in
         (FStar_Errors_Codes.Fatal_ExpectedGhostExpression, uu___)
 let (expected_effect_1_got_effect_2 :
@@ -578,7 +583,7 @@ let (failed_to_prove_specification_of :
         let uu___1 = FStar_Syntax_Print.lbname_to_string l in
         let uu___2 =
           FStar_Compiler_Effect.op_Bar_Greater lbls
-            (FStar_String.concat ", ") in
+            (FStar_Compiler_String.concat ", ") in
         FStar_Compiler_Util.format2
           "Failed to prove specification of %s; assertions at [%s] may fail"
           uu___1 uu___2 in
@@ -593,7 +598,7 @@ let (failed_to_prove_specification :
       | uu___ ->
           let uu___1 =
             FStar_Compiler_Effect.op_Bar_Greater lbls
-              (FStar_String.concat "\n\t") in
+              (FStar_Compiler_String.concat "\n\t") in
           FStar_Compiler_Util.format1
             "The following problems were found:\n\t%s" uu___1 in
     (FStar_Errors_Codes.Error_TypeCheckerFailToProve, msg)

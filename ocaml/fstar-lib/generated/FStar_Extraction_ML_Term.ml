@@ -72,7 +72,7 @@ let err_ill_typed_application :
                             | (x, uu___8) ->
                                 FStar_Syntax_Print.term_to_string x)) in
                   FStar_Compiler_Effect.op_Bar_Greater uu___6
-                    (FStar_String.concat " ") in
+                    (FStar_Compiler_String.concat " ") in
                 FStar_Compiler_Util.format4
                   "Ill-typed application: source application is %s \n translated prefix to %s at type %s\n remaining args are %s\n"
                   uu___2 uu___3 uu___4 uu___5 in
@@ -215,10 +215,14 @@ let rec (is_arity :
         let uu___1 = FStar_Syntax_Subst.compress t1 in
         uu___1.FStar_Syntax_Syntax.n in
       match uu___ with
-      | FStar_Syntax_Syntax.Tm_unknown -> failwith "Impossible"
-      | FStar_Syntax_Syntax.Tm_delayed uu___1 -> failwith "Impossible"
-      | FStar_Syntax_Syntax.Tm_ascribed uu___1 -> failwith "Impossible"
-      | FStar_Syntax_Syntax.Tm_meta uu___1 -> failwith "Impossible"
+      | FStar_Syntax_Syntax.Tm_unknown ->
+          FStar_Compiler_Effect.failwith "Impossible"
+      | FStar_Syntax_Syntax.Tm_delayed uu___1 ->
+          FStar_Compiler_Effect.failwith "Impossible"
+      | FStar_Syntax_Syntax.Tm_ascribed uu___1 ->
+          FStar_Compiler_Effect.failwith "Impossible"
+      | FStar_Syntax_Syntax.Tm_meta uu___1 ->
+          FStar_Compiler_Effect.failwith "Impossible"
       | FStar_Syntax_Syntax.Tm_lazy i ->
           let uu___1 = FStar_Syntax_Util.unfold_lazy i in is_arity env uu___1
       | FStar_Syntax_Syntax.Tm_uvar uu___1 -> false
@@ -274,12 +278,12 @@ let rec (is_type_aux :
           let uu___1 =
             let uu___2 = FStar_Syntax_Print.tag_of_term t1 in
             FStar_Compiler_Util.format1 "Impossible: %s" uu___2 in
-          failwith uu___1
+          FStar_Compiler_Effect.failwith uu___1
       | FStar_Syntax_Syntax.Tm_unknown ->
           let uu___ =
             let uu___1 = FStar_Syntax_Print.tag_of_term t1 in
             FStar_Compiler_Util.format1 "Impossible: %s" uu___1 in
-          failwith uu___
+          FStar_Compiler_Effect.failwith uu___
       | FStar_Syntax_Syntax.Tm_lazy i ->
           let uu___ = FStar_Syntax_Util.unfold_lazy i in
           is_type_aux env uu___
@@ -660,7 +664,7 @@ let (instantiate_maybe_partial :
                            (FStar_Extraction_ML_Syntax.MLE_Fun (vs_ts, tapp)) in
                        (f, FStar_Extraction_ML_Syntax.E_PURE, t1))
                 else
-                  failwith
+                  FStar_Compiler_Effect.failwith
                     "Impossible: instantiate_maybe_partial called with too many arguments"
 let (eta_expand :
   FStar_Extraction_ML_UEnv.uenv ->
@@ -1118,19 +1122,19 @@ let rec (translate_term_to_mlty :
               let uu___2 = FStar_Syntax_Print.term_to_string t1 in
               FStar_Compiler_Util.format1 "Impossible: Unexpected term %s"
                 uu___2 in
-            failwith uu___1
+            FStar_Compiler_Effect.failwith uu___1
         | FStar_Syntax_Syntax.Tm_delayed uu___ ->
             let uu___1 =
               let uu___2 = FStar_Syntax_Print.term_to_string t1 in
               FStar_Compiler_Util.format1 "Impossible: Unexpected term %s"
                 uu___2 in
-            failwith uu___1
+            FStar_Compiler_Effect.failwith uu___1
         | FStar_Syntax_Syntax.Tm_unknown ->
             let uu___ =
               let uu___1 = FStar_Syntax_Print.term_to_string t1 in
               FStar_Compiler_Util.format1 "Impossible: Unexpected term %s"
                 uu___1 in
-            failwith uu___
+            FStar_Compiler_Effect.failwith uu___
         | FStar_Syntax_Syntax.Tm_lazy i ->
             let uu___ = FStar_Syntax_Util.unfold_lazy i in
             translate_term_to_mlty env uu___
@@ -1402,7 +1406,13 @@ let (resugar_pat :
                         FStar_Compiler_List.map FStar_Ident.string_of_id
                           uu___2 in
                       let fs = record_fields g ty fns pats in
-                      FStar_Extraction_ML_Syntax.MLP_Record (path, fs)
+                      let uu___2 =
+                        let uu___3 =
+                          FStar_Compiler_Effect.op_Bar_Greater path
+                            (FStar_Compiler_List.filter
+                               (fun s -> s <> "Stubs")) in
+                        (uu___3, fs) in
+                      FStar_Extraction_ML_Syntax.MLP_Record uu___2
                   | uu___2 -> p))
         | uu___ -> p
 let rec (extract_one_pat :
@@ -1564,7 +1574,7 @@ let rec (extract_one_pat :
                         FStar_Extraction_ML_UEnv.exp_b_tscheme = ttys;_}
                       -> (n, ttys)
                   | FStar_Pervasives_Native.Some uu___3 ->
-                      failwith "Expected a constructor"
+                      FStar_Compiler_Effect.failwith "Expected a constructor"
                   | FStar_Pervasives_Native.None ->
                       let uu___3 =
                         let uu___4 =
@@ -1623,7 +1633,9 @@ let rec (extract_one_pat :
                                               uu___10 in
                                           FStar_Compiler_List.map uu___9 args in
                                         FStar_Compiler_Effect.op_Bar_Greater
-                                          uu___8 (FStar_String.concat " -> ") in
+                                          uu___8
+                                          (FStar_Compiler_String.concat
+                                             " -> ") in
                                       let res =
                                         let uu___8 =
                                           FStar_Extraction_ML_UEnv.current_module_of_uenv
@@ -1736,7 +1748,9 @@ let (extract_pat :
               extract_one_pat false g1 p1 expected_t1 term_as_mlexpr in
             match uu___ with
             | (g2, FStar_Pervasives_Native.Some (x, v), b) -> (g2, (x, v), b)
-            | uu___1 -> failwith "Impossible: Unable to translate pattern" in
+            | uu___1 ->
+                FStar_Compiler_Effect.failwith
+                  "Impossible: Unable to translate pattern" in
           let mk_when_clause whens =
             match whens with
             | [] -> FStar_Pervasives_Native.None
@@ -1792,7 +1806,7 @@ let (maybe_eta_data_and_project_record :
                   FStar_Compiler_Util.format2
                     "Impossible: Head type is not an arrow: (%s : %s)" uu___2
                     uu___3 in
-                failwith uu___1 in
+                FStar_Compiler_Effect.failwith uu___1 in
           let as_record qual1 e =
             match ((e.FStar_Extraction_ML_Syntax.expr), qual1) with
             | (FStar_Extraction_ML_Syntax.MLE_CTor (uu___, args),
@@ -1802,10 +1816,12 @@ let (maybe_eta_data_and_project_record :
                   let uu___1 = FStar_Ident.ns_of_lid tyname in
                   FStar_Compiler_List.map FStar_Ident.string_of_id uu___1 in
                 let fields1 = record_fields g tyname fields args in
+                let path1 =
+                  FStar_Compiler_List.filter (fun s -> s <> "Stubs") path in
                 FStar_Compiler_Effect.op_Less_Bar
                   (FStar_Extraction_ML_Syntax.with_ty
                      e.FStar_Extraction_ML_Syntax.mlty)
-                  (FStar_Extraction_ML_Syntax.MLE_Record (path, fields1))
+                  (FStar_Extraction_ML_Syntax.MLE_Record (path1, fields1))
             | uu___ -> e in
           let resugar_and_maybe_eta qual1 e =
             let uu___ = eta_args g [] residualType in
@@ -1843,7 +1859,8 @@ let (maybe_eta_data_and_project_record :
                                  (FStar_Extraction_ML_Syntax.MLE_Fun
                                     (binders, body))
                            | uu___3 ->
-                               failwith "Impossible: Not a constructor"))) in
+                               FStar_Compiler_Effect.failwith
+                                 "Impossible: Not a constructor"))) in
           match ((mlAppExpr.FStar_Extraction_ML_Syntax.expr), qual) with
           | (uu___, FStar_Pervasives_Native.None) -> mlAppExpr
           | (FStar_Extraction_ML_Syntax.MLE_App
@@ -2254,7 +2271,8 @@ let (extract_lb_sig :
                                                 (lbtyp1, (targs, polytype1)),
                                                 add_unit, body2))
                                        else
-                                         failwith "Not enough type binders")
+                                         FStar_Compiler_Effect.failwith
+                                           "Not enough type binders")
                               | FStar_Syntax_Syntax.Tm_uinst uu___7 ->
                                   let env =
                                     FStar_Compiler_List.fold_left
@@ -2672,7 +2690,7 @@ and (term_as_mlexpr' :
                  (head.FStar_Syntax_Syntax.hash_code)
              }
          | uu___2 ->
-             failwith
+             FStar_Compiler_Effect.failwith
                "Impossible! cannot apply args to match branches if head is not a match" in
        let t = FStar_Syntax_Subst.compress top1 in
        match t.FStar_Syntax_Syntax.n with
@@ -2681,25 +2699,25 @@ and (term_as_mlexpr' :
              let uu___2 = FStar_Syntax_Print.tag_of_term t in
              FStar_Compiler_Util.format1 "Impossible: Unexpected term: %s"
                uu___2 in
-           failwith uu___1
+           FStar_Compiler_Effect.failwith uu___1
        | FStar_Syntax_Syntax.Tm_delayed uu___1 ->
            let uu___2 =
              let uu___3 = FStar_Syntax_Print.tag_of_term t in
              FStar_Compiler_Util.format1 "Impossible: Unexpected term: %s"
                uu___3 in
-           failwith uu___2
+           FStar_Compiler_Effect.failwith uu___2
        | FStar_Syntax_Syntax.Tm_uvar uu___1 ->
            let uu___2 =
              let uu___3 = FStar_Syntax_Print.tag_of_term t in
              FStar_Compiler_Util.format1 "Impossible: Unexpected term: %s"
                uu___3 in
-           failwith uu___2
+           FStar_Compiler_Effect.failwith uu___2
        | FStar_Syntax_Syntax.Tm_bvar uu___1 ->
            let uu___2 =
              let uu___3 = FStar_Syntax_Print.tag_of_term t in
              FStar_Compiler_Util.format1 "Impossible: Unexpected term: %s"
                uu___3 in
-           failwith uu___2
+           FStar_Compiler_Effect.failwith uu___2
        | FStar_Syntax_Syntax.Tm_lazy i ->
            let uu___1 = FStar_Syntax_Util.unfold_lazy i in
            term_as_mlexpr g uu___1
@@ -2830,7 +2848,7 @@ and (term_as_mlexpr' :
                           FStar_Compiler_Util.format1
                             "This should not happen (should have been handled at Tm_abs level for effect %s)"
                             uu___6 in
-                        failwith uu___5))
+                        FStar_Compiler_Effect.failwith uu___5))
             | uu___2 -> term_as_mlexpr g t2)
        | FStar_Syntax_Syntax.Tm_meta
            { FStar_Syntax_Syntax.tm2 = t1;
@@ -3407,7 +3425,7 @@ and (term_as_mlexpr' :
                              (((exp_b.FStar_Extraction_ML_UEnv.exp_b_expr),
                                 (exp_b.FStar_Extraction_ML_UEnv.exp_b_tscheme)),
                                q))
-                        | uu___7 -> failwith "FIXME Ty" in
+                        | uu___7 -> FStar_Compiler_Effect.failwith "FIXME Ty" in
                       (match uu___5 with
                        | ((head_ml, (vars, t1)), qual) ->
                            let has_typ_apps =
@@ -3482,7 +3500,7 @@ and (term_as_mlexpr' :
                                                    t2) in
                                             (uu___13, t2))
                                    | uu___9 ->
-                                       failwith
+                                       FStar_Compiler_Effect.failwith
                                          "Impossible: Unexpected head term" in
                                  (match uu___8 with
                                   | (head2, t2) -> (head2, t2, rest)) in
@@ -3532,7 +3550,7 @@ and (term_as_mlexpr' :
                              (((exp_b.FStar_Extraction_ML_UEnv.exp_b_expr),
                                 (exp_b.FStar_Extraction_ML_UEnv.exp_b_tscheme)),
                                q))
-                        | uu___7 -> failwith "FIXME Ty" in
+                        | uu___7 -> FStar_Compiler_Effect.failwith "FIXME Ty" in
                       (match uu___5 with
                        | ((head_ml, (vars, t1)), qual) ->
                            let has_typ_apps =
@@ -3607,7 +3625,7 @@ and (term_as_mlexpr' :
                                                    t2) in
                                             (uu___13, t2))
                                    | uu___9 ->
-                                       failwith
+                                       FStar_Compiler_Effect.failwith
                                          "Impossible: Unexpected head term" in
                                  (match uu___8 with
                                   | (head2, t2) -> (head2, t2, rest)) in
@@ -3670,7 +3688,8 @@ and (term_as_mlexpr' :
            let f1 =
              match f with
              | FStar_Pervasives_Native.None ->
-                 failwith "Ascription node with an empty effect label"
+                 FStar_Compiler_Effect.failwith
+                   "Ascription node with an empty effect label"
              | FStar_Pervasives_Native.Some l -> effect_as_etag g l in
            let uu___3 = check_term_as_mlexpr g e0 f1 t1 in
            (match uu___3 with | (e, t2) -> (e, f1, t2))
@@ -4123,7 +4142,7 @@ and (term_as_mlexpr' :
                                                f_then f_else in
                                            (uu___8, uu___9, t_branch))))
                         | uu___5 ->
-                            failwith
+                            FStar_Compiler_Effect.failwith
                               "ITE pats matched but then and else expressions not found?")
                      else
                        (let uu___6 =
@@ -4385,7 +4404,9 @@ let (ind_discriminator_body :
                                   (g1,
                                     ((v, FStar_Extraction_ML_Syntax.MLTY_Top)
                                     :: vs)))) binders1 (env, [])
-              | uu___4 -> failwith "Discriminator must be a function" in
+              | uu___4 ->
+                  FStar_Compiler_Effect.failwith
+                    "Discriminator must be a function" in
             (match uu___2 with
              | (g, wildcards) ->
                  let uu___3 = FStar_Extraction_ML_UEnv.new_mlident g in

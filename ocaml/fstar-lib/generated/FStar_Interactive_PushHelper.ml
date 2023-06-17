@@ -225,7 +225,7 @@ let (deps_and_repl_ld_tasks_of_our_file :
                      [uu___4]))
                | impl::[] -> []
                | uu___2 ->
-                   let mods_str = FStar_String.concat " " same_name in
+                   let mods_str = FStar_Compiler_String.concat " " same_name in
                    let message = "Too many or too few files matching %s: %s" in
                    ((let uu___4 =
                        let uu___5 =
@@ -332,7 +332,7 @@ let (pop_repl :
     fun st ->
       let uu___ = FStar_Compiler_Effect.op_Bang repl_stack in
       match uu___ with
-      | [] -> failwith "Too many pops"
+      | [] -> FStar_Compiler_Effect.failwith "Too many pops"
       | (depth, (uu___1, st'))::stack_tl ->
           let env =
             rollback_env
@@ -844,11 +844,12 @@ let (add_module_completions :
           then str
           else
             (let first =
-               FStar_String.substring str Prims.int_zero Prims.int_one in
+               FStar_Compiler_String.substring str Prims.int_zero
+                 Prims.int_one in
              let uu___1 =
-               FStar_String.substring str Prims.int_one
-                 ((FStar_String.length str) - Prims.int_one) in
-             Prims.op_Hat (FStar_String.uppercase first) uu___1) in
+               FStar_Compiler_String.substring str Prims.int_one
+                 ((FStar_Compiler_String.length str) - Prims.int_one) in
+             Prims.strcat (FStar_Compiler_String.uppercase first) uu___1) in
         let mods = FStar_Parser_Dep.build_inclusion_candidates_list () in
         let loaded_mods_set =
           let uu___ = FStar_Compiler_Util.psmap_empty () in
@@ -867,7 +868,7 @@ let (add_module_completions :
              fun uu___ ->
                match uu___ with
                | (modname, mod_path) ->
-                   let mod_key = FStar_String.lowercase modname in
+                   let mod_key = FStar_Compiler_String.lowercase modname in
                    if this_mod_key = mod_key
                    then table1
                    else
