@@ -2002,6 +2002,8 @@ let (reuse_hint_for : unit -> Prims.string FStar_Pervasives_Native.option) =
 let (report_assumes : unit -> Prims.string FStar_Pervasives_Native.option) =
   fun uu___ -> get_report_assumes ()
 let (silent : unit -> Prims.bool) = fun uu___ -> get_silent ()
+let (smt : unit -> Prims.string FStar_Pervasives_Native.option) =
+  fun uu___ -> get_smt ()
 let (smtencoding_elim_box : unit -> Prims.bool) =
   fun uu___ -> get_smtencoding_elim_box ()
 let (smtencoding_nl_arith_native : unit -> Prims.bool) =
@@ -2074,12 +2076,6 @@ let (warn_default_effects : unit -> Prims.bool) =
 let (warn_error : unit -> Prims.string) =
   fun uu___ ->
     let uu___1 = get_warn_error () in FStar_String.concat " " uu___1
-let (z3_exe : unit -> Prims.string) =
-  fun uu___ ->
-    let uu___1 = get_smt () in
-    match uu___1 with
-    | FStar_Pervasives_Native.None -> FStar_Platform.exe "z3"
-    | FStar_Pervasives_Native.Some s -> s
 let (z3_cliopt : unit -> Prims.string Prims.list) =
   fun uu___ -> get_z3cliopt ()
 let (z3_smtopt : unit -> Prims.string Prims.list) =

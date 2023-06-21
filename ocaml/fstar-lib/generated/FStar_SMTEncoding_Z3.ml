@@ -104,30 +104,62 @@ let (__proj__Mkquery_log__item__close_log : query_log -> unit -> unit) =
         close_log
 let (_z3version_checked : Prims.bool FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref false
-let (_z3version_expected : Prims.string) = "Z3 version 4.8.5"
+let (_z3version_expected_num : Prims.string) = "4.12.3"
+let (_z3version_expected_str : Prims.string) =
+  Prims.op_Hat "Z3 version " _z3version_expected_num
 let (_z3url : Prims.string) =
   "https://github.com/FStarLang/binaries/tree/master/z3-tested"
+let (inpath : Prims.string -> Prims.bool) =
+  fun path ->
+    try
+      (fun uu___ ->
+         match () with
+         | () ->
+             let s =
+               FStar_Compiler_Util.run_process "z3_pathtest" path
+                 ["-version"] FStar_Pervasives_Native.None in
+             s <> "") ()
+    with | uu___ -> false
+let (_z3_exe : Prims.string FStar_Thunk.t) =
+  FStar_Thunk.mk
+    (fun uu___ ->
+       let path =
+         let z3_v =
+           FStar_Compiler_Effect.op_Bar_Greater
+             (Prims.op_Hat "z3-" _z3version_expected_num) FStar_Platform.exe in
+         let smto = FStar_Options.smt () in
+         if FStar_Pervasives_Native.uu___is_Some smto
+         then FStar_Pervasives_Native.__proj__Some__item__v smto
+         else
+           (let uu___2 = inpath z3_v in
+            if uu___2 then z3_v else FStar_Platform.exe "z3") in
+       (let uu___2 = FStar_Options.debug_any () in
+        if uu___2
+        then FStar_Compiler_Util.print1 "Chosen Z3 executable: %s\n" path
+        else ());
+       path)
+let (z3_exe : unit -> Prims.string) = fun uu___ -> FStar_Thunk.force _z3_exe
 let (parse_z3_version_lines :
   Prims.string -> Prims.string FStar_Pervasives_Native.option) =
   fun out ->
     match FStar_Compiler_Util.splitlines out with
     | version::uu___ ->
-        if FStar_Compiler_Util.starts_with version _z3version_expected
+        if FStar_Compiler_Util.starts_with version _z3version_expected_str
         then
           ((let uu___2 = FStar_Options.debug_any () in
             if uu___2
             then
               let uu___3 =
                 FStar_Compiler_Util.format1
-                  "Successfully found expected Z3 version %s\n" version in
+                  "Successfully found expected Z3 version \"%s\"\n" version in
               FStar_Compiler_Util.print_string uu___3
             else ());
            FStar_Pervasives_Native.None)
         else
           (let msg =
              FStar_Compiler_Util.format2
-               "Expected Z3 version \"%s\", got \"%s\"" _z3version_expected
-               (FStar_Compiler_Util.trim_string out) in
+               "Expected Z3 version \"%s\", got \"%s\""
+               _z3version_expected_str (FStar_Compiler_Util.trim_string out) in
            FStar_Pervasives_Native.Some msg)
     | uu___ -> FStar_Pervasives_Native.Some "No Z3 version string found"
 let (z3version_warning_message :
@@ -142,7 +174,7 @@ let (z3version_warning_message :
            match () with
            | () ->
                let uu___2 =
-                 let uu___3 = FStar_Options.z3_exe () in
+                 let uu___3 = z3_exe () in
                  FStar_Compiler_Util.run_process "z3_version" uu___3
                    ["-version"] FStar_Pervasives_Native.None in
                FStar_Pervasives_Native.Some uu___2) ()
@@ -173,7 +205,7 @@ let (check_z3version : unit -> unit) =
             let msg1 =
               FStar_Compiler_Util.format4 "%s\n%s\n%s\n%s" msg
                 "Please download the version of Z3 corresponding to your platform from:"
-                _z3url "and add the bin/ subdirectory into your PATH" in
+                _z3url "and add the bin/ subdirectory into your PATH." in
             FStar_Errors.log_issue FStar_Compiler_Range_Type.dummyRange
               (e, msg1)))
     else ()
@@ -293,7 +325,7 @@ let (query_logging : query_log) =
   { get_module_name; set_module_name; write_to_log; close_log }
 let (z3_cmd_and_args : unit -> (Prims.string * Prims.string Prims.list)) =
   fun uu___ ->
-    let cmd = FStar_Options.z3_exe () in
+    let cmd = z3_exe () in
     let cmd_args =
       let uu___1 =
         let uu___2 =
@@ -739,7 +771,7 @@ let (doZ3Exe :
             parse (FStar_Compiler_Util.trim_string stdout)
 let (z3_options : Prims.string FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref
-    "(set-option :global-decls false)\n(set-option :smt.mbqi false)\n(set-option :auto_config false)\n(set-option :produce-unsat-cores true)\n(set-option :model true)\n(set-option :smt.case_split 3)\n(set-option :smt.relevancy 2)\n"
+    "(set-option :global-decls false)\n(set-option :smt.mbqi false)\n(set-option :auto_config false)\n(set-option :produce-unsat-cores true)\n(set-option :model true)\n(set-option :smt.case_split 3)\n(set-option :smt.arith.solver 2)\n(set-option :rewriter.enable_der false)\n(set-option :rewriter.sort_disjunctions false)\n(set-option :pi.decompose_patterns false)\n(set-option :smt.relevancy 2)\n"
 let (set_z3_options : Prims.string -> unit) =
   fun opts -> FStar_Compiler_Effect.op_Colon_Equals z3_options opts
 let (init : unit -> unit) = fun uu___ -> ()
