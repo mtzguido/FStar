@@ -22,7 +22,7 @@ def parse_line(line):
     # Then the constant "succeeded in" or "succeeded (with hint) in" follows
     # The the timing field appears
     # All fields are separated by whitespace
-    pattern = re.compile(r'RUNLIM: (.+)\s+(\d+.\d+) s\s+(\d+) MB')
+    pattern = re.compile(r'RESMON: (.+)\s+(\d+.\d+) s\s+(\d+) MB')
     match = pattern.match(line)
     if match is not None:
         program_name = match.group(1)

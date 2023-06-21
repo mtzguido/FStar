@@ -20,12 +20,17 @@
 # if the first element of the list is "space:", it adds the filename and the second string to the second hashtable
 # it returns the two hashtables
 def parse_line(filename, time, space, line):
-    line = line.replace("[runlim] ", "")
     line = line.split()
-    if line[0] == "time:":
-        time[filename] = line[1]
-    elif line[0] == "space:":
-        space[filename] = line[1]
+    if line[0] == "group.total":
+        s = line[1]
+        s = s.replace("s", "")
+        time[filename] = s
+    elif line[0] == "group.mempeak":
+        s = line[1]
+        s = s.replace("GB", "000MB")
+        s = s.replace("MB", "000KB")
+        s = s.replace("KB", "000")
+        space[filename] = s
     return time, space
 
 
@@ -37,9 +42,9 @@ def parse_line(filename, time, space, line):
 def parse_file(filename, identifier, dire, time, space):
     file_id = filename
     if identifier != "":
-      file_id = file_id.replace(".{}.runlim".format(identifier), "")
+      file_id = file_id.replace(".{}.resinfo".format(identifier), "")
     if dire != "":
-      file_id = file_id.replace(".runlim".format(identifier), "")
+      file_id = file_id.replace(".resinfo".format(identifier), "")
       file_id = file_id.replace(dire + "/", "")
 
     with open(filename) as f:
@@ -63,18 +68,17 @@ def list_files(directory):
             files = files + list_files(os.path.join(directory, filename))
     return files
 
-
 # a function that takes as input an identifier
 # it creates 2 empty hashtables
 # it calls list_files on "." (the current directory)
-# it calls parse_file on all the files in the list with suffix .identifier".runlim"
+# it calls parse_file on all the files in the list with suffix .identifier".resinfo"
 # it returns the 2 hashtables
 def parse_all(identifier):
     time = {}
     space = {}
     files = list_files(".")
     for filename in files:
-        if filename.endswith(".{}.runlim".format(identifier)):
+        if filename.endswith(".{}.resinfo".format(identifier)):
             time, space = parse_file(filename, identifier, "", time, space)
     return time, space
 
@@ -83,7 +87,7 @@ def parse_dir(dire):
     space = {}
     files = list_files(dire)
     for filename in files:
-        if filename.endswith(".runlim"):
+        if filename.endswith(".resinfo"):
             time, space = parse_file(filename, "", dire, time, space)
     return time, space
 

@@ -61,9 +61,11 @@ verify-extra: $(filter $(addprefix %, $(addsuffix .checked, $(notdir $(EXTRA))))
 %.checked:
 	$(call msg, "CHECK", $(basename $(notdir $@)))
 	@# MY_FSTAR is imported from ulib/gmake.Makefile.tmpl, so it does not
-	@# contain the $(SIL) flag nor the $(RUNLIM) for monitoring resources.
+	@# contain the $(SIL) flag nor the $(RESMON) for monitoring resources.
 	@# You can debug with --debug $(basename $(notdir $<))
-	$(Q)$(RUNLIM) $(MY_FSTAR) $(SIL) $(COMPAT_INDEXED_EFFECTS) $<
+	ramon --mark begin_$@
+	$(Q)$(RESMON) $(MY_FSTAR) $(SIL) $(COMPAT_INDEXED_EFFECTS) $<
+	ramon --mark end_$@
 
 # Benchmarking rules
 #

@@ -57,7 +57,9 @@ endif
 all: $(addsuffix .all, $(ALL_EXAMPLE_DIRS))
 
 %.all: %
-	+$(MAKE) -C $^ all
+	ramon --mark examples_$@_start
+	+ramon -o $@.ramon $(MAKE) -C $^ all
+	ramon --mark examples_$@_end
 
 test: all
 

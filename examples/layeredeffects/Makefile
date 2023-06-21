@@ -19,7 +19,7 @@ extraction:
 endif
 
 .depend:
-	$(FSTAR) --dep full $(ROOTS) > .depend
+	$(RESMON) $(FSTAR) --dep full $(ROOTS) > .depend
 
 depend: .depend
 
@@ -30,7 +30,7 @@ verify: $(filter-out $(addsuffix .checked,$(NO_VERIFY)),$(ALL_CHECKED_FILES))
 verify-all: $(ALL_CHECKED_FILES)
 
 %.checked:
-	$(FSTAR) --cache_checked_modules $<
+	$(RESMON) $(FSTAR) --cache_checked_modules $<
 
 clean:
 	rm -f .depend *.checked parsing/*.checked

@@ -18,7 +18,7 @@ FSTAR_BOOT ?= $(FSTAR)
 #   -- MLish and lax tune type-inference for use with unverified ML programs
 DUNE_SNAPSHOT ?= $(call maybe_cygwin_path,$(FSTAR_HOME)/ocaml)
 OUTPUT_DIRECTORY = $(DUNE_SNAPSHOT)/fstar-lib/generated
-FSTAR_C=$(RUNLIM) $(FSTAR_BOOT) $(SIL) $(FSTAR_BOOT_OPTIONS) --cache_checked_modules
+FSTAR_C=$(RESMON) $(FSTAR_BOOT) $(SIL) $(FSTAR_BOOT_OPTIONS) --cache_checked_modules
 
 # Tests.* goes to fstar-tests, the rest to fstar-lib
 OUTPUT_DIRECTORY_FOR = $(if $(findstring FStar_Tests_,$(1)),$(DUNE_SNAPSHOT)/fstar-tests/generated,$(DUNE_SNAPSHOT)/fstar-lib/generated)

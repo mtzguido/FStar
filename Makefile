@@ -19,14 +19,28 @@ FSTAR_BUILD_PROFILE ?= release
 fstar:
 	$(Q)cp version.txt $(DUNE_SNAPSHOT)/
 	@# Call Dune to build the snapshot.
-	@echo "  DUNE BUILD"
-	$(Q)cd $(DUNE_SNAPSHOT) && dune build --profile=$(FSTAR_BUILD_PROFILE)
-	@echo "  DUNE INSTALL"
-	$(Q)cd $(DUNE_SNAPSHOT) && dune install --profile=$(FSTAR_BUILD_PROFILE) --prefix=$(FSTAR_CURDIR)
+	+$(Q)$(MAKE) dune-build
+	+$(Q)$(MAKE) dune-install
+
+.PHONY: dune-build
+dune-build:
+	$(call msg, "DUNE BUILD")
+	ramon --mark dune-build
+	$(Q)cd $(DUNE_SNAPSHOT) && $(call resmon_to,dune-build) dune build --profile=$(FSTAR_BUILD_PROFILE)
+	ramon --mark dune-build-done
+
+.PHONY: dune-install
+dune-install:
+	$(call msg, "DUNE INSTALL")
+	ramon --mark dune-install
+	$(Q)cd $(DUNE_SNAPSHOT) && $(call resmon_to,dune-install) dune install --profile=$(FSTAR_BUILD_PROFILE) --prefix=$(FSTAR_CURDIR)
+	ramon --mark dune-install-done
 
 .PHONY: verify-ulib
 verify-ulib:
+	ramon --mark verify-ulib
 	+$(Q)$(MAKE) -C ulib
+	ramon --mark verify-ulib-done
 
 .PHONY: build-and-verify-ulib
 build-and-verify-ulib: fstar
@@ -43,19 +57,27 @@ clean-snapshot: clean-intermediate
 
 .PHONY: extract-all
 extract-all:
+	ramon --mark extract-all
 	+$(Q)$(MAKE) -C src/ocaml-output dune-snapshot
+	ramon --mark extract-all-done
 
 # This rule is not incremental, by design.
 .PHONY: full-bootstrap
 full-bootstrap:
+	ramon --mark initial-fstar-build
 	+$(Q)$(MAKE) fstar
+	ramon --mark initial-fstar-build-done
 	+$(Q)$(MAKE) clean-snapshot
+	ramon --mark bootstrap
 	+$(Q)$(MAKE) bootstrap
+	ramon --mark bootstrap-done
 
 .PHONY: bootstrap
 bootstrap:
 	+$(Q)$(MAKE) extract-all
+	ramon --mark second-fstar-build
 	+$(Q)$(MAKE) fstar
+	ramon --mark second-fstar-done
 
 .PHONY: boot
 boot:
@@ -137,8 +159,11 @@ output:
 # snapshot, nor run the build-standalone script.
 .PHONY: ci
 ci:
-	+$(Q)OTHERFLAGS="--use_hints" FSTAR_HOME=$(CURDIR) $(MAKE) ci-pre
-	+$(Q)OTHERFLAGS="--use_hints" FSTAR_HOME=$(CURDIR) $(MAKE) ci-post
+	ramon --mark ci-pre-start
+	+$(Q)OTHERFLAGS="--use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-pre $(MAKE) ci-pre
+	ramon --mark ci-post-start
+	+$(Q)OTHERFLAGS="--use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-post $(MAKE) ci-post
+	ramon --mark ci-post-end
 
 # This rule runs a CI job in a local container, exactly like is done for
 # CI.

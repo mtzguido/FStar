@@ -24,33 +24,40 @@
 
 Q?=@
 SIL?=--silent
-RUNLIM=
+RESMON=
 ifneq ($(V),)
 	Q=
 	SIL=
 endif
 
-define NO_RUNLIM_ERR
-runlim not found:
-  To use RESOURCEMONITOR=1, the `runlim` tool must be installed and in your $$PATH.
-  It must also be a recent version supporting the `-p` option.
-  You can get it from: [https://github.com/arminbiere/runlim]
+define NO_RAMON_ERR
+ramon not found:
+  To use RESOURCEMONITOR=1, the `ramon` tool must be installed and in your $$PATH.
+  You can get it from: [https://github.com/mtzguido/ramon]
 endef
 
 define msg =
 @printf "  %-8s  %s\n" $(1) $(2)
 endef
 
-# Passing RESOURCEMONITOR=1 will create .runlim files through the source tree with
+define resmon_to =
+ramon -o $(1).$(MONPREFIX)resinfo
+endef
+
+# Passing RESOURCEMONITOR=1 will create .resinfo files through the source tree with
 # information about the time and space taken by each F* invocation.
 ifneq ($(RESOURCEMONITOR),)
-	ifeq ($(shell which runlim),)
-		_ := $(error $(NO_RUNLIM_ERR)))
+	ifeq ($(shell which ramon),)
+		_ := $(error $(NO_RAMON_ERR)))
 	endif
 	ifneq ($(MONID),)
 		MONPREFIX=$(MONID).
 	endif
-	RUNLIM=runlim -p -o $@.$(MONPREFIX)runlim
+	RESMON=$(call resmon_to,$@)
+else
+	# Undefine resmon_to
+define resmon_to =
+endef
 endif
 
 # Can be called as $(call maybe_cygwin_path,...)

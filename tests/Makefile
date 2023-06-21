@@ -17,7 +17,7 @@ all: $(addsuffix .all, $(ALL_TEST_DIRS))
 clean: $(addsuffix .clean, $(ALL_TEST_DIRS))
 
 %.all: %
-	+$(MAKE) -C $^ all
+	+ramon -o $@.ramon $(MAKE) -C $^ all
 
 %.clean: %
 	+$(MAKE) -C $^ clean

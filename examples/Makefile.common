@@ -57,7 +57,7 @@ VERBOSE_FSTAR=$(BENCHMARK_PRE) $(FSTAR)                     \
 		  $(OTHERFLAGS) $(MAYBE_ADMIT)
 
 # As above, but perhaps with --silent, and perhaps with a prefix (usually for monitoring)
-MY_FSTAR=$(RUNLIM) $(VERBOSE_FSTAR) $(SIL)
+MY_FSTAR=$(RESMON) $(VERBOSE_FSTAR) $(SIL)
 
 #--------------------------------------------------------------------------------
 # Default target: verify all FSTAR_FILES
@@ -81,13 +81,17 @@ include .depend
 # a.fst.checked is the binary, checked version of a.fst
 %.fst.checked:
 	$(call msg, "CHECK", $(basename $(notdir $@)))
+	ramon --mark begin_$@
 	$(Q)$(MY_FSTAR) $<
+	ramon --mark end_$@
 	@touch -c $@
 
 # a.fsti.checked is the binary, checked version of a.fsti
 %.fsti.checked:
 	$(call msg, "CHECK", $(basename $(notdir $@)))
+	ramon --mark begin_$@
 	$(Q)$(MY_FSTAR) $<
+	ramon --mark end_$@
 	@touch -c $@
 
 %.fst.output: %.fst

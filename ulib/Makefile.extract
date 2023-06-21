@@ -16,7 +16,7 @@ FSTAR_FILES+=$(wildcard experimental/*.fst experimental/*.fsti)
 FSTAR_FILES:=$(filter-out $(NOEXTRACT_FILES), $(FSTAR_FILES))
 
 CODEGEN = Plugin
-MY_FSTAR=$(RUNLIM) $(FSTAR) $(SIL) $(OTHERFLAGS) --cache_checked_modules --odir $(OUTPUT_DIRECTORY) --cache_dir .cache --warn_error @241
+MY_FSTAR=$(RESMON) $(FSTAR) $(SIL) $(OTHERFLAGS) --cache_checked_modules --odir $(OUTPUT_DIRECTORY) --cache_dir .cache --warn_error @241
 EXTRACT_MODULES=--extract '* $(NOEXTRACT_MODULES)'
 
 # And then, in a separate invocation, from each .checked we
