@@ -1,5 +1,7 @@
 include .common.mk
 
+SHELL:=/bin/bash
+
 .PHONY: all
 all: build-and-verify-ulib
 
@@ -139,8 +141,8 @@ clean-intermediate:
 # Regenerate all hints for the standard library and regression test suite
 .PHONY: hints
 hints:
-	+$(Q)OTHERFLAGS=--record_hints $(MAKE) -C ulib/
-	+$(Q)OTHERFLAGS=--record_hints $(MAKE) ci-uregressions
+	+$(Q)OTHERFLAGS+=" --record_hints" $(MAKE) -C ulib/
+	+$(Q)OTHERFLAGS+=" --record_hints" $(MAKE) ci-uregressions
 
 .PHONY: bench
 bench:
@@ -160,9 +162,9 @@ output:
 .PHONY: ci
 ci:
 	ramon --mark ci-pre-start
-	+$(Q)OTHERFLAGS="--use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-pre $(MAKE) ci-pre
+	+$(Q)OTHERFLAGS+=" --use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-pre $(MAKE) ci-pre
 	ramon --mark ci-post-start
-	+$(Q)OTHERFLAGS="--use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-post $(MAKE) ci-post
+	+$(Q)OTHERFLAGS+=" --use_hints" V=1 FSTAR_HOME=$(CURDIR) ramon -o ci-post $(MAKE) ci-post
 	ramon --mark ci-post-end
 
 # This rule runs a CI job in a local container, exactly like is done for
