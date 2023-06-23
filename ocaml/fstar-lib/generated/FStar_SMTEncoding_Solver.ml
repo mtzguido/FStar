@@ -758,6 +758,7 @@ let (report_errors : query_settings -> unit) =
   fun qry_settings ->
     let uu___ = errors_to_report qry_settings in
     FStar_Errors.add_errors uu___
+let (rlimit_conversion_factor : Prims.int) = (Prims.parse_int "544656")
 let (query_info : query_settings -> FStar_SMTEncoding_Z3.z3result -> unit) =
   fun settings ->
     fun z3result ->
@@ -896,7 +897,7 @@ let (query_info : query_settings -> FStar_SMTEncoding_Z3.z3result -> unit) =
               | uu___3 ->
                   let uu___4 =
                     FStar_Compiler_Util.colorize_red
-                      (Prims.op_Hat "failed {reason-unknown="
+                      (Prims.op_Hat "failed {"
                          (Prims.op_Hat status_string "}")) in
                   (uu___4, FStar_Pervasives_Native.None) in
             (match uu___2 with
@@ -950,7 +951,8 @@ let (query_info : query_settings -> FStar_SMTEncoding_Z3.z3result -> unit) =
                                    let uu___16 =
                                      let uu___17 =
                                        FStar_Compiler_Util.string_of_int
-                                         settings.query_rlimit in
+                                         (settings.query_rlimit /
+                                            rlimit_conversion_factor) in
                                      [uu___17; stats] in
                                    uu___15 :: uu___16 in
                                  uu___13 :: uu___14 in
@@ -961,7 +963,7 @@ let (query_info : query_settings -> FStar_SMTEncoding_Z3.z3result -> unit) =
                        (settings.query_name) :: uu___6 in
                      range :: uu___5 in
                    FStar_Compiler_Util.print
-                     "%s\tQuery-stats (%s, %s)\t%s%s in %s milliseconds with fuel %s and ifuel %s and rlimit %s %s\n"
+                     "%s\tQuery-stats (%s, %s)\t%s%s in %s milliseconds with fuel=%s ifuel=%s and rlimit=%s %s\n"
                      uu___4);
                   (let uu___5 = FStar_Options.print_z3_statistics () in
                    if uu___5 then process_unsat_core core else ());
@@ -1179,11 +1181,11 @@ let (make_solver_configs :
                     match uu___1 with
                     | (qname, index) ->
                         let rlimit =
-                          let uu___2 = FStar_Options.z3_rlimit_factor () in
-                          let uu___3 =
+                          let uu___2 =
+                            let uu___3 = FStar_Options.z3_rlimit_factor () in
                             let uu___4 = FStar_Options.z3_rlimit () in
-                            uu___4 * (Prims.parse_int "544656") in
-                          uu___2 * uu___3 in
+                            FStar_Mul.op_Star uu___3 uu___4 in
+                          FStar_Mul.op_Star uu___2 rlimit_conversion_factor in
                         let next_hint = get_hint_for qname index in
                         let default_settings =
                           let uu___2 = FStar_TypeChecker_Env.get_range env in
