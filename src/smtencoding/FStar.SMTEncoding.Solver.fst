@@ -565,7 +565,7 @@ let query_info settings z3result =
         in
         let tag, core = match z3result.z3result_status with
          | UNSAT core -> BU.colorize_green "succeeded", core
-         | _ -> BU.colorize_red ("failed {reason-unknown=" ^ status_string ^ "}"), None
+         | _ -> BU.colorize_red ("failed {" ^ status_string ^ "}"), None
         in
         let range = "(" ^ (Range.string_of_range settings.query_range) ^ at_log_file ^ ")" in
         let used_hint_tag = if used_hint settings then " (with hint)" else "" in
@@ -575,7 +575,7 @@ let query_info settings z3result =
                 let str = smap_fold z3result.z3result_statistics f "statistics={" in
                     (substring str 0 ((String.length str) - 1)) ^ "}"
             else "" in
-        BU.print "%s\tQuery-stats (%s, %s)\t%s%s in %s milliseconds with fuel %s and ifuel %s and rlimit %s %s\n"
+        BU.print "%s\tQuery-stats (%s, %s)\t%s%s in %s milliseconds with fuel=%s ifuel=%s and rlimit=%s %s\n"
              [  range;
                 settings.query_name;
                 BU.string_of_int settings.query_index;
