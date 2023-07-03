@@ -4719,9 +4719,7 @@ let rec (try_make_equal :
       fun t2 ->
         let blast t11 t21 =
           let steps =
-            [FStar_TypeChecker_Env.UnfoldUntil
-               FStar_Syntax_Syntax.delta_constant;
-            FStar_TypeChecker_Env.Primops;
+            [FStar_TypeChecker_Env.Primops;
             FStar_TypeChecker_Env.Beta;
             FStar_TypeChecker_Env.Eager_unfolding;
             FStar_TypeChecker_Env.Iota] in

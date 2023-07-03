@@ -2071,7 +2071,7 @@ be VERY expensive, so we should find a smarter way. *)
 let rec try_make_equal env (t1 t2 : term) : U.eq_result =
   let blast (t1 t2 : term) : U.eq_result =
     let steps = [
-      Env.UnfoldUntil delta_constant;
+      (* Env.UnfoldUntil delta_constant; *)
       Env.Primops;
       Env.Beta;
       Env.Eager_unfolding;
