@@ -1,0 +1,35 @@
+name: Update generated files in a PR
+on: issue_comment
+
+jobs:
+  pr_comment:
+    name: Comment on PR
+    if: ${{ github.event.issue.pull_request }} # Only on PRs, not issues
+    runs-on: [self-hosted, linux, X64]
+
+    defaults:
+      run:
+        # Setting the default shell to bash. This is not only more standard,
+        # but also makes sure that we run with -o pipefail, so we can safely
+        # pipe data (such as | tee LOG) without missing out on failures
+        # and getting false positives. If you want to change the default shell,
+        # keep in mind you need a way to handle this.
+        shell: bash
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: git show
+        run: |
+          R=$(git show | head -n1)
+          echo "R=$R" >> $GITHUB_ENV
+
+      - name: Hello world
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            This is a test!
+            ${{env.R}}
+          reactions: '+1'
