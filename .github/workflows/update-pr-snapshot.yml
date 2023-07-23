@@ -22,7 +22,7 @@ jobs:
 
       - name: git show
         run: |
-          R=$(git show | head -n1)
+          R="$(git show | head -n1)"
           echo "R=$R" >> $GITHUB_ENV
 
       - name: Hello world
