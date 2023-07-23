@@ -255,7 +255,7 @@ let defaults =
       ("z3refresh"                    , Bool false);
       ("z3rlimit"                     , Int 5);
       ("z3rlimit_factor"              , Int 1);
-      ("z3seed"                       , Int 0);
+      ("z3seed"                       , Int 1);
       ("z3cliopt"                     , List []);
       ("z3smtopt"                     , List []);
       ("__no_positivity"              , Bool false);
