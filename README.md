@@ -1,6 +1,7 @@
 F*: A Proof-oriented Programming Language
 =========================================
-
+[![Build and test FStar](https://github.com/FStarLang/FStar/actions/workflows/linux-x64.yaml/badge.svg)](https://github.com/FStarLang/FStar/actions/workflows/linux-x64.yaml)
+[![Codespaces Prebuilds](https://github.com/FStarLang/FStar/actions/workflows/codespaces/create_codespaces_prebuilds/badge.svg)](https://github.com/FStarLang/FStar/actions/workflows/codespaces/create_codespaces_prebuilds)
 ### F\* website
 
 More information on F\* can be found at www.fstar-lang.org
