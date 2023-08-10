@@ -874,57 +874,61 @@ type term_ctxt =
   | Ctxt_hole            : term_ctxt
   | Ctxt_app_head        : term_ctxt -> argv -> term_ctxt
   | Ctxt_app_arg         : term -> aqualv -> term_ctxt -> term_ctxt
-  // | Ctxt_abs_binder      : binder_ctxt -> term -> term_ctxt
-  // | Ctxt_abs_body        : binder -> term_ctxt -> term_ctxt
-  // | Ctxt_arrow_binder    : binder_ctxt -> comp -> term_ctxt
-  // | Ctxt_arrow_comp      : binder -> comp_ctxt -> term_ctxt
-  // | Ctxt_refine_sort     : bv -> term_ctxt -> term -> term_ctxt
-  // | Ctxt_refine_ref      : bv -> typ -> term_ctxt -> term_ctxt
-  // | Ctxt_let_sort        : bool -> list term -> bv -> term_ctxt -> term -> term -> term_ctxt
-  // | Ctxt_let_def         : bool -> list term -> bv -> term -> term_ctxt -> term -> term_ctxt
-  // | Ctxt_let_body        : bool -> list term -> bv -> term -> term -> term_ctxt -> term_ctxt
-  // | Ctxt_match_scrutinee : term_ctxt -> option match_returns_ascription -> list branch -> term_ctxt
+  | Ctxt_abs_binder      : binder_ctxt -> term -> term_ctxt
+  | Ctxt_abs_body        : binder -> term_ctxt -> term_ctxt
+  | Ctxt_arrow_binder    : binder_ctxt -> comp -> term_ctxt
+  | Ctxt_arrow_comp      : binder -> comp_ctxt -> term_ctxt
+  | Ctxt_refine_sort     : ppname_t -> term_ctxt -> term -> term_ctxt
+  | Ctxt_refine_ref      : simple_binder -> term_ctxt -> term_ctxt
+  | Ctxt_let_sort        : bool -> list term -> ppname_t -> term_ctxt -> term -> term -> term_ctxt
+  | Ctxt_let_def         : bool -> list term -> simple_binder -> term_ctxt -> term -> term_ctxt
+  | Ctxt_let_body        : bool -> list term -> simple_binder -> term -> term_ctxt -> term_ctxt
+  | Ctxt_match_scrutinee : term_ctxt -> option match_returns_ascription -> list branch -> term_ctxt
 
-// and bv_ctxt =
-//   | Ctxt_bv : sealed string -> nat -> term_ctxt -> bv_ctxt
+and bv_ctxt =
+  | Ctxt_bv : sealed string -> nat -> term_ctxt -> bv_ctxt
 
-// and binder_ctxt =
-//   | Ctxt_binder : bv -> aqualv -> list term -> term_ctxt -> binder_ctxt
+and binder_ctxt =
+  | Ctxt_binder : ppname_t -> aqualv -> list term -> term_ctxt -> binder_ctxt
 
-// and comp_ctxt =
-//   | Ctxt_total  : term_ctxt -> comp_ctxt
-//   | Ctxt_gtotal : term_ctxt -> comp_ctxt
+and comp_ctxt =
+  | Ctxt_total  : term_ctxt -> comp_ctxt
+  | Ctxt_gtotal : term_ctxt -> comp_ctxt
 
 let rec apply_term_ctxt (e:term_ctxt) (t:term) : Tot term (decreases e) =
   match e with
   | Ctxt_hole -> t
   | Ctxt_app_head e arg -> pack_ln (Tv_App (apply_term_ctxt e t) arg)
   | Ctxt_app_arg hd q e -> pack_ln (Tv_App hd (apply_term_ctxt e t, q))
-//   | Ctxt_abs_binder b body -> pack_ln (Tv_Abs (apply_binder_ctxt b t) body)
-//   | Ctxt_abs_body b e -> pack_ln (Tv_Abs b (apply_term_ctxt e t))
-//   | Ctxt_arrow_binder b c -> pack_ln (Tv_Arrow (apply_binder_ctxt b t) c)
-//   | Ctxt_arrow_comp b c -> pack_ln (Tv_Arrow b (apply_comp_ctxt c t))
-//   | Ctxt_refine_sort b sort phi -> pack_ln (Tv_Refine b (apply_term_ctxt sort t) phi)
-//   | Ctxt_refine_ref b sort phi -> pack_ln (Tv_Refine b sort (apply_term_ctxt phi t))
-  
-//   | Ctxt_let_sort b attrs bv sort def body ->
-//     pack_ln (Tv_Let b attrs bv (apply_term_ctxt sort t) def body)
-//   | Ctxt_let_def b attrs bv sort def body ->
-//     pack_ln (Tv_Let b attrs bv sort (apply_term_ctxt def t) body)
-//   | Ctxt_let_body b attrs bv sort def body ->
-//     pack_ln (Tv_Let b attrs bv sort def (apply_term_ctxt body t))
-    
-//   | Ctxt_match_scrutinee sc ret brs ->
-//     pack_ln (Tv_Match (apply_term_ctxt sc t) ret brs)
+  | Ctxt_abs_binder b body -> pack_ln (Tv_Abs (apply_binder_ctxt b t) body)
+  | Ctxt_abs_body b e -> pack_ln (Tv_Abs b (apply_term_ctxt e t))
+  | Ctxt_arrow_binder b c -> pack_ln (Tv_Arrow (apply_binder_ctxt b t) c)
+  | Ctxt_arrow_comp b c -> pack_ln (Tv_Arrow b (apply_comp_ctxt c t))
+  | Ctxt_refine_sort nm ctx phi ->
+    let b = mk_simple_binder nm (apply_term_ctxt ctx t) in
+    pack_ln (Tv_Refine b phi)
+  | Ctxt_refine_ref b ctx ->
+    pack_ln (Tv_Refine b (apply_term_ctxt ctx t))
 
-// and apply_binder_ctxt (b:binder_ctxt) (t:term) : Tot binder (decreases b) =
-//   let Ctxt_binder binder_bv binder_qual binder_attrs ctxt = b in
-//   pack_binder {binder_bv; binder_qual; binder_attrs; binder_sort=apply_term_ctxt ctxt t}
+  | Ctxt_let_sort isrec attrs ppname ctx def body ->
+    let b = mk_simple_binder ppname (apply_term_ctxt ctx t) in
+    pack_ln (Tv_Let isrec attrs b def body)
+  | Ctxt_let_def isrec attrs b def body ->
+    pack_ln (Tv_Let isrec attrs b (apply_term_ctxt def t) body)
+  | Ctxt_let_body isrec attrs b def body ->
+    pack_ln (Tv_Let isrec attrs b def (apply_term_ctxt body t))
 
-// and apply_comp_ctxt (c:comp_ctxt) (t:term) : Tot comp (decreases c) =
-//   match c with
-//   | Ctxt_total e -> pack_comp (C_Total (apply_term_ctxt e t))
-//   | Ctxt_gtotal e -> pack_comp (C_GTotal (apply_term_ctxt e t))
+  | Ctxt_match_scrutinee sc ret brs ->
+    pack_ln (Tv_Match (apply_term_ctxt sc t) ret brs)
+
+and apply_binder_ctxt (b:binder_ctxt) (t:term) : Tot binder (decreases b) =
+  let Ctxt_binder ppname qual attrs ctxt = b in
+  pack_binder {ppname; qual; attrs; sort=apply_term_ctxt ctxt t}
+
+and apply_comp_ctxt (c:comp_ctxt) (t:term) : Tot comp (decreases c) =
+  match c with
+  | Ctxt_total e -> pack_comp (C_Total (apply_term_ctxt e t))
+  | Ctxt_gtotal e -> pack_comp (C_GTotal (apply_term_ctxt e t))
 
 noeq
 type constant_typing: vconst -> term -> Type0 = 

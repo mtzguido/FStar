@@ -119,7 +119,8 @@ type bindings = list binding
 but no qualifiers nor attributes can appear there. We call these
 binders simple. This module assumes an abstract predicate
 for them, which is later assumed to be equivalent to being a binder
-without qualifiers nor attributes (once inspect_binder is in scope). *)
+without qualifiers nor attributes (once inspect_binder is in scope,
+in FStar.Reflection.V2.Builtins ). *)
 val binder_is_simple : binder -> Tot bool
 
 type simple_binder = b:binder{binder_is_simple b}

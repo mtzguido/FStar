@@ -793,7 +793,7 @@ let rec open_with_gt_ln e i t j
   | Tv_Refine b f ->
     open_with_gt_ln_binder b i t j;
     open_with_gt_ln f (i + 1) t (j + 1)
-  | Tv_Uvar j c -> admit ()
+  | Tv_Uvar j c -> ()
   | Tv_Let recf attrs b def body ->
     open_with_gt_ln_terms attrs i t j;
     open_with_gt_ln_binder b i t j;
