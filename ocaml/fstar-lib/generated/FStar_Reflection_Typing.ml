@@ -954,12 +954,67 @@ type term_ctxt =
   | Ctxt_app_head of term_ctxt * FStar_Reflection_V2_Data.argv 
   | Ctxt_app_arg of FStar_Reflection_Types.term *
   FStar_Reflection_V2_Data.aqualv * term_ctxt 
+  | Ctxt_abs_binder of binder_ctxt * FStar_Reflection_Types.term 
+  | Ctxt_abs_body of FStar_Reflection_Types.binder * term_ctxt 
+  | Ctxt_arrow_binder of binder_ctxt * FStar_Reflection_Types.comp 
+  | Ctxt_arrow_comp of FStar_Reflection_Types.binder * comp_ctxt 
+  | Ctxt_refine_sort of FStar_Reflection_V2_Data.ppname_t * term_ctxt *
+  FStar_Reflection_Types.term 
+  | Ctxt_refine_ref of FStar_Reflection_V2_Data.simple_binder * term_ctxt 
+  | Ctxt_let_sort of Prims.bool * FStar_Reflection_Types.term Prims.list *
+  FStar_Reflection_V2_Data.ppname_t * term_ctxt * FStar_Reflection_Types.term
+  * FStar_Reflection_Types.term 
+  | Ctxt_let_def of Prims.bool * FStar_Reflection_Types.term Prims.list *
+  FStar_Reflection_V2_Data.simple_binder * term_ctxt *
+  FStar_Reflection_Types.term 
+  | Ctxt_let_body of Prims.bool * FStar_Reflection_Types.term Prims.list *
+  FStar_Reflection_V2_Data.simple_binder * FStar_Reflection_Types.term *
+  term_ctxt 
+  | Ctxt_match_scrutinee of term_ctxt *
+  FStar_Reflection_Types.match_returns_ascription
+  FStar_Pervasives_Native.option * FStar_Reflection_V2_Data.branch Prims.list 
+and bv_ctxt =
+  | Ctxt_bv of Prims.string FStar_Sealed.sealed * Prims.nat * term_ctxt 
+and binder_ctxt =
+  | Ctxt_binder of FStar_Reflection_V2_Data.ppname_t *
+  FStar_Reflection_V2_Data.aqualv * FStar_Reflection_Types.term Prims.list *
+  term_ctxt 
+and comp_ctxt =
+  | Ctxt_total of term_ctxt 
+  | Ctxt_gtotal of term_ctxt 
 let uu___is_Ctxt_hole uu___ =
   match uu___ with | Ctxt_hole _ -> true | _ -> false
 let uu___is_Ctxt_app_head uu___ =
   match uu___ with | Ctxt_app_head _ -> true | _ -> false
 let uu___is_Ctxt_app_arg uu___ =
   match uu___ with | Ctxt_app_arg _ -> true | _ -> false
+let uu___is_Ctxt_abs_binder uu___ =
+  match uu___ with | Ctxt_abs_binder _ -> true | _ -> false
+let uu___is_Ctxt_abs_body uu___ =
+  match uu___ with | Ctxt_abs_body _ -> true | _ -> false
+let uu___is_Ctxt_arrow_binder uu___ =
+  match uu___ with | Ctxt_arrow_binder _ -> true | _ -> false
+let uu___is_Ctxt_arrow_comp uu___ =
+  match uu___ with | Ctxt_arrow_comp _ -> true | _ -> false
+let uu___is_Ctxt_refine_sort uu___ =
+  match uu___ with | Ctxt_refine_sort _ -> true | _ -> false
+let uu___is_Ctxt_refine_ref uu___ =
+  match uu___ with | Ctxt_refine_ref _ -> true | _ -> false
+let uu___is_Ctxt_let_sort uu___ =
+  match uu___ with | Ctxt_let_sort _ -> true | _ -> false
+let uu___is_Ctxt_let_def uu___ =
+  match uu___ with | Ctxt_let_def _ -> true | _ -> false
+let uu___is_Ctxt_let_body uu___ =
+  match uu___ with | Ctxt_let_body _ -> true | _ -> false
+let uu___is_Ctxt_match_scrutinee uu___ =
+  match uu___ with | Ctxt_match_scrutinee _ -> true | _ -> false
+let uu___is_Ctxt_bv uu___ = match uu___ with | Ctxt_bv _ -> true | _ -> false
+let uu___is_Ctxt_binder uu___ =
+  match uu___ with | Ctxt_binder _ -> true | _ -> false
+let uu___is_Ctxt_total uu___ =
+  match uu___ with | Ctxt_total _ -> true | _ -> false
+let uu___is_Ctxt_gtotal uu___ =
+  match uu___ with | Ctxt_gtotal _ -> true | _ -> false
 let rec (apply_term_ctxt :
   term_ctxt -> FStar_Reflection_Types.term -> FStar_Reflection_Types.term) =
   fun e ->
@@ -973,6 +1028,67 @@ let rec (apply_term_ctxt :
           FStar_Reflection_V2_Builtins.pack_ln
             (FStar_Reflection_V2_Data.Tv_App
                (hd, ((apply_term_ctxt e1 t), q)))
+      | Ctxt_abs_binder (b, body) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Abs ((apply_binder_ctxt b t), body))
+      | Ctxt_abs_body (b, e1) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Abs (b, (apply_term_ctxt e1 t)))
+      | Ctxt_arrow_binder (b, c) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Arrow ((apply_binder_ctxt b t), c))
+      | Ctxt_arrow_comp (b, c) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Arrow (b, (apply_comp_ctxt c t)))
+      | Ctxt_refine_sort (nm, ctx, phi) ->
+          let b = mk_simple_binder nm (apply_term_ctxt ctx t) in
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Refine (b, phi))
+      | Ctxt_refine_ref (b, ctx) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Refine (b, (apply_term_ctxt ctx t)))
+      | Ctxt_let_sort (isrec, attrs, ppname, ctx, def, body) ->
+          let b = mk_simple_binder ppname (apply_term_ctxt ctx t) in
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Let (isrec, attrs, b, def, body))
+      | Ctxt_let_def (isrec, attrs, b, def, body) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Let
+               (isrec, attrs, b, (apply_term_ctxt def t), body))
+      | Ctxt_let_body (isrec, attrs, b, def, body) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Let
+               (isrec, attrs, b, def, (apply_term_ctxt body t)))
+      | Ctxt_match_scrutinee (sc, ret, brs) ->
+          FStar_Reflection_V2_Builtins.pack_ln
+            (FStar_Reflection_V2_Data.Tv_Match
+               ((apply_term_ctxt sc t), ret, brs))
+and (apply_binder_ctxt :
+  binder_ctxt -> FStar_Reflection_Types.term -> FStar_Reflection_Types.binder)
+  =
+  fun b ->
+    fun t ->
+      let uu___ = b in
+      match uu___ with
+      | Ctxt_binder (ppname, qual, attrs, ctxt) ->
+          FStar_Reflection_V2_Builtins.pack_binder
+            {
+              FStar_Reflection_V2_Data.sort2 = (apply_term_ctxt ctxt t);
+              FStar_Reflection_V2_Data.qual = qual;
+              FStar_Reflection_V2_Data.attrs = attrs;
+              FStar_Reflection_V2_Data.ppname2 = ppname
+            }
+and (apply_comp_ctxt :
+  comp_ctxt -> FStar_Reflection_Types.term -> FStar_Reflection_Types.comp) =
+  fun c ->
+    fun t ->
+      match c with
+      | Ctxt_total e ->
+          FStar_Reflection_V2_Builtins.pack_comp
+            (FStar_Reflection_V2_Data.C_Total (apply_term_ctxt e t))
+      | Ctxt_gtotal e ->
+          FStar_Reflection_V2_Builtins.pack_comp
+            (FStar_Reflection_V2_Data.C_GTotal (apply_term_ctxt e t))
 type ('dummyV0, 'dummyV1) constant_typing =
   | CT_Unit 
   | CT_True 
