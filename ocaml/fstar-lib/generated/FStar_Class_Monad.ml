@@ -33,6 +33,25 @@ let (monad_option : unit FStar_Pervasives_Native.option monad) =
                   fun uu___ -> Obj.magic FStar_Compiler_Util.bind_opt) uu___3
                  uu___2 uu___1 uu___)
   }
+let (monad_list : unit Prims.list monad) =
+  {
+    return =
+      (fun uu___1 ->
+         fun uu___ -> (fun a -> fun x -> Obj.magic [x]) uu___1 uu___);
+    op_let_Bang =
+      (fun uu___3 ->
+         fun uu___2 ->
+           fun uu___1 ->
+             fun uu___ ->
+               (fun a ->
+                  fun b ->
+                    fun x ->
+                      let x = Obj.magic x in
+                      fun f ->
+                        let f = Obj.magic f in
+                        Obj.magic (FStar_Compiler_List.concatMap f x)) uu___3
+                 uu___2 uu___1 uu___)
+  }
 let rec mapM :
   'm . 'm monad -> unit -> unit -> (Obj.t -> 'm) -> Obj.t Prims.list -> 'm =
   fun uu___ ->
