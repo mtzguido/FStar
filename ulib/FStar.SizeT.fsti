@@ -115,6 +115,25 @@ val mul (x y: t) : Pure t
   (requires (fits (v x * v y)))
   (ensures (fun z -> v z == v x * v y))
 
+(** Underspecified, possibly overflowing operators:
+
+    The postcondition only enures that the result is correct
+    if is no overflow *)
+val add_underspec (x:t) (y:t) : Pure t
+  (requires True)
+  (ensures (fun z ->
+    fits (v x + v y) ==> v x + v y = v z))
+
+val sub_underspec (x:t) (y:t) : Pure t
+  (requires True)
+  (ensures (fun z ->
+    fits (v x - v y) ==> v x + v y = v z))
+
+val mul_underspec (x:t) (y:t) : Pure t
+  (requires True)
+  (ensures (fun z ->
+    fits (v x * v y) ==> v x + v y = v z))
+
 (** Euclidean division of [a] and [b], with [b] non-zero *)
 val div (a:t) (b:t{v b <> 0}) : Pure t
   (requires (True))
