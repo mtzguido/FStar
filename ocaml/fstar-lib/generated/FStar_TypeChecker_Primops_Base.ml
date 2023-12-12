@@ -1334,3 +1334,196 @@ let mk3' :
                           as_primitive_step_nbecbs true
                             (name, (Prims.of_int (3)), u_arity, interp,
                               nbe_interp)
+let mk4' :
+  'a 'b 'c 'd 'r 'na 'nb 'nc 'nd 'nr .
+    Prims.int ->
+      FStar_Ident.lid ->
+        'a FStar_Syntax_Embeddings_Base.embedding ->
+          'na FStar_TypeChecker_NBETerm.embedding ->
+            'b FStar_Syntax_Embeddings_Base.embedding ->
+              'nb FStar_TypeChecker_NBETerm.embedding ->
+                'c FStar_Syntax_Embeddings_Base.embedding ->
+                  'nc FStar_TypeChecker_NBETerm.embedding ->
+                    'd FStar_Syntax_Embeddings_Base.embedding ->
+                      'nd FStar_TypeChecker_NBETerm.embedding ->
+                        'r FStar_Syntax_Embeddings_Base.embedding ->
+                          'nr FStar_TypeChecker_NBETerm.embedding ->
+                            ('a ->
+                               'b ->
+                                 'c ->
+                                   'd -> 'r FStar_Pervasives_Native.option)
+                              ->
+                              ('na ->
+                                 'nb ->
+                                   'nc ->
+                                     'nd ->
+                                       'nr FStar_Pervasives_Native.option)
+                                -> primitive_step
+  =
+  fun u_arity ->
+    fun name ->
+      fun uu___ ->
+        fun uu___1 ->
+          fun uu___2 ->
+            fun uu___3 ->
+              fun uu___4 ->
+                fun uu___5 ->
+                  fun uu___6 ->
+                    fun uu___7 ->
+                      fun uu___8 ->
+                        fun uu___9 ->
+                          fun f ->
+                            fun nbe_f ->
+                              let interp psc1 cb us args =
+                                match args with
+                                | (a1, uu___10)::(b1, uu___11)::(c1, uu___12)::
+                                    (d1, uu___13)::[] ->
+                                    Obj.magic
+                                      (Obj.repr
+                                         (let uu___14 =
+                                            let uu___15 =
+                                              let uu___16 =
+                                                let uu___17 =
+                                                  let uu___18 =
+                                                    try_unembed_simple uu___
+                                                      a1 in
+                                                  Obj.magic
+                                                    (FStar_Class_Monad.op_Less_Dollar_Greater
+                                                       FStar_Class_Monad.monad_option
+                                                       () ()
+                                                       (fun uu___19 ->
+                                                          (Obj.magic f)
+                                                            uu___19)
+                                                       (Obj.magic uu___18)) in
+                                                let uu___18 =
+                                                  try_unembed_simple uu___2
+                                                    b1 in
+                                                Obj.magic
+                                                  (FStar_Class_Monad.op_Less_Star_Greater
+                                                     FStar_Class_Monad.monad_option
+                                                     () ()
+                                                     (Obj.magic uu___17)
+                                                     (Obj.magic uu___18)) in
+                                              let uu___17 =
+                                                try_unembed_simple uu___4 c1 in
+                                              Obj.magic
+                                                (FStar_Class_Monad.op_Less_Star_Greater
+                                                   FStar_Class_Monad.monad_option
+                                                   () () (Obj.magic uu___16)
+                                                   (Obj.magic uu___17)) in
+                                            let uu___16 =
+                                              try_unembed_simple uu___6 d1 in
+                                            Obj.magic
+                                              (FStar_Class_Monad.op_Less_Star_Greater
+                                                 FStar_Class_Monad.monad_option
+                                                 () () (Obj.magic uu___15)
+                                                 (Obj.magic uu___16)) in
+                                          FStar_Class_Monad.op_let_Bang
+                                            FStar_Class_Monad.monad_option ()
+                                            () (Obj.magic uu___14)
+                                            (fun uu___15 ->
+                                               (fun r1 ->
+                                                  let r1 = Obj.magic r1 in
+                                                  Obj.magic
+                                                    (FStar_Class_Monad.op_let_Bang
+                                                       FStar_Class_Monad.monad_option
+                                                       () () (Obj.magic r1)
+                                                       (fun uu___15 ->
+                                                          (fun r2 ->
+                                                             let r2 =
+                                                               Obj.magic r2 in
+                                                             let uu___15 =
+                                                               embed_simple
+                                                                 uu___8
+                                                                 psc1.psc_range
+                                                                 r2 in
+                                                             Obj.magic
+                                                               (FStar_Class_Monad.return
+                                                                  FStar_Class_Monad.monad_option
+                                                                  ()
+                                                                  (Obj.magic
+                                                                    uu___15)))
+                                                            uu___15)))
+                                                 uu___15)))
+                                | uu___10 ->
+                                    Obj.magic
+                                      (Obj.repr FStar_Pervasives_Native.None) in
+                              let nbe_interp cbs us args =
+                                match args with
+                                | (a1, uu___10)::(b1, uu___11)::(c1, uu___12)::
+                                    (d1, uu___13)::[] ->
+                                    Obj.magic
+                                      (Obj.repr
+                                         (let uu___14 =
+                                            let uu___15 =
+                                              let uu___16 =
+                                                let uu___17 =
+                                                  let uu___18 =
+                                                    FStar_TypeChecker_NBETerm.unembed
+                                                      (solve uu___1) cbs a1 in
+                                                  Obj.magic
+                                                    (FStar_Class_Monad.op_Less_Dollar_Greater
+                                                       FStar_Class_Monad.monad_option
+                                                       () ()
+                                                       (fun uu___19 ->
+                                                          (Obj.magic nbe_f)
+                                                            uu___19)
+                                                       (Obj.magic uu___18)) in
+                                                let uu___18 =
+                                                  FStar_TypeChecker_NBETerm.unembed
+                                                    (solve uu___3) cbs b1 in
+                                                Obj.magic
+                                                  (FStar_Class_Monad.op_Less_Star_Greater
+                                                     FStar_Class_Monad.monad_option
+                                                     () ()
+                                                     (Obj.magic uu___17)
+                                                     (Obj.magic uu___18)) in
+                                              let uu___17 =
+                                                FStar_TypeChecker_NBETerm.unembed
+                                                  (solve uu___5) cbs c1 in
+                                              Obj.magic
+                                                (FStar_Class_Monad.op_Less_Star_Greater
+                                                   FStar_Class_Monad.monad_option
+                                                   () () (Obj.magic uu___16)
+                                                   (Obj.magic uu___17)) in
+                                            let uu___16 =
+                                              FStar_TypeChecker_NBETerm.unembed
+                                                (solve uu___7) cbs d1 in
+                                            Obj.magic
+                                              (FStar_Class_Monad.op_Less_Star_Greater
+                                                 FStar_Class_Monad.monad_option
+                                                 () () (Obj.magic uu___15)
+                                                 (Obj.magic uu___16)) in
+                                          FStar_Class_Monad.op_let_Bang
+                                            FStar_Class_Monad.monad_option ()
+                                            () (Obj.magic uu___14)
+                                            (fun uu___15 ->
+                                               (fun r1 ->
+                                                  let r1 = Obj.magic r1 in
+                                                  Obj.magic
+                                                    (FStar_Class_Monad.op_let_Bang
+                                                       FStar_Class_Monad.monad_option
+                                                       () () (Obj.magic r1)
+                                                       (fun uu___15 ->
+                                                          (fun r2 ->
+                                                             let r2 =
+                                                               Obj.magic r2 in
+                                                             let uu___15 =
+                                                               FStar_TypeChecker_NBETerm.embed
+                                                                 (solve
+                                                                    uu___9)
+                                                                 cbs r2 in
+                                                             Obj.magic
+                                                               (FStar_Class_Monad.return
+                                                                  FStar_Class_Monad.monad_option
+                                                                  ()
+                                                                  (Obj.magic
+                                                                    uu___15)))
+                                                            uu___15)))
+                                                 uu___15)))
+                                | uu___10 ->
+                                    Obj.magic
+                                      (Obj.repr FStar_Pervasives_Native.None) in
+                              as_primitive_step_nbecbs true
+                                (name, (Prims.of_int (4)), u_arity, interp,
+                                  nbe_interp)
