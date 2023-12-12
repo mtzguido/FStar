@@ -53,6 +53,20 @@ let nbe_eq2 (_typ x y : NBE.abstract_nbe_term) : option NBE.abstract_nbe_term =
   | U.NotEqual -> Some (AbstractNBE (mkFV (S.lid_as_fv PC.false_lid None) [] []))
   | U.Unknown  -> None
 
+let s_eq3 (_typ1 _typ2 x y : EMB.abstract_term) : option EMB.abstract_term =
+  match U.eq_tm x.t y.t with
+  | U.Equal -> Some (EMB.Abstract U.t_true)
+  | U.NotEqual -> Some (EMB.Abstract U.t_false)
+  | _ -> None
+
+let nbe_eq3 (_typ1 _typ2 x y : NBE.abstract_nbe_term) : option NBE.abstract_nbe_term =
+  let open FStar.TypeChecker.NBETerm in
+  match NBETerm.eq_t x.t y.t with
+  | U.Equal    -> Some (AbstractNBE (mkFV (S.lid_as_fv PC.true_lid None)  [] []))
+  | U.NotEqual -> Some (AbstractNBE (mkFV (S.lid_as_fv PC.false_lid None) [] []))
+  | U.Unknown  -> None
+
 let prop_eq_ops : list primitive_step = [
   mk3' 1 PC.eq2_lid s_eq2 nbe_eq2;
+  mk4' 2 PC.eq3_lid s_eq3 nbe_eq3;
 ]
