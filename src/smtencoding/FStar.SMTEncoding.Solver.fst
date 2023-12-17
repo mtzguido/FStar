@@ -1200,6 +1200,14 @@ let ask_solver
         let cfg = List.last configs in
         if not ans.ok then
           maybe_save_failing_query env prefix cfg;
+        let ans =
+          if not ans.ok && Options.ext_getv "fstar:__unsafe_no_fail" <> "" then (
+            Errors.log_issue cfg.query_range (Errors.Warning_ProofRecovery,
+              BU.format1 "__unsafe_no_fail: query %s failed, continuing anyway\n" (show (cfg.query_name, cfg.query_index)));
+            { ans with ok = true }
+          ) else
+            ans
+        in
         ans
 
       )

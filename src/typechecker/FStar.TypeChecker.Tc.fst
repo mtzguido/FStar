@@ -577,6 +577,11 @@ let tc_decl' env0 se: list sigelt & list sigelt & Env.env =
         (Print.sigelt_to_string_short se);
     [], [], env
 
+  (* If we're using --ext fstar:__unsafe_no_fail, then the underlying defn will probably
+  succeed instead of failing, so just skip it. *)
+  | Sig_fail _ when Options.ext_getv "fstar:__unsafe_no_fail" <> "" ->
+    [], [], env
+
   | Sig_fail {errs=expected_errors; fail_in_lax=lax; ses} ->
     let env' = if lax then { env with lax = true } else env in
     let env' = Env.push env' "expect_failure" in
