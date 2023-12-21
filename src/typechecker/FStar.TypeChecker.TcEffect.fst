@@ -1966,8 +1966,14 @@ Errors.with_ctx (BU.format1 "While checking layered effect definition `%s`" (str
 
 let tc_non_layered_eff_decl env0 (ed:S.eff_decl) (_quals : list qualifier) (_attrs : list S.attribute) : S.eff_decl =
 Errors.with_ctx (BU.format1 "While checking effect definition `%s`" (string_of_lid ed.mname)) (fun () ->
-  if Env.debug env0 <| Options.Other "ED" then
-    BU.print1 "Typechecking eff_decl: \n\t%s\n" (Print.eff_decl_to_string false ed);
+  if true || Env.debug env0 <| Options.Other "ED" then (
+    let open FStar.Pprint in
+    let open FStar.Errors.Msg in
+    Errors.log_issue_doc env0.range (Warning_UnrecognizedAttribute, [
+       text "Typechecking eff_decl:";
+        text (Print.eff_decl_to_string false ed);
+    ])
+  );
 
   let us, bs =
     //ed.univs are free universes in the binders
