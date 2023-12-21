@@ -6452,92 +6452,156 @@ let (tc_non_layered_eff_decl :
               "While checking effect definition `%s`" uu___1 in
           FStar_Errors.with_ctx uu___
             (fun uu___1 ->
-               (let uu___3 =
-                  FStar_TypeChecker_Env.debug env0 (FStar_Options.Other "ED") in
+               (let uu___3 = true in
                 if uu___3
                 then
-                  let uu___4 = FStar_Syntax_Print.eff_decl_to_string false ed in
-                  FStar_Compiler_Util.print1
-                    "Typechecking eff_decl: \n\t%s\n" uu___4
+                  let uu___4 =
+                    let uu___5 =
+                      let uu___6 =
+                        FStar_Errors_Msg.text "Typechecking eff_decl:" in
+                      let uu___7 =
+                        let uu___8 =
+                          let uu___9 =
+                            FStar_Syntax_Print.eff_decl_to_string false ed in
+                          FStar_Errors_Msg.text uu___9 in
+                        [uu___8] in
+                      uu___6 :: uu___7 in
+                    (FStar_Errors_Codes.Warning_UnrecognizedAttribute,
+                      uu___5) in
+                  FStar_Errors.log_issue_doc env0.FStar_TypeChecker_Env.range
+                    uu___4
                 else ());
                (let uu___3 =
-                  let uu___4 =
-                    FStar_Syntax_Subst.univ_var_opening
-                      ed.FStar_Syntax_Syntax.univs in
-                  match uu___4 with
-                  | (ed_univs_subst, ed_univs) ->
-                      let bs =
-                        let uu___5 =
-                          FStar_Syntax_Subst.subst_binders ed_univs_subst
-                            ed.FStar_Syntax_Syntax.binders in
-                        FStar_Syntax_Subst.open_binders uu___5 in
-                      let uu___5 =
-                        let uu___6 =
-                          FStar_TypeChecker_Env.push_univ_vars env0 ed_univs in
-                        FStar_TypeChecker_TcTerm.tc_tparams uu___6 bs in
-                      (match uu___5 with
-                       | (bs1, uu___6, uu___7) ->
-                           let uu___8 =
-                             let tmp_t =
-                               let uu___9 =
-                                 FStar_Syntax_Syntax.mk_Total
-                                   FStar_Syntax_Syntax.t_unit in
-                               FStar_Syntax_Util.arrow bs1 uu___9 in
-                             let uu___9 =
-                               FStar_TypeChecker_Generalize.generalize_universes
-                                 env0 tmp_t in
-                             match uu___9 with
-                             | (us, tmp_t1) ->
-                                 let uu___10 =
-                                   let uu___11 =
-                                     let uu___12 =
-                                       FStar_Syntax_Util.arrow_formals tmp_t1 in
-                                     FStar_Pervasives_Native.fst uu___12 in
-                                   FStar_Syntax_Subst.close_binders uu___11 in
-                                 (us, uu___10) in
-                           (match uu___8 with
-                            | (us, bs2) ->
-                                (match ed_univs with
-                                 | [] -> (us, bs2)
-                                 | uu___9 ->
-                                     let uu___10 =
-                                       ((FStar_Compiler_List.length ed_univs)
-                                          = (FStar_Compiler_List.length us))
-                                         &&
-                                         (FStar_Compiler_List.forall2
-                                            (fun u1 ->
-                                               fun u2 ->
-                                                 let uu___11 =
-                                                   FStar_Syntax_Syntax.order_univ_name
-                                                     u1 u2 in
-                                                 uu___11 = Prims.int_zero)
-                                            ed_univs us) in
-                                     if uu___10
-                                     then (us, bs2)
-                                     else
-                                       (let uu___12 =
-                                          let uu___13 =
-                                            let uu___14 =
-                                              FStar_Ident.string_of_lid
-                                                ed.FStar_Syntax_Syntax.mname in
-                                            let uu___15 =
-                                              FStar_Compiler_Util.string_of_int
-                                                (FStar_Compiler_List.length
-                                                   ed_univs) in
-                                            let uu___16 =
-                                              FStar_Compiler_Util.string_of_int
-                                                (FStar_Compiler_List.length
-                                                   us) in
-                                            FStar_Compiler_Util.format3
-                                              "Expected and generalized universes in effect declaration for %s are different, expected: %s, but found %s"
-                                              uu___14 uu___15 uu___16 in
-                                          (FStar_Errors_Codes.Fatal_UnexpectedNumberOfUniverse,
-                                            uu___13) in
-                                        let uu___13 =
-                                          FStar_Ident.range_of_lid
-                                            ed.FStar_Syntax_Syntax.mname in
-                                        FStar_Errors.raise_error uu___12
-                                          uu___13)))) in
+                  (let uu___5 =
+                     FStar_Syntax_Print.univ_names_to_string
+                       ed.FStar_Syntax_Syntax.univs in
+                   FStar_Compiler_Util.print1 "GG ed_univs=%s\n" uu___5);
+                  (let uu___5 =
+                     FStar_Syntax_Subst.univ_var_opening
+                       ed.FStar_Syntax_Syntax.univs in
+                   match uu___5 with
+                   | (ed_univs_subst, ed_univs) ->
+                       let bs =
+                         let uu___6 =
+                           FStar_Syntax_Subst.subst_binders ed_univs_subst
+                             ed.FStar_Syntax_Syntax.binders in
+                         FStar_Syntax_Subst.open_binders uu___6 in
+                       let uu___6 =
+                         let uu___7 =
+                           FStar_TypeChecker_Env.push_univ_vars env0 ed_univs in
+                         FStar_TypeChecker_TcTerm.tc_tparams uu___7 bs in
+                       (match uu___6 with
+                        | (bs1, uu___7, uu___8) ->
+                            let uu___9 =
+                              let tmp_t =
+                                let uu___10 =
+                                  FStar_Syntax_Syntax.mk_Total
+                                    FStar_Syntax_Syntax.t_unit in
+                                FStar_Syntax_Util.arrow bs1 uu___10 in
+                              (let uu___11 =
+                                 FStar_Syntax_Print.binders_to_string "," bs1 in
+                               let uu___12 =
+                                 FStar_Syntax_Print.term_to_string tmp_t in
+                               FStar_Compiler_Util.print2
+                                 "GG bs=%s, orig tmp_t: %s\n" uu___11 uu___12);
+                              (let uu___11 =
+                                 FStar_TypeChecker_Generalize.generalize_universes
+                                   env0 tmp_t in
+                               match uu___11 with
+                               | (us, tmp_t1) ->
+                                   ((let uu___13 =
+                                       FStar_Syntax_Print.univ_names_to_string
+                                         us in
+                                     let uu___14 =
+                                       FStar_Syntax_Print.term_to_string
+                                         tmp_t1 in
+                                     FStar_Compiler_Util.print2
+                                       "GG us: %s, tmp_t: %s\n" uu___13
+                                       uu___14);
+                                    (let uu___13 =
+                                       let uu___14 =
+                                         let uu___15 =
+                                           FStar_Syntax_Util.arrow_formals
+                                             tmp_t1 in
+                                         FStar_Pervasives_Native.fst uu___15 in
+                                       FStar_Syntax_Subst.close_binders
+                                         uu___14 in
+                                     (us, uu___13)))) in
+                            (match uu___9 with
+                             | (us, bs2) ->
+                                 (match ed_univs with
+                                  | [] -> (us, bs2)
+                                  | uu___10 ->
+                                      let uu___11 =
+                                        ((FStar_Compiler_List.length ed_univs)
+                                           = (FStar_Compiler_List.length us))
+                                          &&
+                                          (FStar_Compiler_List.forall2
+                                             (fun u1 ->
+                                                fun u2 ->
+                                                  let uu___12 =
+                                                    FStar_Syntax_Syntax.order_univ_name
+                                                      u1 u2 in
+                                                  uu___12 = Prims.int_zero)
+                                             ed_univs us) in
+                                      if uu___11
+                                      then (us, bs2)
+                                      else
+                                        (let uu___13 =
+                                           let uu___14 =
+                                             let uu___15 =
+                                               let uu___16 =
+                                                 FStar_Errors_Msg.text
+                                                   "Expected and generalized universes in effect declaration for" in
+                                               let uu___17 =
+                                                 let uu___18 =
+                                                   let uu___19 =
+                                                     FStar_Ident.string_of_lid
+                                                       ed.FStar_Syntax_Syntax.mname in
+                                                   FStar_Pprint.doc_of_string
+                                                     uu___19 in
+                                                 let uu___19 =
+                                                   FStar_Errors_Msg.text
+                                                     "are different" in
+                                                 FStar_Pprint.op_Hat_Slash_Hat
+                                                   uu___18 uu___19 in
+                                               FStar_Pprint.op_Hat_Slash_Hat
+                                                 uu___16 uu___17 in
+                                             let uu___16 =
+                                               let uu___17 =
+                                                 let uu___18 =
+                                                   FStar_Errors_Msg.text
+                                                     "Expected" in
+                                                 let uu___19 =
+                                                   let uu___20 =
+                                                     FStar_Class_PP.pp
+                                                       FStar_Class_PP.pp_int
+                                                       (FStar_Compiler_List.length
+                                                          ed_univs) in
+                                                   let uu___21 =
+                                                     let uu___22 =
+                                                       FStar_Errors_Msg.text
+                                                         "but found" in
+                                                     let uu___23 =
+                                                       FStar_Class_PP.pp
+                                                         FStar_Class_PP.pp_int
+                                                         (FStar_Compiler_List.length
+                                                            us) in
+                                                     FStar_Pprint.op_Hat_Slash_Hat
+                                                       uu___22 uu___23 in
+                                                   FStar_Pprint.op_Hat_Slash_Hat
+                                                     uu___20 uu___21 in
+                                                 FStar_Pprint.op_Hat_Slash_Hat
+                                                   uu___18 uu___19 in
+                                               [uu___17] in
+                                             uu___15 :: uu___16 in
+                                           (FStar_Errors_Codes.Fatal_UnexpectedNumberOfUniverse,
+                                             uu___14) in
+                                         let uu___14 =
+                                           FStar_Ident.range_of_lid
+                                             ed.FStar_Syntax_Syntax.mname in
+                                         FStar_Errors.raise_error_doc uu___13
+                                           uu___14))))) in
                 match uu___3 with
                 | (us, bs) ->
                     let ed1 =

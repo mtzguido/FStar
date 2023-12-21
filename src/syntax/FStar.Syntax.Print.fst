@@ -831,6 +831,7 @@ let rec sigelt_to_string (x: sigelt) =
           (tscheme_to_string t)
           (tscheme_to_string ty)
           (indexed_effect_combinator_kind_opt_to_string k)
+       | Sig_sugar {d} -> "Sig_sugar ..."
       in
       match x.sigattrs with
       | [] -> "[@ ]" ^ "\n" ^ basic //It is important to keep this empty attribute marker since the Vale type extractor uses it as a delimiter
@@ -905,6 +906,8 @@ let rec sigelt_to_string_short (x: sigelt) = match x.sigel with
   | Sig_polymonadic_subcomp {m_lid=m; n_lid=n} ->
     U.format2 "polymonadic_subcomp %s <: %s" (Ident.string_of_lid m) (Ident.string_of_lid n)
 
+  | Sig_sugar {d} -> "Sig_sugar ..."
+
 let tag_of_sigelt (se:sigelt) : string =
   match se.sigel with
   | Sig_inductive_typ _    -> "Sig_inductive_typ"
@@ -921,6 +924,7 @@ let tag_of_sigelt (se:sigelt) : string =
   | Sig_polymonadic_bind _ -> "Sig_polymonadic_bind"
   | Sig_polymonadic_subcomp _ -> "Sig_polymonadic_subcomp"
   | Sig_fail _             -> "Sig_fail"
+  | Sig_sugar _            -> "Sig_sugar"
 
 (*
  * AR: 07/19: exports is redundant, keeping it here until vale is fixed to not parse it

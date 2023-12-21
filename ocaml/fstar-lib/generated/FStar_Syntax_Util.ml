@@ -1500,6 +1500,7 @@ let (lids_of_sigelt :
     | FStar_Syntax_Syntax.Sig_fail uu___ -> []
     | FStar_Syntax_Syntax.Sig_polymonadic_bind uu___ -> []
     | FStar_Syntax_Syntax.Sig_polymonadic_subcomp uu___ -> []
+    | FStar_Syntax_Syntax.Sig_sugar uu___ -> []
 let (lid_of_sigelt :
   FStar_Syntax_Syntax.sigelt ->
     FStar_Ident.lident FStar_Pervasives_Native.option)

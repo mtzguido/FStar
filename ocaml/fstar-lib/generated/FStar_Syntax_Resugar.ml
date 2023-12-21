@@ -2769,6 +2769,8 @@ let (resugar_sigelt' :
   fun env ->
     fun se ->
       match se.FStar_Syntax_Syntax.sigel with
+      | FStar_Syntax_Syntax.Sig_sugar { FStar_Syntax_Syntax.d = d;_} ->
+          FStar_Pervasives_Native.Some d
       | FStar_Syntax_Syntax.Sig_bundle
           { FStar_Syntax_Syntax.ses = ses;
             FStar_Syntax_Syntax.lids = uu___;_}

@@ -1824,6 +1824,8 @@ and sigelt'__Sig_fail__payload =
   errs: Prims.int Prims.list ;
   fail_in_lax: Prims.bool ;
   ses1: sigelt Prims.list }
+and sigelt'__Sig_sugar__payload = {
+  d: FStar_Parser_AST.decl }
 and sigelt' =
   | Sig_inductive_typ of sigelt'__Sig_inductive_typ__payload 
   | Sig_bundle of sigelt'__Sig_bundle__payload 
@@ -1839,6 +1841,7 @@ and sigelt' =
   | Sig_polymonadic_bind of sigelt'__Sig_polymonadic_bind__payload 
   | Sig_polymonadic_subcomp of sigelt'__Sig_polymonadic_subcomp__payload 
   | Sig_fail of sigelt'__Sig_fail__payload 
+  | Sig_sugar of sigelt'__Sig_sugar__payload 
 and sigelt =
   {
   sigel: sigelt' ;
@@ -2076,6 +2079,9 @@ let (__proj__Mksigelt'__Sig_fail__payload__item__ses :
   sigelt'__Sig_fail__payload -> sigelt Prims.list) =
   fun projectee ->
     match projectee with | { errs; fail_in_lax; ses1 = ses;_} -> ses
+let (__proj__Mksigelt'__Sig_sugar__payload__item__d :
+  sigelt'__Sig_sugar__payload -> FStar_Parser_AST.decl) =
+  fun projectee -> match projectee with | { d;_} -> d
 let (uu___is_Sig_inductive_typ : sigelt' -> Prims.bool) =
   fun projectee ->
     match projectee with | Sig_inductive_typ _0 -> true | uu___ -> false
@@ -2153,6 +2159,11 @@ let (uu___is_Sig_fail : sigelt' -> Prims.bool) =
     match projectee with | Sig_fail _0 -> true | uu___ -> false
 let (__proj__Sig_fail__item___0 : sigelt' -> sigelt'__Sig_fail__payload) =
   fun projectee -> match projectee with | Sig_fail _0 -> _0
+let (uu___is_Sig_sugar : sigelt' -> Prims.bool) =
+  fun projectee ->
+    match projectee with | Sig_sugar _0 -> true | uu___ -> false
+let (__proj__Sig_sugar__item___0 : sigelt' -> sigelt'__Sig_sugar__payload) =
+  fun projectee -> match projectee with | Sig_sugar _0 -> _0
 let (__proj__Mksigelt__item__sigel : sigelt -> sigelt') =
   fun projectee ->
     match projectee with

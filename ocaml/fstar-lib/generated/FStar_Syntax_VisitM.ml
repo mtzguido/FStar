@@ -2073,6 +2073,8 @@ let rec on_sub_sigelt' : 'm . 'm lvm -> FStar_Syntax_Syntax.sigelt' -> 'm =
                                FStar_Syntax_Syntax.lids2 = lids;
                                FStar_Syntax_Syntax.tac = tac1
                              })))) uu___1)
+      | FStar_Syntax_Syntax.Sig_sugar uu___ ->
+          FStar_Class_Monad.return (_lvm_monad d) () (Obj.magic se)
       | uu___ -> FStar_Compiler_Effect.failwith "on_sub_sigelt: missing case"
 and on_sub_sigelt : 'm . 'm lvm -> FStar_Syntax_Syntax.sigelt -> 'm =
   fun d ->

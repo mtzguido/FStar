@@ -1348,6 +1348,15 @@ let push_sigelt' (force:bool) env s =
   let env = {env with gamma_sig = sb::env.gamma_sig} in
   add_sigelt force env s;
   env.tc_hooks.tc_push_in_gamma_hook env (Inr sb);
+  if Options.debug_any () then
+    BU.print2 "GGG pushing to dsenv se=(%s), force=%s\n"
+      (show s)
+      (show force);
+  // let env =
+  //   if List.contains Private s.sigquals
+  //   then env
+  //   else { env with dsenv = DsEnv.push_sigelt_force env.dsenv s }
+  // in
   env
 
 let push_sigelt = push_sigelt' false

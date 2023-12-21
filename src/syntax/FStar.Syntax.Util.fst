@@ -875,6 +875,7 @@ let lids_of_sigelt (se: sigelt) = match se.sigel with
   | Sig_fail _
   | Sig_polymonadic_bind _ -> []
   | Sig_polymonadic_subcomp _ -> []
+  | Sig_sugar _ -> []
 
 let lid_of_sigelt se : option lident = match lids_of_sigelt se with
   | [l] -> Some l

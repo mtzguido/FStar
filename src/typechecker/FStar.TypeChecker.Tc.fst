@@ -50,6 +50,7 @@ module PC = FStar.Parser.Const
 module EMB = FStar.Syntax.Embeddings
 module ToSyntax = FStar.ToSyntax.ToSyntax
 module O = FStar.Options
+module A = FStar.Parser.AST
 
 let sigelt_typ (se:sigelt) : option typ =
   match se.sigel with
@@ -659,6 +660,27 @@ let tc_decl' env0 se: list sigelt * list sigelt * Env.env =
     else se
   in
   match se.sigel with
+  | Sig_sugar {d} ->
+    if Options.debug_any () then
+      BU.print1 "GGG ! processing Sig_sugar %s\n" (A.decl_to_string d);
+    begin match d.d with
+    | A.Open lid ->
+      let dsenv = DsEnv.push_namespace env.dsenv lid in
+      let env = { env with dsenv } in
+      [], [], env
+    | A.Include lid ->
+      let dsenv = DsEnv.push_include env.dsenv lid in
+      let env = { env with dsenv } in
+      [], [], env
+    | A.Friend lid ->
+      (* Apparently desugaring does not do anything, it's
+      just dep analysis. *)
+      [], [], env
+    | _ ->
+      failwith "unrecognized Sig_sugar";
+      [], [], env
+    end
+
   | Sig_inductive_typ _
   | Sig_datacon _ ->
     failwith "Impossible bare data-constructor"
@@ -765,9 +787,11 @@ let tc_decl' env0 se: list sigelt * list sigelt * Env.env =
       let ne =
         if do_two_phases env then run_phase1 (fun _ ->
           let ne =
+            Errors.with_ctx "tc_eff_decl phase 1" (fun () ->
             TcEff.tc_eff_decl ({ env with phase1 = true; lax = true }) ne se.sigquals se.sigattrs
             |> (fun ne -> { se with sigel = Sig_new_effect ne })
-            |> N.elim_uvars env |> U.eff_decl_of_new_effect in
+            |> N.elim_uvars env |> U.eff_decl_of_new_effect)
+          in
           if Env.debug env <| Options.Other "TwoPhases"
           then BU.print1 "Effect decl after phase 1: %s\n"
                  (Print.sigelt_to_string ({ se with sigel = Sig_new_effect ne }));
@@ -1007,7 +1031,9 @@ let add_sigelt_to_env (env:Env.env) (se:sigelt) (from_cache:bool) : Env.env =
   | Sig_let _ when se.sigquals |> BU.for_some (function OnlyName -> true | _ -> false) -> env
 
   | _ ->
-    let env = Env.push_sigelt env se in
+    (* Push to desugaring environment. *)
+    let env = Env.push_sigelt_force env se in
+
     //match again to perform postprocessing
     match se.sigel with
     | Sig_pragma (PushOptions _)
@@ -1202,8 +1228,9 @@ let deep_compress_modul (m:modul) : modul =
 let tc_modul (env0:env) (m:modul) (iface_exists:bool) :(modul * env) =
   let msg = "Internals for " ^ string_of_lid m.name in
   //AR: push env, this will also push solver, and then finish_partial_modul will do the pop
-  let env0 = push_context env0 msg in
-  let modul, env = tc_partial_modul env0 m in
+  let env = push_context env0 msg in
+  let env = { env with dsenv = DsEnv.set_current_module env0.dsenv m.name } in
+  let modul, env = tc_partial_modul env m in
   // Note: all sigelts returned by tc_partial_modul must already be compressed
   // by Syntax.compress.deep_compress, so they are safe to output.
   finish_partial_modul false iface_exists env modul

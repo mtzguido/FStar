@@ -4996,6 +4996,18 @@ let (push_sigelt' : Prims.bool -> env -> FStar_Syntax_Syntax.sigelt -> env) =
           } in
         add_sigelt force env2 s;
         (env2.tc_hooks).tc_push_in_gamma_hook env2 (FStar_Pervasives.Inr sb);
+        (let uu___3 = FStar_Options.debug_any () in
+         if uu___3
+         then
+           let uu___4 =
+             FStar_Class_Show.show FStar_Syntax_Print.showable_sigelt s in
+           let uu___5 =
+             FStar_Class_Show.show
+               (FStar_Class_Show.printableshow
+                  FStar_Class_Printable.printable_bool) force in
+           FStar_Compiler_Util.print2
+             "GGG pushing to dsenv se=(%s), force=%s\n" uu___4 uu___5
+         else ());
         env2
 let (push_sigelt : env -> FStar_Syntax_Syntax.sigelt -> env) =
   push_sigelt' false

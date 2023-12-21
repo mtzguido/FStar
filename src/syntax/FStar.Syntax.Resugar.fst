@@ -1370,6 +1370,8 @@ let resugar_eff_decl' env r q ed =
 
 let resugar_sigelt' env se : option A.decl =
   match se.sigel with
+  | Sig_sugar {d} -> Some d
+
   | Sig_bundle {ses} ->
     let decl_typ_ses, datacon_ses = ses |> List.partition
       (fun se -> match se.sigel with

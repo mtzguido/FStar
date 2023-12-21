@@ -458,6 +458,9 @@ let rec on_sub_sigelt' #m {|d : lvm m |} (se : sigelt') : m sigelt' =
     let! tac = tac |> f_term in
     return <| Sig_splice {is_typed; lids; tac}
 
+  | Sig_sugar _ ->
+    return <| se
+
   | _ -> failwith "on_sub_sigelt: missing case"
 
 and on_sub_sigelt #m {|d : lvm m |} (se : sigelt) : m sigelt =

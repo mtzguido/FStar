@@ -610,6 +610,7 @@ let rec generalize_annotated_univs (s:sigelt) :sigelt =
   let unames = get () in
 
   match s.sigel with
+  | Sig_sugar _ -> s
   | Sig_inductive_typ _
   | Sig_datacon _ -> failwith "Impossible: collect_annotated_universes: bare data/type constructor"
   | Sig_bundle {ses=sigs; lids} ->
@@ -3713,6 +3714,17 @@ and desugar_decl env (d:decl) :(env_t * sigelts) =
 
 and desugar_decl_core env (d_attrs:list S.term) (d:decl) : (env_t * sigelts) =
   let trans_qual = trans_qual d.drange in
+  let mk_sig_sugar (d:decl) : S.sigelt =
+    {
+      sigel = Sig_sugar {d};
+      sigrng = d.drange;
+      sigquals = [];
+      sigmeta = default_sigmeta;
+      sigattrs = d_attrs;
+      sigopts = None;
+      sigopens_and_abbrevs = opens_and_abbrevs env;
+    }
+  in
   match d.d with
   | Pragma p ->
     let p = trans_pragma p in
@@ -3731,7 +3743,7 @@ and desugar_decl_core env (d_attrs:list S.term) (d:decl) : (env_t * sigelts) =
 
   | Open lid ->
     let env = Env.push_namespace env lid in
-    env, []
+    env, [mk_sig_sugar d]
 
   | Friend lid ->
     if Env.iface env
@@ -3746,11 +3758,11 @@ and desugar_decl_core env (d_attrs:list S.term) (d:decl) : (env_t * sigelts) =
     else if not (FStar.Parser.Dep.deps_has_implementation (Env.dep_graph env) lid)
     then raise_error (Errors.Fatal_FriendInterface,
                       "'friend' module has not been loaded; recompute dependences (C-c C-r) if in interactive mode") d.drange
-    else env, []
+    else env, [mk_sig_sugar d]
 
   | Include lid ->
     let env = Env.push_include env lid in
-    env, []
+    env, [mk_sig_sugar d]
 
   | ModuleAbbrev(x, l) ->
     Env.push_module_abbrev env x l, []

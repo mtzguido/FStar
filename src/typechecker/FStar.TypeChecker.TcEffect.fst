@@ -1978,6 +1978,7 @@ Errors.with_ctx (BU.format1 "While checking effect definition `%s`" (string_of_l
   let us, bs =
     //ed.univs are free universes in the binders
     //first open them
+    BU.print1 "GG ed_univs=%s\n" (Print.univ_names_to_string ed.univs);
     let ed_univs_subst, ed_univs = SS.univ_var_opening ed.univs in
 
     //ed.binders are effect parameters (e.g. heap in STATE_h), typecheck them after opening them
@@ -1988,8 +1989,11 @@ Errors.with_ctx (BU.format1 "While checking effect definition `%s`" (string_of_l
     //bs are closed with us and closed
     let us, bs =
       let tmp_t = U.arrow bs (S.mk_Total S.t_unit) in  //create a temporary bs -> Tot unit
+      BU.print2 "GG bs=%s, orig tmp_t: %s\n" (Print.binders_to_string "," bs) (Print.term_to_string tmp_t);
       let us, tmp_t = Gen.generalize_universes env0 tmp_t in
-      us, tmp_t |> U.arrow_formals |> fst |> SS.close_binders in
+      BU.print2 "GG us: %s, tmp_t: %s\n" (Print.univ_names_to_string us) (Print.term_to_string tmp_t);
+      us, tmp_t |> U.arrow_formals |> fst |> SS.close_binders
+    in
 
     match ed_univs with
     | [] -> us, bs  //if no annotated universes, return us, bs

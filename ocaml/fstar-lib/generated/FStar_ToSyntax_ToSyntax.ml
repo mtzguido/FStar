@@ -1100,6 +1100,7 @@ let rec (generalize_annotated_univs :
       uu___1 s in
     let unames = get () in
     match s.FStar_Syntax_Syntax.sigel with
+    | FStar_Syntax_Syntax.Sig_sugar uu___1 -> s
     | FStar_Syntax_Syntax.Sig_inductive_typ uu___1 ->
         FStar_Compiler_Effect.failwith
           "Impossible: collect_annotated_universes: bare data/type constructor"
@@ -8910,6 +8911,18 @@ and (desugar_decl_core :
     fun d_attrs ->
       fun d ->
         let trans_qual1 = trans_qual d.FStar_Parser_AST.drange in
+        let mk_sig_sugar d1 =
+          let uu___ = FStar_Syntax_DsEnv.opens_and_abbrevs env in
+          {
+            FStar_Syntax_Syntax.sigel =
+              (FStar_Syntax_Syntax.Sig_sugar { FStar_Syntax_Syntax.d = d1 });
+            FStar_Syntax_Syntax.sigrng = (d1.FStar_Parser_AST.drange);
+            FStar_Syntax_Syntax.sigquals = [];
+            FStar_Syntax_Syntax.sigmeta = FStar_Syntax_Syntax.default_sigmeta;
+            FStar_Syntax_Syntax.sigattrs = d_attrs;
+            FStar_Syntax_Syntax.sigopens_and_abbrevs = uu___;
+            FStar_Syntax_Syntax.sigopts = FStar_Pervasives_Native.None
+          } in
         match d.FStar_Parser_AST.d with
         | FStar_Parser_AST.Pragma p ->
             let p1 = trans_pragma p in
@@ -8931,7 +8944,8 @@ and (desugar_decl_core :
         | FStar_Parser_AST.TopLevelModule id -> (env, [])
         | FStar_Parser_AST.Open lid ->
             let env1 = FStar_Syntax_DsEnv.push_namespace env lid in
-            (env1, [])
+            let uu___ = let uu___1 = mk_sig_sugar d in [uu___1] in
+            (env1, uu___)
         | FStar_Parser_AST.Friend lid ->
             let uu___ = FStar_Syntax_DsEnv.iface env in
             if uu___
@@ -8977,9 +8991,13 @@ and (desugar_decl_core :
                          (FStar_Errors_Codes.Fatal_FriendInterface,
                            "'friend' module has not been loaded; recompute dependences (C-c C-r) if in interactive mode")
                          d.FStar_Parser_AST.drange
-                     else (env, []))))
+                     else
+                       (let uu___8 = let uu___9 = mk_sig_sugar d in [uu___9] in
+                        (env, uu___8)))))
         | FStar_Parser_AST.Include lid ->
-            let env1 = FStar_Syntax_DsEnv.push_include env lid in (env1, [])
+            let env1 = FStar_Syntax_DsEnv.push_include env lid in
+            let uu___ = let uu___1 = mk_sig_sugar d in [uu___1] in
+            (env1, uu___)
         | FStar_Parser_AST.ModuleAbbrev (x, l) ->
             let uu___ = FStar_Syntax_DsEnv.push_module_abbrev env x l in
             (uu___, [])

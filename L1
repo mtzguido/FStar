@@ -1,0 +1,1726 @@
+Will try to load cmxs files: []
+Opening file ../desugar_incr/X.fsti
+Chosen Z3 executable: z3-4.8.5
+GGG pushing to dsenv se=(assume new
+val attribute:Type0), force=true
+GGG pushing to dsenv se=(assume
+val cps:Prims.attribute), force=true
+GGG pushing to dsenv se=(assume
+val hasEq:(*uu___282*) _: Type u#uu___282 -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let eqtype = a: Type0{Prims.hasEq u#0 a}), force=true
+GGG pushing to dsenv se=(assume new
+val bool:Prims.eqtype), force=true
+GGG pushing to dsenv se=(type empty =), force=true
+GGG pushing to dsenv se=(type trivial = | T : Prims.trivial), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(assume new
+val unit:Prims.eqtype), force=true
+GGG pushing to dsenv se=(let squash p = (*uu___14*) x: Prims.unit{p}), force=true
+GGG pushing to dsenv se=(let auto_squash p = (*uu___14*) Prims.squash u#uu___14 p), force=true
+GGG pushing to dsenv se=(private
+let logical = Type0), force=true
+GGG pushing to dsenv se=(assume
+val smt_theory_symbol:Prims.attribute), force=true
+GGG pushing to dsenv se=(let l_True = Prims.squash u#0 Prims.trivial), force=true
+GGG pushing to dsenv se=(let l_False = Prims.squash u#0 Prims.empty), force=true
+GGG pushing to dsenv se=(type equals (#a: Type u#uu__univ_bvar_0) (x: a) =
+  | Refl : Prims.Tot (Prims.equals u#uu__univ_bvar_2 #a x x)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let eq2 #a x y = (*uu___16*) Prims.squash u#0 (Prims.equals u#uu___16 #a x y)), force=true
+GGG pushing to dsenv se=(let b2t b = Prims.eq2 u#0 #Prims.bool b true), force=true
+GGG pushing to dsenv se=(type pair (p: Type u#uu__univ_bvar_1) (q: Type u#uu__univ_bvar_1) =
+  | Pair : _1: p -> _2: q -> Prims.Tot (Prims.pair u#uu__univ_bvar_5 u#uu__univ_bvar_4 p q)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let l_and p q = Prims.squash u#0 (Prims.pair u#0 u#0 p q)), force=true
+GGG pushing to dsenv se=(type sum (p: Type u#uu__univ_bvar_1) (q: Type u#uu__univ_bvar_1) =
+  | Right : v: q -> Prims.Tot (Prims.sum u#uu__univ_bvar_4 u#uu__univ_bvar_3 p q)
+  | Left : v: p -> Prims.Tot (Prims.sum u#uu__univ_bvar_4 u#uu__univ_bvar_3 p q)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let l_or p q = Prims.squash u#0 (Prims.sum u#0 u#0 p q)), force=true
+GGG pushing to dsenv se=(let l_imp p q = Prims.squash u#0 (_: p -> Prims.GTot q)), force=true
+GGG pushing to dsenv se=(let l_iff p q = (p ==> q) /\ (q ==> p)), force=true
+GGG pushing to dsenv se=(let l_not p = p ==> Prims.l_False), force=true
+GGG pushing to dsenv se=(unfold
+let l_ITE p q r = (p ==> q) /\ (~p ==> r)), force=true
+GGG pushing to dsenv se=(assume
+val precedes:(*uu___1916, uu___1917*)
+#a: Type u#uu___1916 -> #b: Type u#uu___1917 -> _: a -> _: b -> Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume new
+val string:Prims.eqtype), force=true
+GGG pushing to dsenv se=(assume
+val warn_on_use (msg: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val deprecated (s: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val has_type:(*uu___2003, uu___2004*)
+#a: Type u#uu___2003 -> _: a -> _: Type u#uu___2004 -> Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(let l_Forall #a p = (*uu___20*) Prims.squash u#uu___20 (x: a -> Prims.GTot (p x))), force=true
+GGG pushing to dsenv se=(#push-options "--warn_error -288"), force=true
+GGG pushing to dsenv se=(let subtype_of p1 p2 =
+  (*uu___21, uu___20*) forall (x: p1). Prims.has_type u#uu___21 u#uu___20 #p1 x p2), force=true
+GGG pushing to dsenv se=(#pop-options), force=true
+GGG pushing to dsenv se=(let prop = a: Type0{Prims.subtype_of u#0 u#0 a Prims.unit}), force=true
+GGG pushing to dsenv se=(let pure_pre = Type0), force=true
+GGG pushing to dsenv se=(let pure_post' a pre = (*uu___21, uu___20*) _: a{pre} -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let pure_post a = (*uu___20*) Prims.pure_post' u#uu___20 u#0 a Prims.l_True), force=true
+GGG pushing to dsenv se=(let pure_wp' a = (*uu___20*) _: Prims.pure_post u#uu___20 a -> Prims.GTot Prims.pure_pre), force=true
+GGG pushing to dsenv se=(let pure_wp_monotonic0 a wp =
+  (*uu___20*)
+  forall (p: Prims.pure_post u#uu___20 a) (q: Prims.pure_post u#uu___20 a).
+    (forall (x: a). p x ==> q x) ==> wp p ==> wp q), force=true
+GGG pushing to dsenv se=(let pure_wp_monotonic = (*uu___20*) Prims.pure_wp_monotonic0 u#uu___20), force=true
+GGG pushing to dsenv se=(let pure_wp a = (*uu___20*) wp: Prims.pure_wp' u#uu___20 a {Prims.pure_wp_monotonic u#uu___20 a wp}), force=true
+GGG pushing to dsenv se=(assume
+val guard_free (_: Type0) : Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(unfold
+let pure_return0 a x =
+  (*uu___20*)
+  (fun p -> forall (return_val: a). Prims.eq2 u#uu___20 #a return_val x ==> p return_val)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___20 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_bind_wp0 a b wp1 wp2 =
+  (*uu___21, uu___20*)
+  (fun p -> wp1 (fun bind_result_1 -> wp2 bind_result_1 p)) <: Prims.Tot (Prims.pure_wp u#uu___20 b)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_if_then_else0 a p wp_then wp_else =
+  (*uu___20*)
+  (fun post -> wp_then post /\ (~p ==> wp_else post)) <: Prims.Tot (Prims.pure_wp u#uu___20 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_ite_wp0 a wp =
+  (*uu___20*)
+  (fun post ->
+      forall (k: Prims.pure_post u#uu___20 a).
+        (forall (x: a). {:pattern Prims.guard_free (k x)} post x ==> k x) ==> wp k)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___20 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_stronger a wp1 wp2 = (*uu___20*) forall (p: Prims.pure_post u#uu___20 a). wp1 p ==> wp2 p), force=true
+GGG pushing to dsenv se=(unfold
+let pure_close_wp0 a b wp =
+  (*uu___21, uu___20*) (fun p -> forall (b: b). wp b p) <: Prims.Tot (Prims.pure_wp u#uu___21 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_trivial a wp = (*uu___20*) wp (fun _ -> Prims.l_True)), force=true
+GGG pushing to dsenv se=(total
+new_effect {
+  PURE : a: Type u#uu__univ_bvar_0 -> wp: Prims.pure_wp u#uu__univ_bvar_1 a -> Prims.Tot Effect
+  with
+    ret_wp = Prims.pure_return0 u#uu__univ_bvar_0
+  ; bind_wp = Prims.pure_bind_wp0 u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; stronger = Prims.pure_stronger u#uu__univ_bvar_0
+  ; if_then_else = Prims.pure_if_then_else0 u#uu__univ_bvar_0
+  ; ite_wp = Prims.pure_ite_wp0 u#uu__univ_bvar_0
+  ; close_wp = Prims.pure_close_wp0 u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; trivial = Prims.pure_trivial u#uu__univ_bvar_0
+}), force=true
+GGG pushing to dsenv se=(type Pure
+  (a: Type u#uu__univ_bvar_0) (pre: Prims.pure_pre)
+  (post: Prims.pure_post' u#uu__univ_bvar_2 u#0 a pre)
+  = Prims.PURE a), force=true
+GGG pushing to dsenv se=(type Admit (a: Type u#uu__univ_bvar_0) = Prims.PURE a), force=true
+GGG pushing to dsenv se=(unfold
+let pure_null_wp0 a =
+  (*uu___20*)
+  (fun p -> forall (any_result: a). p any_result) <: Prims.Tot (Prims.pure_wp u#uu___20 a)), force=true
+GGG pushing to dsenv se=(type Tot (a: Type u#uu__univ_bvar_0) = Prims.PURE a), force=true
+GGG pushing to dsenv se=(unfold
+let pure_assert_wp0 p = (fun post -> p /\ post ()) <: Prims.Tot (Prims.pure_wp u#0 Prims.unit)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_assume_wp0 p = (fun post -> p ==> post ()) <: Prims.Tot (Prims.pure_wp u#0 Prims.unit)), force=true
+GGG pushing to dsenv se=(total
+new_effect {
+  GHOST : a: Type u#uu__univ_bvar_0 -> wp: Prims.pure_wp u#uu__univ_bvar_1 a -> Prims.Tot Effect
+  with
+    ret_wp = Prims.pure_return0 u#uu__univ_bvar_0
+  ; bind_wp = Prims.pure_bind_wp0 u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; stronger = Prims.pure_stronger u#uu__univ_bvar_0
+  ; if_then_else = Prims.pure_if_then_else0 u#uu__univ_bvar_0
+  ; ite_wp = Prims.pure_ite_wp0 u#uu__univ_bvar_0
+  ; close_wp = Prims.pure_close_wp0 u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; trivial = Prims.pure_trivial u#uu__univ_bvar_0
+}), force=true
+GGG pushing to dsenv se=(unfold
+let purewp_id a wp = (*uu___20*) wp), force=true
+GGG pushing to dsenv se=(sub_effect Prims.PURE ~> Prims.GHOST { lift_wp = Prims.purewp_id u#uu__univ_bvar_0 }), force=true
+GGG pushing to dsenv se=(type Ghost
+  (a: Type u#uu__univ_bvar_0) (pre: Type0) (post: Prims.pure_post' u#uu__univ_bvar_2 u#0 a pre)
+  = Prims.GHOST a), force=true
+GGG pushing to dsenv se=(type GTot (a: Type u#uu__univ_bvar_0) = Prims.GHOST a), force=true
+GGG pushing to dsenv se=(let op_Equals_Equals_Equals #a #b x y =
+  (*uu___20*)
+  Prims.eq2 u#(1 + uu___20) #(Type u#uu___20) a b /\ Prims.eq2 u#uu___20 #a x y
+  <:
+  Prims.Tot Prims.logical), force=true
+GGG pushing to dsenv se=(unopteq
+type dtuple2 (a: Type u#uu__univ_bvar_1) (b: (_: a -> Prims.GTot (Type u#uu__univ_bvar_2))) =
+  | Mkdtuple2 : _1: a -> _2: b _1
+    -> Prims.Tot (Prims.dtuple2 u#uu__univ_bvar_5 u#uu__univ_bvar_4 a b)), force=true
+GGG pushing to dsenv se=(val dtuple2__uu___haseq: Prims.l_True /\
+(forall (a: Type u#uu__univ_bvar_1) (b: (_: a -> Prims.GTot (Type u#uu__univ_bvar_2))).
+    {:pattern
+
+      Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2)
+        (Prims.dtuple2 u#uu__univ_bvar_3 u#uu__univ_bvar_2 a b)}
+    Prims.l_True /\
+    (forall (_1: a) (_2: b _1).
+        Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_5 a /\ Prims.hasEq u#uu__univ_bvar_4 (b _1)) ==>
+    Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2)
+      (Prims.dtuple2 u#uu__univ_bvar_3 u#uu__univ_bvar_2 a b))), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let l_Exists #a p =
+  (*uu___24*) Prims.squash u#uu___24 (Prims.dtuple2 u#uu___24 u#0 a (fun x -> p x))), force=true
+GGG pushing to dsenv se=(assume new
+val int:Prims.eqtype), force=true
+GGG pushing to dsenv se=(assume
+val ( op_AmpAmp ) (_ _: Prims.bool) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_BarBar ) (_ _: Prims.bool) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Negation ) (_: Prims.bool) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Multiply ) (_ _: Prims.int) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val ( - ) (_ _: Prims.int) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Addition ) (_ _: Prims.int) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val ( - ) (_: Prims.int) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val ( op_LessThanOrEqual ) (_ _: Prims.int) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_GreaterThan ) (_ _: Prims.int) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_GreaterThanOrEqual ) (_ _: Prims.int) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_LessThan ) (_ _: Prims.int) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Equality ) (#a: Prims.eqtype) (_ _: a) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume
+val ( op_disEquality ) (#a: Prims.eqtype) (_ _: a) : Prims.Tot Prims.bool), force=true
+GGG pushing to dsenv se=(assume new
+val exn:Type0), force=true
+GGG pushing to dsenv se=(assume new
+val array:(*uu___7037*) _: Type u#uu___7037 -> Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume
+val strcat (_ _: Prims.string) : Prims.Tot Prims.string), force=true
+GGG pushing to dsenv se=(inline_for_extraction unfold
+let op_Hat s1 s2 = Prims.strcat s1 s2), force=true
+GGG pushing to dsenv se=(type list (a: Type u#uu__univ_bvar_0) =
+  | Cons : hd: a -> tl: Prims.list u#uu__univ_bvar_2 a -> Prims.Tot (Prims.list u#uu__univ_bvar_3 a)
+  | Nil : Prims.Tot (Prims.list u#uu__univ_bvar_1 a)), force=true
+GGG pushing to dsenv se=(val list__uu___haseq: forall (a: Type u#uu__univ_bvar_0).
+  {:pattern Prims.hasEq u#uu__univ_bvar_1 (Prims.list u#uu__univ_bvar_1 a)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_1 a ==>
+  Prims.hasEq u#uu__univ_bvar_1 (Prims.list u#uu__univ_bvar_1 a)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type M (a: Type u#uu__univ_bvar_0) = Prims.Tot a), force=true
+GGG pushing to dsenv se=(let returnM a x = (*uu___24*) x <: Prims.M a), force=true
+GGG pushing to dsenv se=(unfold
+let as_requires #a wp = (*uu___24*) wp (fun _ -> Prims.l_True) <: Prims.Tot Prims.pure_pre), force=true
+GGG pushing to dsenv se=(unfold
+let as_ensures #a wp =
+  (*uu___24*)
+  (fun x -> ~(wp (fun y -> ~(Prims.eq2 u#uu___24 #a y x))))
+  <:
+  Prims.Tot (Prims.pure_post u#uu___24 a)), force=true
+GGG pushing to dsenv se=(assume
+val _assume (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val admit:(*uu___8852*) #a: Type u#uu___8852 -> _: Prims.unit -> Prims.Admit a), force=true
+GGG pushing to dsenv se=(assume
+val magic:(*uu___8883*) #a: Type u#uu___8883 -> _: Prims.unit -> Prims.Tot a), force=true
+GGG pushing to dsenv se=(irreducible
+let unsafe_coerce #a #b x =
+  (*uu___25, uu___24*)
+  (Prims.admit u#0 #Prims.unit ();
+    x)
+  <:
+  Prims.Tot b), force=true
+GGG pushing to dsenv se=(assume
+val admitP (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(val _assert (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(let _assert p = ()), force=true
+GGG pushing to dsenv se=(val cut (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(let cut p = ()), force=true
+GGG pushing to dsenv se=(let nat = i: Prims.int{Prims.b2t (i >= 0)}), force=true
+GGG pushing to dsenv se=(let pos = i: Prims.int{Prims.b2t (i > 0)}), force=true
+GGG pushing to dsenv se=(let nonzero = i: Prims.int{Prims.b2t ((Prims.int <> i) 0)}), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Modulus ) (_: Prims.int) (_: Prims.nonzero) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val ( op_Division ) (_: Prims.int) (_: Prims.nonzero) : Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(let rec pow2 x =
+  (match x with
+    | 0 -> 1
+    | _ -> 2 * Prims.pow2 (x - 1))
+  <:
+  Prims.Tot Prims.pos), force=true
+GGG pushing to dsenv se=(let min x y =
+  (match x <= y with
+    | true -> x
+    | _ -> y)
+  <:
+  Prims.int), force=true
+GGG pushing to dsenv se=(let abs x =
+  (match x >= 0 with
+    | true -> x
+    | _ -> - x)
+  <:
+  Prims.Tot Prims.int), force=true
+GGG pushing to dsenv se=(assume
+val string_of_bool (_: Prims.bool) : Prims.Tot Prims.string), force=true
+GGG pushing to dsenv se=(assume
+val string_of_int (_: Prims.int) : Prims.Tot Prims.string), force=true
+GGG pushing to dsenv se=(irreducible
+let __cache_version_number__ = 64), force=true
+GGG pushing to dsenv se=(type option (a: Type u#uu__univ_bvar_0) =
+  | Some : v: a -> Prims.Tot (FStar.Pervasives.Native.option u#uu__univ_bvar_2 a)
+  | None : Prims.Tot (FStar.Pervasives.Native.option u#uu__univ_bvar_1 a)), force=true
+GGG pushing to dsenv se=(val option__uu___haseq: forall (a: Type u#uu__univ_bvar_0).
+  {:pattern Prims.hasEq u#uu__univ_bvar_1 (FStar.Pervasives.Native.option u#uu__univ_bvar_1 a)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_1 a ==>
+  Prims.hasEq u#uu__univ_bvar_1 (FStar.Pervasives.Native.option u#uu__univ_bvar_1 a)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple2 ('a: Type u#uu__univ_bvar_1) ('b: Type u#uu__univ_bvar_1) =
+  | Mktuple2 : _1: 'a -> _2: 'b -> Prims.Tot ('a * 'b)), force=true
+GGG pushing to dsenv se=(val tuple2__uu___haseq: forall ('a: Type u#uu__univ_bvar_1) ('b: Type u#uu__univ_bvar_1).
+  {:pattern Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2) ('a * 'b)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_3 'a /\ Prims.hasEq u#uu__univ_bvar_2 'b ==>
+  Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2) ('a * 'b)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let fst #'a #'b x =
+  (*uu___213, uu___212*) Mktuple2?._1 u#uu___213 u#uu___212 #'a #'b x <: Prims.Tot 'a), force=true
+GGG pushing to dsenv se=(let snd #'a #'b x =
+  (*uu___213, uu___212*) Mktuple2?._2 u#uu___213 u#uu___212 #'a #'b x <: Prims.Tot 'b), force=true
+GGG pushing to dsenv se=(type tuple3 ('a: Type u#uu__univ_bvar_2) ('b: Type u#uu__univ_bvar_2) ('c: Type u#uu__univ_bvar_2) =
+  | Mktuple3 : _1: 'a -> _2: 'b -> _3: 'c -> Prims.Tot ('a * 'b * 'c)), force=true
+GGG pushing to dsenv se=(val tuple3__uu___haseq: forall ('a: Type u#uu__univ_bvar_2)
+  ('b: Type u#uu__univ_bvar_2)
+  ('c: Type u#uu__univ_bvar_2).
+  {:pattern Prims.hasEq u#(max uu__univ_bvar_5 uu__univ_bvar_4 uu__univ_bvar_3) ('a * 'b * 'c)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_5 'a /\ Prims.hasEq u#uu__univ_bvar_4 'b /\
+  Prims.hasEq u#uu__univ_bvar_3 'c ==>
+  Prims.hasEq u#(max uu__univ_bvar_5 uu__univ_bvar_4 uu__univ_bvar_3) ('a * 'b * 'c)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple4
+  ('a: Type u#uu__univ_bvar_3) ('b: Type u#uu__univ_bvar_3) ('c: Type u#uu__univ_bvar_3)
+  ('d: Type u#uu__univ_bvar_3)
+  = | Mktuple4 : _1: 'a -> _2: 'b -> _3: 'c -> _4: 'd -> Prims.Tot ('a * 'b * 'c * 'd)), force=true
+GGG pushing to dsenv se=(val tuple4__uu___haseq: forall ('a: Type u#uu__univ_bvar_3)
+  ('b: Type u#uu__univ_bvar_3)
+  ('c: Type u#uu__univ_bvar_3)
+  ('d: Type u#uu__univ_bvar_3).
+  {:pattern
+
+    Prims.hasEq u#(max uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5 uu__univ_bvar_4)
+      ('a * 'b * 'c * 'd)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_7 'a /\ Prims.hasEq u#uu__univ_bvar_6 'b /\
+  Prims.hasEq u#uu__univ_bvar_5 'c /\ Prims.hasEq u#uu__univ_bvar_4 'd ==>
+  Prims.hasEq u#(max uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5 uu__univ_bvar_4)
+    ('a * 'b * 'c * 'd)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple5
+  ('a: Type u#uu__univ_bvar_4) ('b: Type u#uu__univ_bvar_4) ('c: Type u#uu__univ_bvar_4)
+  ('d: Type u#uu__univ_bvar_4) ('e: Type u#uu__univ_bvar_4)
+  =
+  | Mktuple5 : _1: 'a -> _2: 'b -> _3: 'c -> _4: 'd -> _5: 'e -> Prims.Tot ('a * 'b * 'c * 'd * 'e)), force=true
+GGG pushing to dsenv se=(val tuple5__uu___haseq: forall ('a: Type u#uu__univ_bvar_4)
+  ('b: Type u#uu__univ_bvar_4)
+  ('c: Type u#uu__univ_bvar_4)
+  ('d: Type u#uu__univ_bvar_4)
+  ('e: Type u#uu__univ_bvar_4).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5)
+      ('a * 'b * 'c * 'd * 'e)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_9 'a /\ Prims.hasEq u#uu__univ_bvar_8 'b /\
+  Prims.hasEq u#uu__univ_bvar_7 'c /\ Prims.hasEq u#uu__univ_bvar_6 'd /\
+  Prims.hasEq u#uu__univ_bvar_5 'e ==>
+  Prims.hasEq u#(max uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5
+    )
+    ('a * 'b * 'c * 'd * 'e)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple6
+  ('a: Type u#uu__univ_bvar_5) ('b: Type u#uu__univ_bvar_5) ('c: Type u#uu__univ_bvar_5)
+  ('d: Type u#uu__univ_bvar_5) ('e: Type u#uu__univ_bvar_5) ('f: Type u#uu__univ_bvar_5)
+  =
+  | Mktuple6 : _1: 'a -> _2: 'b -> _3: 'c -> _4: 'd -> _5: 'e -> _6: 'f
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f)), force=true
+GGG pushing to dsenv se=(val tuple6__uu___haseq: forall ('a: Type u#uu__univ_bvar_5)
+  ('b: Type u#uu__univ_bvar_5)
+  ('c: Type u#uu__univ_bvar_5)
+  ('d: Type u#uu__univ_bvar_5)
+  ('e: Type u#uu__univ_bvar_5)
+  ('f: Type u#uu__univ_bvar_5).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_11 'a /\ Prims.hasEq u#uu__univ_bvar_10 'b /\
+  Prims.hasEq u#uu__univ_bvar_9 'c /\ Prims.hasEq u#uu__univ_bvar_8 'd /\
+  Prims.hasEq u#uu__univ_bvar_7 'e /\ Prims.hasEq u#uu__univ_bvar_6 'f ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple7
+  ('a: Type u#uu__univ_bvar_6) ('b: Type u#uu__univ_bvar_6) ('c: Type u#uu__univ_bvar_6)
+  ('d: Type u#uu__univ_bvar_6) ('e: Type u#uu__univ_bvar_6) ('f: Type u#uu__univ_bvar_6)
+  ('g: Type u#uu__univ_bvar_6)
+  =
+  | Mktuple7 : _1: 'a -> _2: 'b -> _3: 'c -> _4: 'd -> _5: 'e -> _6: 'f -> _7: 'g
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g)), force=true
+GGG pushing to dsenv se=(val tuple7__uu___haseq: forall ('a: Type u#uu__univ_bvar_6)
+  ('b: Type u#uu__univ_bvar_6)
+  ('c: Type u#uu__univ_bvar_6)
+  ('d: Type u#uu__univ_bvar_6)
+  ('e: Type u#uu__univ_bvar_6)
+  ('f: Type u#uu__univ_bvar_6)
+  ('g: Type u#uu__univ_bvar_6).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_13 'a /\ Prims.hasEq u#uu__univ_bvar_12 'b /\
+  Prims.hasEq u#uu__univ_bvar_11 'c /\ Prims.hasEq u#uu__univ_bvar_10 'd /\
+  Prims.hasEq u#uu__univ_bvar_9 'e /\ Prims.hasEq u#uu__univ_bvar_8 'f /\
+  Prims.hasEq u#uu__univ_bvar_7 'g ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple8
+  ('a: Type u#uu__univ_bvar_7) ('b: Type u#uu__univ_bvar_7) ('c: Type u#uu__univ_bvar_7)
+  ('d: Type u#uu__univ_bvar_7) ('e: Type u#uu__univ_bvar_7) ('f: Type u#uu__univ_bvar_7)
+  ('g: Type u#uu__univ_bvar_7) ('h: Type u#uu__univ_bvar_7)
+  =
+  | Mktuple8 : _1: 'a -> _2: 'b -> _3: 'c -> _4: 'd -> _5: 'e -> _6: 'f -> _7: 'g -> _8: 'h
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h)), force=true
+GGG pushing to dsenv se=(val tuple8__uu___haseq: forall ('a: Type u#uu__univ_bvar_7)
+  ('b: Type u#uu__univ_bvar_7)
+  ('c: Type u#uu__univ_bvar_7)
+  ('d: Type u#uu__univ_bvar_7)
+  ('e: Type u#uu__univ_bvar_7)
+  ('f: Type u#uu__univ_bvar_7)
+  ('g: Type u#uu__univ_bvar_7)
+  ('h: Type u#uu__univ_bvar_7).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_15 'a /\ Prims.hasEq u#uu__univ_bvar_14 'b /\
+  Prims.hasEq u#uu__univ_bvar_13 'c /\ Prims.hasEq u#uu__univ_bvar_12 'd /\
+  Prims.hasEq u#uu__univ_bvar_11 'e /\ Prims.hasEq u#uu__univ_bvar_10 'f /\
+  Prims.hasEq u#uu__univ_bvar_9 'g /\ Prims.hasEq u#uu__univ_bvar_8 'h ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9 uu__univ_bvar_8
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple9
+  ('a: Type u#uu__univ_bvar_8) ('b: Type u#uu__univ_bvar_8) ('c: Type u#uu__univ_bvar_8)
+  ('d: Type u#uu__univ_bvar_8) ('e: Type u#uu__univ_bvar_8) ('f: Type u#uu__univ_bvar_8)
+  ('g: Type u#uu__univ_bvar_8) ('h: Type u#uu__univ_bvar_8) ('i: Type u#uu__univ_bvar_8)
+  =
+  | Mktuple9 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i)), force=true
+GGG pushing to dsenv se=(val tuple9__uu___haseq: forall ('a: Type u#uu__univ_bvar_8)
+  ('b: Type u#uu__univ_bvar_8)
+  ('c: Type u#uu__univ_bvar_8)
+  ('d: Type u#uu__univ_bvar_8)
+  ('e: Type u#uu__univ_bvar_8)
+  ('f: Type u#uu__univ_bvar_8)
+  ('g: Type u#uu__univ_bvar_8)
+  ('h: Type u#uu__univ_bvar_8)
+  ('i: Type u#uu__univ_bvar_8).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_17 'a /\ Prims.hasEq u#uu__univ_bvar_16 'b /\
+  Prims.hasEq u#uu__univ_bvar_15 'c /\ Prims.hasEq u#uu__univ_bvar_14 'd /\
+  Prims.hasEq u#uu__univ_bvar_13 'e /\ Prims.hasEq u#uu__univ_bvar_12 'f /\
+  Prims.hasEq u#uu__univ_bvar_11 'g /\ Prims.hasEq u#uu__univ_bvar_10 'h /\
+  Prims.hasEq u#uu__univ_bvar_9 'i ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10 uu__univ_bvar_9
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple10
+  ('a: Type u#uu__univ_bvar_9) ('b: Type u#uu__univ_bvar_9) ('c: Type u#uu__univ_bvar_9)
+  ('d: Type u#uu__univ_bvar_9) ('e: Type u#uu__univ_bvar_9) ('f: Type u#uu__univ_bvar_9)
+  ('g: Type u#uu__univ_bvar_9) ('h: Type u#uu__univ_bvar_9) ('i: Type u#uu__univ_bvar_9)
+  ('j: Type u#uu__univ_bvar_9)
+  =
+  | Mktuple10 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i ->
+      _10: 'j
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j)), force=true
+GGG pushing to dsenv se=(val tuple10__uu___haseq: forall ('a: Type u#uu__univ_bvar_9) ('b: Type u#uu__univ_bvar_9)
+  ('c: Type u#uu__univ_bvar_9) ('d: Type u#uu__univ_bvar_9) ('e: Type u#uu__univ_bvar_9)
+  ('f: Type u#uu__univ_bvar_9) ('g: Type u#uu__univ_bvar_9) ('h: Type u#uu__univ_bvar_9)
+  ('i: Type u#uu__univ_bvar_9) ('j: Type u#uu__univ_bvar_9).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_19 'a /\ Prims.hasEq u#uu__univ_bvar_18 'b /\
+  Prims.hasEq u#uu__univ_bvar_17 'c /\ Prims.hasEq u#uu__univ_bvar_16 'd /\
+  Prims.hasEq u#uu__univ_bvar_15 'e /\ Prims.hasEq u#uu__univ_bvar_14 'f /\
+  Prims.hasEq u#uu__univ_bvar_13 'g /\ Prims.hasEq u#uu__univ_bvar_12 'h /\
+  Prims.hasEq u#uu__univ_bvar_11 'i /\ Prims.hasEq u#uu__univ_bvar_10 'j ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11 uu__univ_bvar_10
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple11
+  ('a: Type u#uu__univ_bvar_10) ('b: Type u#uu__univ_bvar_10) ('c: Type u#uu__univ_bvar_10)
+  ('d: Type u#uu__univ_bvar_10) ('e: Type u#uu__univ_bvar_10) ('f: Type u#uu__univ_bvar_10)
+  ('g: Type u#uu__univ_bvar_10) ('h: Type u#uu__univ_bvar_10) ('i: Type u#uu__univ_bvar_10)
+  ('j: Type u#uu__univ_bvar_10) ('k: Type u#uu__univ_bvar_10)
+  =
+  | Mktuple11 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i ->
+      _10: 'j ->
+      _11: 'k
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k)), force=true
+GGG pushing to dsenv se=(val tuple11__uu___haseq: forall ('a: Type u#uu__univ_bvar_10) ('b: Type u#uu__univ_bvar_10)
+  ('c: Type u#uu__univ_bvar_10) ('d: Type u#uu__univ_bvar_10) ('e: Type u#uu__univ_bvar_10)
+  ('f: Type u#uu__univ_bvar_10) ('g: Type u#uu__univ_bvar_10) ('h: Type u#uu__univ_bvar_10)
+  ('i: Type u#uu__univ_bvar_10) ('j: Type u#uu__univ_bvar_10) ('k: Type u#uu__univ_bvar_10).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_21 'a /\ Prims.hasEq u#uu__univ_bvar_20 'b /\
+  Prims.hasEq u#uu__univ_bvar_19 'c /\ Prims.hasEq u#uu__univ_bvar_18 'd /\
+  Prims.hasEq u#uu__univ_bvar_17 'e /\ Prims.hasEq u#uu__univ_bvar_16 'f /\
+  Prims.hasEq u#uu__univ_bvar_15 'g /\ Prims.hasEq u#uu__univ_bvar_14 'h /\
+  Prims.hasEq u#uu__univ_bvar_13 'i /\ Prims.hasEq u#uu__univ_bvar_12 'j /\
+  Prims.hasEq u#uu__univ_bvar_11 'k ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12 uu__univ_bvar_11
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple12
+  ('a: Type u#uu__univ_bvar_11) ('b: Type u#uu__univ_bvar_11) ('c: Type u#uu__univ_bvar_11)
+  ('d: Type u#uu__univ_bvar_11) ('e: Type u#uu__univ_bvar_11) ('f: Type u#uu__univ_bvar_11)
+  ('g: Type u#uu__univ_bvar_11) ('h: Type u#uu__univ_bvar_11) ('i: Type u#uu__univ_bvar_11)
+  ('j: Type u#uu__univ_bvar_11) ('k: Type u#uu__univ_bvar_11) ('l: Type u#uu__univ_bvar_11)
+  =
+  | Mktuple12 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i ->
+      _10: 'j ->
+      _11: 'k ->
+      _12: 'l
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l)), force=true
+GGG pushing to dsenv se=(val tuple12__uu___haseq: forall ('a: Type u#uu__univ_bvar_11) ('b: Type u#uu__univ_bvar_11)
+  ('c: Type u#uu__univ_bvar_11) ('d: Type u#uu__univ_bvar_11) ('e: Type u#uu__univ_bvar_11)
+  ('f: Type u#uu__univ_bvar_11) ('g: Type u#uu__univ_bvar_11) ('h: Type u#uu__univ_bvar_11)
+  ('i: Type u#uu__univ_bvar_11) ('j: Type u#uu__univ_bvar_11) ('k: Type u#uu__univ_bvar_11)
+  ('l: Type u#uu__univ_bvar_11).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_23 'a /\ Prims.hasEq u#uu__univ_bvar_22 'b /\
+  Prims.hasEq u#uu__univ_bvar_21 'c /\ Prims.hasEq u#uu__univ_bvar_20 'd /\
+  Prims.hasEq u#uu__univ_bvar_19 'e /\ Prims.hasEq u#uu__univ_bvar_18 'f /\
+  Prims.hasEq u#uu__univ_bvar_17 'g /\ Prims.hasEq u#uu__univ_bvar_16 'h /\
+  Prims.hasEq u#uu__univ_bvar_15 'i /\ Prims.hasEq u#uu__univ_bvar_14 'j /\
+  Prims.hasEq u#uu__univ_bvar_13 'k /\ Prims.hasEq u#uu__univ_bvar_12 'l ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13 uu__univ_bvar_12
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple13
+  ('a: Type u#uu__univ_bvar_12) ('b: Type u#uu__univ_bvar_12) ('c: Type u#uu__univ_bvar_12)
+  ('d: Type u#uu__univ_bvar_12) ('e: Type u#uu__univ_bvar_12) ('f: Type u#uu__univ_bvar_12)
+  ('g: Type u#uu__univ_bvar_12) ('h: Type u#uu__univ_bvar_12) ('i: Type u#uu__univ_bvar_12)
+  ('j: Type u#uu__univ_bvar_12) ('k: Type u#uu__univ_bvar_12) ('l: Type u#uu__univ_bvar_12)
+  ('m: Type u#uu__univ_bvar_12)
+  =
+  | Mktuple13 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i ->
+      _10: 'j ->
+      _11: 'k ->
+      _12: 'l ->
+      _13: 'm
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm)), force=true
+GGG pushing to dsenv se=(val tuple13__uu___haseq: forall ('a: Type u#uu__univ_bvar_12) ('b: Type u#uu__univ_bvar_12)
+  ('c: Type u#uu__univ_bvar_12) ('d: Type u#uu__univ_bvar_12) ('e: Type u#uu__univ_bvar_12)
+  ('f: Type u#uu__univ_bvar_12) ('g: Type u#uu__univ_bvar_12) ('h: Type u#uu__univ_bvar_12)
+  ('i: Type u#uu__univ_bvar_12) ('j: Type u#uu__univ_bvar_12) ('k: Type u#uu__univ_bvar_12)
+  ('l: Type u#uu__univ_bvar_12) ('m: Type u#uu__univ_bvar_12).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_25 uu__univ_bvar_24 uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_25 'a /\ Prims.hasEq u#uu__univ_bvar_24 'b /\
+  Prims.hasEq u#uu__univ_bvar_23 'c /\ Prims.hasEq u#uu__univ_bvar_22 'd /\
+  Prims.hasEq u#uu__univ_bvar_21 'e /\ Prims.hasEq u#uu__univ_bvar_20 'f /\
+  Prims.hasEq u#uu__univ_bvar_19 'g /\ Prims.hasEq u#uu__univ_bvar_18 'h /\
+  Prims.hasEq u#uu__univ_bvar_17 'i /\ Prims.hasEq u#uu__univ_bvar_16 'j /\
+  Prims.hasEq u#uu__univ_bvar_15 'k /\ Prims.hasEq u#uu__univ_bvar_14 'l /\
+  Prims.hasEq u#uu__univ_bvar_13 'm ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_25 uu__univ_bvar_24 uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14 uu__univ_bvar_13
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(type tuple14
+  ('a: Type u#uu__univ_bvar_13) ('b: Type u#uu__univ_bvar_13) ('c: Type u#uu__univ_bvar_13)
+  ('d: Type u#uu__univ_bvar_13) ('e: Type u#uu__univ_bvar_13) ('f: Type u#uu__univ_bvar_13)
+  ('g: Type u#uu__univ_bvar_13) ('h: Type u#uu__univ_bvar_13) ('i: Type u#uu__univ_bvar_13)
+  ('j: Type u#uu__univ_bvar_13) ('k: Type u#uu__univ_bvar_13) ('l: Type u#uu__univ_bvar_13)
+  ('m: Type u#uu__univ_bvar_13) ('n: Type u#uu__univ_bvar_13)
+  =
+  | Mktuple14 :
+      _1: 'a ->
+      _2: 'b ->
+      _3: 'c ->
+      _4: 'd ->
+      _5: 'e ->
+      _6: 'f ->
+      _7: 'g ->
+      _8: 'h ->
+      _9: 'i ->
+      _10: 'j ->
+      _11: 'k ->
+      _12: 'l ->
+      _13: 'm ->
+      _14: 'n
+    -> Prims.Tot ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm * 'n)), force=true
+GGG pushing to dsenv se=(val tuple14__uu___haseq: forall ('a: Type u#uu__univ_bvar_13) ('b: Type u#uu__univ_bvar_13)
+  ('c: Type u#uu__univ_bvar_13) ('d: Type u#uu__univ_bvar_13) ('e: Type u#uu__univ_bvar_13)
+  ('f: Type u#uu__univ_bvar_13) ('g: Type u#uu__univ_bvar_13) ('h: Type u#uu__univ_bvar_13)
+  ('i: Type u#uu__univ_bvar_13) ('j: Type u#uu__univ_bvar_13) ('k: Type u#uu__univ_bvar_13)
+  ('l: Type u#uu__univ_bvar_13) ('m: Type u#uu__univ_bvar_13) ('n: Type u#uu__univ_bvar_13).
+  {:pattern
+
+    Prims.hasEq u#(max
+          uu__univ_bvar_27 uu__univ_bvar_26 uu__univ_bvar_25 uu__univ_bvar_24 uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14
+      )
+      ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm * 'n)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_27 'a /\ Prims.hasEq u#uu__univ_bvar_26 'b /\
+  Prims.hasEq u#uu__univ_bvar_25 'c /\ Prims.hasEq u#uu__univ_bvar_24 'd /\
+  Prims.hasEq u#uu__univ_bvar_23 'e /\ Prims.hasEq u#uu__univ_bvar_22 'f /\
+  Prims.hasEq u#uu__univ_bvar_21 'g /\ Prims.hasEq u#uu__univ_bvar_20 'h /\
+  Prims.hasEq u#uu__univ_bvar_19 'i /\ Prims.hasEq u#uu__univ_bvar_18 'j /\
+  Prims.hasEq u#uu__univ_bvar_17 'k /\ Prims.hasEq u#uu__univ_bvar_16 'l /\
+  Prims.hasEq u#uu__univ_bvar_15 'm /\ Prims.hasEq u#uu__univ_bvar_14 'n ==>
+  Prims.hasEq u#(max
+        uu__univ_bvar_27 uu__univ_bvar_26 uu__univ_bvar_25 uu__univ_bvar_24 uu__univ_bvar_23 uu__univ_bvar_22 uu__univ_bvar_21 uu__univ_bvar_20 uu__univ_bvar_19 uu__univ_bvar_18 uu__univ_bvar_17 uu__univ_bvar_16 uu__univ_bvar_15 uu__univ_bvar_14
+    )
+    ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j * 'k * 'l * 'm * 'n)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(assume
+val remove_unused_type_parameters (_: Prims.list u#0 Prims.int) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(let pattern = Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val smt_pat:(*uu___553*) #a: Type u#uu___553 -> x: a -> Prims.Tot FStar.Pervasives.pattern), force=true
+GGG pushing to dsenv se=(assume
+val smt_pat_or (x: Prims.list u#0 (Prims.list u#0 FStar.Pervasives.pattern))
+    : Prims.Tot FStar.Pervasives.pattern), force=true
+GGG pushing to dsenv se=(let eqtype_u = (*uu___36*) a: Type u#uu___36 {Prims.hasEq u#uu___36 a}), force=true
+GGG pushing to dsenv se=(type Lemma
+  (a: FStar.Pervasives.eqtype_u u#uu__univ_bvar_0) (pre: Type0)
+  (post: (_: Prims.squash u#0 pre -> Prims.Tot Type0))
+  (pats: Prims.list u#0 FStar.Pervasives.pattern)
+  = Prims.Pure a), force=true
+GGG pushing to dsenv se=(assume
+val spinoff (p: Type0) : Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume
+val spinoff_eq (p: Type0)
+    : FStar.Pervasives.Lemma (ensures Prims.eq2 u#1 #Type0 (FStar.Pervasives.spinoff p) p)), force=true
+GGG pushing to dsenv se=(assume
+val spinoff_equiv (p: Type0)
+    : FStar.Pervasives.Lemma (ensures p <==> FStar.Pervasives.spinoff p)
+      (Prims.Cons u#0
+          #FStar.Pervasives.pattern
+          (SMTPat u#1 #Type0 (FStar.Pervasives.spinoff p))
+          (Prims.Nil u#0 #FStar.Pervasives.pattern))), force=true
+GGG pushing to dsenv se=(assume
+val assert_spinoff (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(unfold
+let id #a x = (*uu___36*) x <: Prims.Tot a), force=true
+GGG pushing to dsenv se=(unfold
+let trivial_pure_post a =
+  (*uu___36*) (fun _ -> Prims.l_True) <: Prims.Tot (Prims.pure_post u#uu___36 a)), force=true
+GGG pushing to dsenv se=(assume
+val ambient:(*uu___1211*) #a: Type u#uu___1211 -> x: a -> Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume
+val intro_ambient:(*uu___1244*)
+#a: Type u#uu___1244 -> x: a
+  -> Prims.Tot (Prims.squash u#0 (FStar.Pervasives.ambient u#uu___1244 #a x))), force=true
+GGG pushing to dsenv se=(assume
+val normalize_term:(*uu___1283*) #a: Type u#uu___1283 -> x: a -> Prims.Tot a), force=true
+GGG pushing to dsenv se=(assume
+val normalize (a: Type0) : Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume
+val norm_step:Type0), force=true
+GGG pushing to dsenv se=(assume
+val simplify:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val weak:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val hnf:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val primops:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val norm_debug:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val zeta:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val zeta_full:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val iota:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val nbe:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val reify_:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta_only (s: Prims.list u#0 Prims.string) : Prims.Tot FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta_fully (s: Prims.list u#0 Prims.string) : Prims.Tot FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta_attr (s: Prims.list u#0 Prims.string) : Prims.Tot FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta_qualifier (s: Prims.list u#0 Prims.string) : Prims.Tot FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val delta_namespace (s: Prims.list u#0 Prims.string) : Prims.Tot FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val unmeta:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val unascribe:FStar.Pervasives.norm_step), force=true
+GGG pushing to dsenv se=(assume
+val norm:(*uu___1489*)
+s: Prims.list u#0 FStar.Pervasives.norm_step -> #a: Type u#uu___1489 -> x: a -> Prims.Tot a), force=true
+GGG pushing to dsenv se=(assume
+val assert_norm (p: Type0) : Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val normalize_term_spec:(*uu___1628*)
+#a: Type u#uu___1628 -> x: a
+  -> FStar.Pervasives.Lemma
+    (ensures Prims.eq2 u#uu___1628 #a (FStar.Pervasives.normalize_term u#uu___1628 #a x) x)), force=true
+GGG pushing to dsenv se=(assume
+val normalize_spec (a: Type0)
+    : FStar.Pervasives.Lemma (ensures Prims.eq2 u#1 #Type0 (FStar.Pervasives.normalize a) a)), force=true
+GGG pushing to dsenv se=(assume
+val norm_spec:(*uu___1780*)
+s: Prims.list u#0 FStar.Pervasives.norm_step -> #a: Type u#uu___1780 -> x: a
+  -> FStar.Pervasives.Lemma
+    (ensures Prims.eq2 u#uu___1780 #a (FStar.Pervasives.norm u#uu___1780 s #a x) x)), force=true
+GGG pushing to dsenv se=(let reveal_opaque #_ s =
+  (*uu___36*)
+  FStar.Pervasives.norm_spec u#uu___36
+    (Prims.Cons u#0
+        #FStar.Pervasives.norm_step
+        (FStar.Pervasives.delta_only (Prims.Cons u#0 #Prims.string s (Prims.Nil u#0 #Prims.string)))
+        (Prims.Nil u#0 #FStar.Pervasives.norm_step))
+    #_), force=true
+GGG pushing to dsenv se=(unfold
+let pure_return a x =
+  (*uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_return0 u#uu___36 a x)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_bind_wp a b wp1 wp2 =
+  (*uu___37, uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_bind_wp0 u#uu___37 u#uu___36 a b wp1 wp2)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 b)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_if_then_else a p wp_then wp_else =
+  (*uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_if_then_else0 u#uu___36 a p wp_then wp_else)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_ite_wp a wp =
+  (*uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_ite_wp0 u#uu___36 a wp)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_close_wp a b wp =
+  (*uu___37, uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_close_wp0 u#uu___37 u#uu___36 a b wp)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___37 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_null_wp a =
+  (*uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_null_wp0 u#uu___36 a)
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 a)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_assert_wp p =
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_assert_wp0 p)
+  <:
+  Prims.Tot (Prims.pure_wp u#0 Prims.unit)), force=true
+GGG pushing to dsenv se=(unfold
+let pure_assume_wp p =
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    Prims.pure_assume_wp0 p)
+  <:
+  Prims.Tot (Prims.pure_wp u#0 Prims.unit)), force=true
+GGG pushing to dsenv se=(new_effect {
+  DIV : a: Type u#uu__univ_bvar_0 -> wp: Prims.pure_wp u#uu__univ_bvar_1 a -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.pure_return u#uu__univ_bvar_0
+  ; bind_wp = FStar.Pervasives.pure_bind_wp u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; stronger = Prims.pure_stronger u#uu__univ_bvar_0
+  ; if_then_else = FStar.Pervasives.pure_if_then_else u#uu__univ_bvar_0
+  ; ite_wp = FStar.Pervasives.pure_ite_wp u#uu__univ_bvar_0
+  ; close_wp = FStar.Pervasives.pure_close_wp u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; trivial = Prims.pure_trivial u#uu__univ_bvar_0
+}), force=true
+GGG pushing to dsenv se=(sub_effect Prims.PURE ~> FStar.Pervasives.DIV { lift_wp = Prims.purewp_id u#uu__univ_bvar_0 }), force=true
+GGG pushing to dsenv se=(unfold
+let div_hoare_to_wp #a #pre post =
+  (*uu___36*)
+  (FStar.Pervasives.reveal_opaque u#1
+      #(_: Type0 -> _: Prims.pure_wp' u#0 _ -> Prims.Tot Prims.logical)
+      "Prims.pure_wp_monotonic"
+      (Prims.pure_wp_monotonic u#0);
+    fun p -> pre /\ (forall (a: _: a{pre}). post a ==> p a))
+  <:
+  Prims.Tot (Prims.pure_wp u#uu___36 a)), force=true
+GGG pushing to dsenv se=(type Div
+  (a: Type u#uu__univ_bvar_0) (pre: Prims.pure_pre)
+  (post: Prims.pure_post' u#uu__univ_bvar_2 u#0 a pre)
+  = FStar.Pervasives.DIV a), force=true
+GGG pushing to dsenv se=(type Dv (a: Type u#uu__univ_bvar_0) = FStar.Pervasives.DIV a), force=true
+GGG pushing to dsenv se=(type EXT (a: Type u#uu__univ_bvar_0) = FStar.Pervasives.Dv a), force=true
+GGG pushing to dsenv se=(let st_pre_h heap = (*uu___36*) _: heap -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let st_post_h' heap a pre = (*uu___38, uu___37, uu___36*) _: a -> _: heap{pre} -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let st_post_h heap a =
+  (*uu___37, uu___36*) FStar.Pervasives.st_post_h' u#uu___37 u#uu___36 u#0 heap a Prims.l_True), force=true
+GGG pushing to dsenv se=(let st_wp_h heap a =
+  (*uu___37, uu___36*)
+  _: FStar.Pervasives.st_post_h u#uu___37 u#uu___36 heap a
+    -> Prims.Tot (FStar.Pervasives.st_pre_h u#uu___37 heap)), force=true
+GGG pushing to dsenv se=(unfold
+let st_return heap a x p = (*uu___37, uu___36*) p x), force=true
+GGG pushing to dsenv se=(unfold
+let st_bind_wp heap a b wp1 wp2 p h0 = (*uu___38, uu___37, uu___36*) wp1 (fun a h1 -> wp2 a p h1) h0), force=true
+GGG pushing to dsenv se=(unfold
+let st_if_then_else heap a p wp_then wp_else post h0 =
+  (*uu___37, uu___36*) wp_then post h0 /\ (~p ==> wp_else post h0)), force=true
+GGG pushing to dsenv se=(unfold
+let st_ite_wp heap a wp post h0 =
+  (*uu___37, uu___36*)
+  forall (k: FStar.Pervasives.st_post_h u#uu___37 u#uu___36 heap a).
+    (forall (x: a) (h: heap). {:pattern Prims.guard_free (k x h)} post x h ==> k x h) ==> wp k h0), force=true
+GGG pushing to dsenv se=(unfold
+let st_stronger heap a wp1 wp2 =
+  (*uu___37, uu___36*)
+  forall (p: FStar.Pervasives.st_post_h u#uu___37 u#uu___36 heap a) (h: heap). wp1 p h ==> wp2 p h), force=true
+GGG pushing to dsenv se=(unfold
+let st_close_wp heap a b wp p h = (*uu___38, uu___37, uu___36*) forall (b: b). wp b p h), force=true
+GGG pushing to dsenv se=(unfold
+let st_trivial heap a wp = (*uu___37, uu___36*) forall (h0: heap). wp (fun _ _ -> Prims.l_True) h0), force=true
+GGG pushing to dsenv se=(new_effect {
+  STATE_h
+    (heap: Type u#uu__univ_bvar_0)
+  :
+
+        result: Type u#uu__univ_bvar_0 ->
+        wp: FStar.Pervasives.st_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 heap result
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.st_return u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; bind_wp = FStar.Pervasives.st_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 heap
+  ; stronger = FStar.Pervasives.st_stronger u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; if_then_else = FStar.Pervasives.st_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; ite_wp = FStar.Pervasives.st_ite_wp u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; close_wp =
+    FStar.Pervasives.st_close_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 heap
+  ; trivial = FStar.Pervasives.st_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+}), force=true
+GGG pushing to dsenv se=(noeq
+type result (a: Type u#uu__univ_bvar_0) =
+  | Err : msg: Prims.string -> Prims.Tot (FStar.Pervasives.result u#uu__univ_bvar_2 a)
+  | E : e: Prims.exn -> Prims.Tot (FStar.Pervasives.result u#uu__univ_bvar_2 a)
+  | V : v: a -> Prims.Tot (FStar.Pervasives.result u#uu__univ_bvar_2 a)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let ex_pre = Type0), force=true
+GGG pushing to dsenv se=(let ex_post' a pre =
+  (*uu___37, uu___36*) _: FStar.Pervasives.result u#uu___37 a {pre} -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let ex_post a = (*uu___36*) FStar.Pervasives.ex_post' u#uu___36 u#0 a Prims.l_True), force=true
+GGG pushing to dsenv se=(let ex_wp a =
+  (*uu___36*) _: FStar.Pervasives.ex_post u#uu___36 a -> Prims.GTot FStar.Pervasives.ex_pre), force=true
+GGG pushing to dsenv se=(unfold
+let ex_return a x p = (*uu___36*) p (FStar.Pervasives.V u#uu___36 #a x) <: Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(unfold
+let ex_bind_wp a b wp1 wp2 p =
+  (*uu___37, uu___36*)
+  (forall (k: FStar.Pervasives.ex_post u#uu___36 b).
+      (forall (rb: FStar.Pervasives.result u#uu___36 b). {:pattern Prims.guard_free (k rb)}
+          p rb ==> k rb) ==>
+      wp1 (fun _ ->
+            (match _ with
+              | FStar.Pervasives.V #_ ra1 -> wp2 ra1 k
+              | FStar.Pervasives.E #_ e -> k (FStar.Pervasives.E u#uu___36 #b e)
+              | FStar.Pervasives.Err #_ m -> k (FStar.Pervasives.Err u#uu___36 #b m))
+            <:
+            Type0))
+  <:
+  Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(unfold
+let ex_if_then_else a p wp_then wp_else post = (*uu___36*) wp_then post /\ (~p ==> wp_else post)), force=true
+GGG pushing to dsenv se=(unfold
+let ex_ite_wp a wp post =
+  (*uu___36*)
+  forall (k: FStar.Pervasives.ex_post u#uu___36 a).
+    (forall (rb: FStar.Pervasives.result u#uu___36 a). {:pattern Prims.guard_free (k rb)}
+        post rb ==> k rb) ==>
+    wp k), force=true
+GGG pushing to dsenv se=(unfold
+let ex_stronger a wp1 wp2 =
+  (*uu___36*) forall (p: FStar.Pervasives.ex_post u#uu___36 a). wp1 p ==> wp2 p), force=true
+GGG pushing to dsenv se=(unfold
+let ex_close_wp a b wp p = (*uu___37, uu___36*) forall (b: b). wp b p), force=true
+GGG pushing to dsenv se=(unfold
+let ex_trivial a wp = (*uu___36*) wp (fun _ -> Prims.l_True)), force=true
+GGG pushing to dsenv se=(new_effect {
+  EXN
+  :
+    result: Type u#uu__univ_bvar_0 -> wp: FStar.Pervasives.ex_wp u#uu__univ_bvar_1 result
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.ex_return u#uu__univ_bvar_0
+  ; bind_wp = FStar.Pervasives.ex_bind_wp u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; stronger = FStar.Pervasives.ex_stronger u#uu__univ_bvar_0
+  ; if_then_else = FStar.Pervasives.ex_if_then_else u#uu__univ_bvar_0
+  ; ite_wp = FStar.Pervasives.ex_ite_wp u#uu__univ_bvar_0
+  ; close_wp = FStar.Pervasives.ex_close_wp u#uu__univ_bvar_1 u#uu__univ_bvar_0
+  ; trivial = FStar.Pervasives.ex_trivial u#uu__univ_bvar_0
+}), force=true
+GGG pushing to dsenv se=(type Exn
+  (a: Type u#uu__univ_bvar_0) (pre: FStar.Pervasives.ex_pre)
+  (post: FStar.Pervasives.ex_post' u#uu__univ_bvar_2 u#0 a pre)
+  = FStar.Pervasives.EXN a), force=true
+GGG pushing to dsenv se=(unfold
+let lift_div_exn a wp p = (*uu___36*) wp (fun a -> p (FStar.Pervasives.V u#uu___36 #a a))), force=true
+GGG pushing to dsenv se=(sub_effect FStar.Pervasives.DIV ~> FStar.Pervasives.EXN {
+  lift_wp = FStar.Pervasives.lift_div_exn u#uu__univ_bvar_0
+}), force=true
+GGG pushing to dsenv se=(type Ex (a: Type u#uu__univ_bvar_0) = FStar.Pervasives.Exn a), force=true
+GGG pushing to dsenv se=(let all_pre_h h = (*uu___36*) _: h -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let all_post_h' h a pre =
+  (*uu___38, uu___37, uu___36*)
+  _: FStar.Pervasives.result u#uu___37 a -> _: h{pre} -> Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(let all_post_h h a =
+  (*uu___37, uu___36*) FStar.Pervasives.all_post_h' u#uu___37 u#uu___36 u#0 h a Prims.l_True), force=true
+GGG pushing to dsenv se=(let all_wp_h h a =
+  (*uu___37, uu___36*)
+  _: FStar.Pervasives.all_post_h u#uu___37 u#uu___36 h a
+    -> Prims.Tot (FStar.Pervasives.all_pre_h u#uu___37 h)), force=true
+GGG pushing to dsenv se=(unfold
+let all_return heap a x p = (*uu___37, uu___36*) p (FStar.Pervasives.V u#uu___36 #a x)), force=true
+GGG pushing to dsenv se=(unfold
+let all_bind_wp heap a b wp1 wp2 p h0 =
+  (*uu___38, uu___37, uu___36*)
+  wp1 (fun ra h1 ->
+        (match ra with
+          | FStar.Pervasives.V #_ v -> wp2 v p h1
+          | FStar.Pervasives.E #_ e -> p (FStar.Pervasives.E u#uu___36 #b e) h1
+          | FStar.Pervasives.Err #_ msg -> p (FStar.Pervasives.Err u#uu___36 #b msg) h1)
+        <:
+        Type0)
+    h0
+  <:
+  Prims.GTot Type0), force=true
+GGG pushing to dsenv se=(unfold
+let all_if_then_else heap a p wp_then wp_else post h0 =
+  (*uu___37, uu___36*) wp_then post h0 /\ (~p ==> wp_else post h0)), force=true
+GGG pushing to dsenv se=(unfold
+let all_ite_wp heap a wp post h0 =
+  (*uu___37, uu___36*)
+  forall (k: FStar.Pervasives.all_post_h u#uu___37 u#uu___36 heap a).
+    (forall (x: FStar.Pervasives.result u#uu___36 a) (h: heap). {:pattern Prims.guard_free (k x h)}
+        post x h ==> k x h) ==>
+    wp k h0), force=true
+GGG pushing to dsenv se=(unfold
+let all_stronger heap a wp1 wp2 =
+  (*uu___37, uu___36*)
+  forall (p: FStar.Pervasives.all_post_h u#uu___37 u#uu___36 heap a) (h: heap). wp1 p h ==> wp2 p h), force=true
+GGG pushing to dsenv se=(unfold
+let all_close_wp heap a b wp p h = (*uu___38, uu___37, uu___36*) forall (b: b). wp b p h), force=true
+GGG pushing to dsenv se=(unfold
+let all_trivial heap a wp = (*uu___37, uu___36*) forall (h0: heap). wp (fun _ _ -> Prims.l_True) h0), force=true
+GGG pushing to dsenv se=(new_effect {
+  ALL_h
+    (heap: Type u#uu__univ_bvar_0)
+  :
+
+        a: Type u#uu__univ_bvar_0 ->
+        wp: FStar.Pervasives.all_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 heap a
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.all_return u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; bind_wp =
+    FStar.Pervasives.all_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 heap
+  ; stronger = FStar.Pervasives.all_stronger u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; if_then_else = FStar.Pervasives.all_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; ite_wp = FStar.Pervasives.all_ite_wp u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+  ; close_wp =
+    FStar.Pervasives.all_close_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 heap
+  ; trivial = FStar.Pervasives.all_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 heap
+}), force=true
+GGG pushing to dsenv se=(assume
+val inversion:(*uu___15464*) a: Type u#uu___15464 -> Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(assume
+val allow_inversion:(*uu___15495*) a: Type u#uu___15495 -> Prims.Pure Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val invertOption:(*uu___15604*)
+a: Type u#uu___15604
+  -> FStar.Pervasives.Lemma
+      (ensures
+        forall (x: FStar.Pervasives.Native.option u#uu___15604 a).
+          Prims.b2t (None? u#uu___15604 #a x) \/ Prims.b2t (Some? u#uu___15604 #a x))
+      (Prims.Cons u#0
+          #FStar.Pervasives.pattern
+          (SMTPat u#(1 + uu___15604)
+              #(Type u#uu___15604)
+              (FStar.Pervasives.Native.option u#uu___15604 a))
+          (Prims.Nil u#0 #FStar.Pervasives.pattern))), force=true
+GGG pushing to dsenv se=(type either (a: Type u#uu__univ_bvar_1) (b: Type u#uu__univ_bvar_1) =
+  | Inr : v: b -> Prims.Tot (FStar.Pervasives.either u#uu__univ_bvar_4 u#uu__univ_bvar_3 a b)
+  | Inl : v: a -> Prims.Tot (FStar.Pervasives.either u#uu__univ_bvar_4 u#uu__univ_bvar_3 a b)), force=true
+GGG pushing to dsenv se=(val either__uu___haseq: forall (a: Type u#uu__univ_bvar_1) (b: Type u#uu__univ_bvar_1).
+  {:pattern
+
+    Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2)
+      (FStar.Pervasives.either u#uu__univ_bvar_3 u#uu__univ_bvar_2 a b)}
+  Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_3 a /\ Prims.hasEq u#uu__univ_bvar_2 b ==>
+  Prims.hasEq u#(max uu__univ_bvar_3 uu__univ_bvar_2)
+    (FStar.Pervasives.either u#uu__univ_bvar_3 u#uu__univ_bvar_2 a b)), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let dfst #a #b t = (*uu___37, uu___36*) Mkdtuple2?._1 u#uu___37 u#uu___36 #a #b t <: Prims.Tot a), force=true
+GGG pushing to dsenv se=(let dsnd #a #b t =
+  (*uu___37, uu___36*)
+  Mkdtuple2?._2 u#uu___37 u#uu___36 #a #b t
+  <:
+  Prims.Tot (b (Mkdtuple2?._1 u#uu___37 u#uu___36 #a #b t))), force=true
+GGG pushing to dsenv se=(unopteq
+type dtuple3
+  (a: Type u#uu__univ_bvar_2) (b: (_: a -> Prims.GTot (Type u#uu__univ_bvar_3)))
+  (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_4)))
+  =
+  | Mkdtuple3 : _1: a -> _2: b _1 -> _3: c _1 _2
+    -> Prims.Tot
+      (FStar.Pervasives.dtuple3 u#uu__univ_bvar_8 u#uu__univ_bvar_7 u#uu__univ_bvar_6 a b c)), force=true
+GGG pushing to dsenv se=(val dtuple3__uu___haseq: Prims.l_True /\
+(forall (a: Type u#uu__univ_bvar_2)
+    (b: (_: a -> Prims.GTot (Type u#uu__univ_bvar_3)))
+    (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_4))).
+    {:pattern
+
+      Prims.hasEq u#(max uu__univ_bvar_5 uu__univ_bvar_4 uu__univ_bvar_3)
+        (FStar.Pervasives.dtuple3 u#uu__univ_bvar_5 u#uu__univ_bvar_4 u#uu__univ_bvar_3 a b c)}
+    Prims.l_True /\
+    (forall (_1: a) (_2: b _1) (_3: c _1 _2).
+        Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_8 a /\ Prims.hasEq u#uu__univ_bvar_7 (b _1) /\
+        Prims.hasEq u#uu__univ_bvar_6 (c _1 _2)) ==>
+    Prims.hasEq u#(max uu__univ_bvar_5 uu__univ_bvar_4 uu__univ_bvar_3)
+      (FStar.Pervasives.dtuple3 u#uu__univ_bvar_5 u#uu__univ_bvar_4 u#uu__univ_bvar_3 a b c))), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(unopteq
+type dtuple4
+  (a: Type u#uu__univ_bvar_3) (b: (x: a -> Prims.GTot (Type u#uu__univ_bvar_4)))
+  (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_5)))
+  (d: (x: a -> y: b x -> z: c x y -> Prims.GTot (Type u#uu__univ_bvar_6)))
+  =
+  | Mkdtuple4 : _1: a -> _2: b _1 -> _3: c _1 _2 -> _4: d _1 _2 _3
+    -> Prims.Tot
+      (FStar.Pervasives.dtuple4 u#uu__univ_bvar_11
+          u#uu__univ_bvar_10
+          u#uu__univ_bvar_9
+          u#uu__univ_bvar_8
+          a
+          b
+          c
+          d)), force=true
+GGG pushing to dsenv se=(val dtuple4__uu___haseq: Prims.l_True /\
+(forall (a: Type u#uu__univ_bvar_3)
+    (b: (x: a -> Prims.GTot (Type u#uu__univ_bvar_4)))
+    (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_5)))
+    (d: (x: a -> y: b x -> z: c x y -> Prims.GTot (Type u#uu__univ_bvar_6))).
+    {:pattern
+
+      Prims.hasEq u#(max uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5 uu__univ_bvar_4)
+        (FStar.Pervasives.dtuple4 u#uu__univ_bvar_7
+            u#uu__univ_bvar_6
+            u#uu__univ_bvar_5
+            u#uu__univ_bvar_4
+            a
+            b
+            c
+            d)}
+    Prims.l_True /\
+    (forall (_1: a) (_2: b _1) (_3: c _1 _2) (_4: d _1 _2 _3).
+        Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_11 a /\ Prims.hasEq u#uu__univ_bvar_10 (b _1) /\
+        Prims.hasEq u#uu__univ_bvar_9 (c _1 _2) /\ Prims.hasEq u#uu__univ_bvar_8 (d _1 _2 _3)) ==>
+    Prims.hasEq u#(max uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5 uu__univ_bvar_4)
+      (FStar.Pervasives.dtuple4 u#uu__univ_bvar_7
+          u#uu__univ_bvar_6
+          u#uu__univ_bvar_5
+          u#uu__univ_bvar_4
+          a
+          b
+          c
+          d))), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(unopteq
+type dtuple5
+  (a: Type u#uu__univ_bvar_4) (b: (x: a -> Prims.GTot (Type u#uu__univ_bvar_5)))
+  (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_6)))
+  (d: (x: a -> y: b x -> z: c x y -> Prims.GTot (Type u#uu__univ_bvar_7)))
+  (e: (x: a -> y: b x -> z: c x y -> w: d x y z -> Prims.GTot (Type u#uu__univ_bvar_8)))
+  =
+  | Mkdtuple5 : _1: a -> _2: b _1 -> _3: c _1 _2 -> _4: d _1 _2 _3 -> _5: e _1 _2 _3 _4
+    -> Prims.Tot
+      (FStar.Pervasives.dtuple5 u#uu__univ_bvar_14 u#uu__univ_bvar_13 u#uu__univ_bvar_12
+          u#uu__univ_bvar_11 u#uu__univ_bvar_10 a b c d e)), force=true
+GGG pushing to dsenv se=(val dtuple5__uu___haseq: Prims.l_True /\
+(forall (a: Type u#uu__univ_bvar_4)
+    (b: (x: a -> Prims.GTot (Type u#uu__univ_bvar_5)))
+    (c: (x: a -> _: b x -> Prims.GTot (Type u#uu__univ_bvar_6)))
+    (d: (x: a -> y: b x -> z: c x y -> Prims.GTot (Type u#uu__univ_bvar_7)))
+    (e: (x: a -> y: b x -> z: c x y -> w: d x y z -> Prims.GTot (Type u#uu__univ_bvar_8))).
+    {:pattern
+
+      Prims.hasEq u#(max
+            uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5)
+        (FStar.Pervasives.dtuple5 u#uu__univ_bvar_9 u#uu__univ_bvar_8 u#uu__univ_bvar_7
+            u#uu__univ_bvar_6 u#uu__univ_bvar_5 a b c d e)}
+    Prims.l_True /\
+    (forall (_1: a) (_2: b _1) (_3: c _1 _2) (_4: d _1 _2 _3) (_5: e _1 _2 _3 _4).
+        Prims.l_True /\ Prims.hasEq u#uu__univ_bvar_14 a /\ Prims.hasEq u#uu__univ_bvar_13 (b _1) /\
+        Prims.hasEq u#uu__univ_bvar_12 (c _1 _2) /\ Prims.hasEq u#uu__univ_bvar_11 (d _1 _2 _3) /\
+        Prims.hasEq u#uu__univ_bvar_10 (e _1 _2 _3 _4)) ==>
+    Prims.hasEq u#(max
+          uu__univ_bvar_9 uu__univ_bvar_8 uu__univ_bvar_7 uu__univ_bvar_6 uu__univ_bvar_5)
+      (FStar.Pervasives.dtuple5 u#uu__univ_bvar_9 u#uu__univ_bvar_8 u#uu__univ_bvar_7
+          u#uu__univ_bvar_6 u#uu__univ_bvar_5 a b c d e))), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(let ignore #a x = (*uu___60*) () <: Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val false_elim:(*uu___44545*)
+#a: Type u#uu___44545 -> u61: u62: Prims.unit{Prims.l_False} -> Prims.Tot a), force=true
+GGG pushing to dsenv se=(type __internal_ocaml_attributes =
+  | CNoInline : FStar.Pervasives.__internal_ocaml_attributes
+  | CMacro : FStar.Pervasives.__internal_ocaml_attributes
+  | CIfDef : FStar.Pervasives.__internal_ocaml_attributes
+  | CAbstractStruct : FStar.Pervasives.__internal_ocaml_attributes
+  | CCConv : _0: Prims.string -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | CConst : _0: Prims.string -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | CEpilogue : _0: Prims.string -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | CPrologue : _0: Prims.string -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | Comment : _0: Prims.string -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | Gc : FStar.Pervasives.__internal_ocaml_attributes
+  | Substitute : FStar.Pervasives.__internal_ocaml_attributes
+  | CInline : FStar.Pervasives.__internal_ocaml_attributes
+  | PpxDerivingYoJson : FStar.Pervasives.__internal_ocaml_attributes
+  | PpxDerivingShowConstant : _0: Prims.string
+    -> Prims.Tot FStar.Pervasives.__internal_ocaml_attributes
+  | PpxDerivingShow : FStar.Pervasives.__internal_ocaml_attributes), force=true
+GGG pushing to dsenv se=(val __internal_ocaml_attributes__uu___haseq: (attributes
+  (Prims.hasEq u#0 FStar.Pervasives.__internal_ocaml_attributes))), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(), force=true
+GGG pushing to dsenv se=(assume
+val inline_let:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val rename_let (new_name: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val plugin (x: Prims.int) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val tcnorm:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val must_erase_for_extraction:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val dm4f_bind_range:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val expect_failure (errs: Prims.list u#0 Prims.int) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val expect_lax_failure (errs: Prims.list u#0 Prims.int) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val tcdecltime:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val unifier_hint_injective:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val strict_on_arguments (x: Prims.list u#0 Prims.int) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val resolve_implicits:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val override_resolve_implicits_handler:(*uu___48851*)
+#a: Type u#uu___48851 -> _: a -> _: Prims.list u#0 Prims.string -> Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val handle_smt_goals:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val erasable:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val commute_nested_matches:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val noextract_to (backend: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val normalize_for_extraction (steps: Prims.list u#0 FStar.Pervasives.norm_step)
+    : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val ite_soundness_by (attribute: Prims.unit) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val default_effect (s: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val top_level_effect (s: Prims.string) : Prims.Tot Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val effect_param:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val bind_has_range_args:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val primitive_extraction:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val extract_as_impure_effect:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val strictly_positive:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val unused:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val no_auto_projectors:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val no_auto_projectors_decls:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val no_subtyping:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val admit_termination:Prims.unit), force=true
+GGG pushing to dsenv se=(assume
+val singleton:(*uu___49104*)
+#a: Type u#uu___49104 -> x: a -> Prims.Tot (y: a{Prims.eq2 u#uu___49104 #a y x})), force=true
+GGG pushing to dsenv se=(unfold
+let eqtype_as_type a = a <: Prims.Tot Type0), force=true
+GGG pushing to dsenv se=(let coerce_eq #a #b _ x = (*uu___60*) x <: Prims.Tot b), force=true
+GGG pushing to dsenv se=(assume
+val coercion:Prims.unit), force=true
+Opening file ../desugar_incr/X.fsti
+Checking i'face: X
+Now verifying interface of X
+>>>>>>>>>>>>>>Checking top-level Sig_pragma decl #set-options "--debug X --debug_level ED --print_universes --print_implicits"
+Processing #set-options "--debug X --debug_level ED --print_universes --print_implicits"
+>>>>>>>>>>>>>>tc_decl #set-options "--debug X --debug_level ED --print_universes --print_implicits"
+>>>>>>>>>>>>>>Adding top-level decl to environment: #set-options "--debug X --debug_level ED --print_universes --print_implicits" (from_cache:false)
+GGG pushing to dsenv se=(#set-options "--debug X --debug_level ED --print_universes --print_implicits"), force=true
++++++++++++Encoding sigelt #set-options "--debug X --debug_level ED --print_universes --print_implicits"
+>>>>>>>>>>>>>>Checking top-level Sig_new_effect decl new_effect {
+  GST
+  :
+
+        result: Type u#uu__univ_bvar_0 ->
+        wp: FStar.Pervasives.st_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 Prims.unit result
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.st_return u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; bind_wp =
+    FStar.Pervasives.st_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; stronger = FStar.Pervasives.st_stronger u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; if_then_else = FStar.Pervasives.st_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; ite_wp = FStar.Pervasives.st_ite_wp u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; close_wp =
+    FStar.Pervasives.st_close_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; trivial = FStar.Pervasives.st_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+}
+Processing new_effect {
+  GST
+  :
+
+        result: Type u#uu__univ_bvar_0 ->
+        wp: FStar.Pervasives.st_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 Prims.unit result
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.st_return u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; bind_wp =
+    FStar.Pervasives.st_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; stronger = FStar.Pervasives.st_stronger u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; if_then_else = FStar.Pervasives.st_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; ite_wp = FStar.Pervasives.st_ite_wp u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; close_wp =
+    FStar.Pervasives.st_close_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; trivial = FStar.Pervasives.st_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+}
+>>>>>>>>>>>>>>tc_decl new_effect {
+  GST
+  :
+
+        result: Type u#uu__univ_bvar_0 ->
+        wp: FStar.Pervasives.st_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 Prims.unit result
+      -> Prims.Tot Effect
+  with
+    ret_wp = FStar.Pervasives.st_return u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; bind_wp =
+    FStar.Pervasives.st_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; stronger = FStar.Pervasives.st_stronger u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; if_then_else = FStar.Pervasives.st_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; ite_wp = FStar.Pervasives.st_ite_wp u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+  ; close_wp =
+    FStar.Pervasives.st_close_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit
+  ; trivial = FStar.Pervasives.st_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit
+}
+* Warning 278 at ../desugar_incr/X.fsti(5,0-5,29):
+  - Typechecking eff_decl:
+  - new_effect { GST : result: Type u#uu__univ_bvar_0 -> wp:
+    FStar.Pervasives.st_wp_h u#uu__univ_bvar_3 u#uu__univ_bvar_1 Prims.unit
+    result -> Prims.Tot Effect with ret_wp = FStar.Pervasives.st_return
+    u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit ; bind_wp =
+    FStar.Pervasives.st_bind_wp u#uu__univ_bvar_3 u#uu__univ_bvar_1
+    u#uu__univ_bvar_0 Prims.unit ; stronger = FStar.Pervasives.st_stronger
+    u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit ; if_then_else =
+    FStar.Pervasives.st_if_then_else u#uu__univ_bvar_2 u#uu__univ_bvar_0
+    Prims.unit ; ite_wp = FStar.Pervasives.st_ite_wp u#uu__univ_bvar_2
+    u#uu__univ_bvar_0 Prims.unit ; close_wp = FStar.Pervasives.st_close_wp
+    u#uu__univ_bvar_3 u#uu__univ_bvar_1 u#uu__univ_bvar_0 Prims.unit ; trivial =
+    FStar.Pervasives.st_trivial u#uu__univ_bvar_2 u#uu__univ_bvar_0 Prims.unit }
+  - > While checking effect definition `X.GST`
+    > tc_eff_decl phase 1
+    > While typechecking the top-level declaration `new_effect { GST ... }`
+
+GG ed_univs=uu___7095
+GG bs=, orig tmp_t: Prims.unit
+GG us: , tmp_t: Prims.unit
+* Error 200 at ../desugar_incr/X.fsti(5,11-5,14):
+  - Expected and generalized universes in effect declaration for
+    X.GST
+    are different
+  - Expected 1 but found 0
+  - > While checking effect definition `X.GST`
+    > tc_eff_decl phase 1
+    > While typechecking the top-level declaration `new_effect { GST ... }`
+
+1 error was reported (see above)

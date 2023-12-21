@@ -32,6 +32,8 @@ open FStar.Class.Show
 open FStar.Class.Deq
 open FStar.Class.Ord
 
+module AST = FStar.Parser.AST
+
 (* Objects with metadata *)
 [@@ PpxDerivingYoJson; PpxDerivingShow ]
 type withinfo_t 'a = {
@@ -725,6 +727,9 @@ type sigelt' =
       ses:list sigelt;    // The sigelts to be checked
   }
 
+  | Sig_sugar {
+      d : AST.decl
+  }
 and sigelt = {
     sigel:    sigelt';
     sigrng:   Range.range;

@@ -1652,7 +1652,9 @@ let rec (sigelt_to_string : FStar_Syntax_Syntax.sigelt -> Prims.string) =
              let uu___6 = indexed_effect_combinator_kind_opt_to_string k in
              FStar_Compiler_Util.format5
                "polymonadic_subcomp %s <: %s = (%s, %s)<%s>" uu___2 uu___3
-               uu___4 uu___5 uu___6 in
+               uu___4 uu___5 uu___6
+         | FStar_Syntax_Syntax.Sig_sugar { FStar_Syntax_Syntax.d = d;_} ->
+             "Sig_sugar ..." in
        match x.FStar_Syntax_Syntax.sigattrs with
        | [] -> Prims.strcat "[@ ]" (Prims.strcat "\n" basic)
        | uu___2 ->
@@ -1813,6 +1815,8 @@ let rec (sigelt_to_string_short : FStar_Syntax_Syntax.sigelt -> Prims.string)
         let uu___4 = FStar_Ident.string_of_lid n in
         FStar_Compiler_Util.format2 "polymonadic_subcomp %s <: %s" uu___3
           uu___4
+    | FStar_Syntax_Syntax.Sig_sugar { FStar_Syntax_Syntax.d = d;_} ->
+        "Sig_sugar ..."
 let (tag_of_sigelt : FStar_Syntax_Syntax.sigelt -> Prims.string) =
   fun se ->
     match se.FStar_Syntax_Syntax.sigel with
@@ -1832,6 +1836,7 @@ let (tag_of_sigelt : FStar_Syntax_Syntax.sigelt -> Prims.string) =
     | FStar_Syntax_Syntax.Sig_polymonadic_subcomp uu___ ->
         "Sig_polymonadic_subcomp"
     | FStar_Syntax_Syntax.Sig_fail uu___ -> "Sig_fail"
+    | FStar_Syntax_Syntax.Sig_sugar uu___ -> "Sig_sugar"
 let (modul_to_string : FStar_Syntax_Syntax.modul -> Prims.string) =
   fun m ->
     let uu___ = sli m.FStar_Syntax_Syntax.name in

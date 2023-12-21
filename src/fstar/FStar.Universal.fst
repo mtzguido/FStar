@@ -356,7 +356,12 @@ let tc_one_file
           )
   in
   let tc_source_file () =
+      let env0 = env in
       let fmod, env = parse env pre_fn fn in
+
+      (* Discard dsenv *)
+      let env = set_tcenv env ({ tcenv_of_uenv env with dsenv = (tcenv_of_uenv env0).dsenv }) in
+
       let mii = FStar.Syntax.DsEnv.inclusion_info (tcenv_of_uenv env).dsenv fmod.name in
       let check_mod () =
           let check env =
