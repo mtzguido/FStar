@@ -12,98 +12,113 @@ type 'm lvm =
   f_univ: ('m, FStar_Syntax_Syntax.universe) endo }
 let __proj__Mklvm__item__lvm_monad :
   'm . 'm lvm -> 'm FStar_Class_Monad.monad =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> lvm_monad
+  fun x10 ->
+    match x10 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> alvm_monad
+let lvm_monad : 'm . 'm lvm -> 'm FStar_Class_Monad.monad =
+  fun x10 ->
+    match x10 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> alvm_monad
 let __proj__Mklvm__item__f_term :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.term) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_term
+  fun x11 ->
+    match x11 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_term
+let f_term : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.term) endo =
+  fun x11 ->
+    match x11 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_term
 let __proj__Mklvm__item__f_binder :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.binder) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_binder
+  fun x12 ->
+    match x12 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_binder
+let f_binder : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.binder) endo =
+  fun x12 ->
+    match x12 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_binder
 let __proj__Mklvm__item__f_binding_bv :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.bv) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_binding_bv
+  fun x13 ->
+    match x13 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} ->
+        af_binding_bv
+let f_binding_bv : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.bv) endo =
+  fun x13 ->
+    match x13 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} ->
+        af_binding_bv
 let __proj__Mklvm__item__f_br :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.branch) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_br
+  fun x14 ->
+    match x14 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_br
+let f_br : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.branch) endo =
+  fun x14 ->
+    match x14 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_br
 let __proj__Mklvm__item__f_comp :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.comp) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_comp
+  fun x15 ->
+    match x15 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_comp
+let f_comp : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.comp) endo =
+  fun x15 ->
+    match x15 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_comp
 let __proj__Mklvm__item__f_residual_comp :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.residual_comp) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_residual_comp
-let __proj__Mklvm__item__f_univ :
-  'm . 'm lvm -> ('m, FStar_Syntax_Syntax.universe) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad; f_term; f_binder; f_binding_bv; f_br; f_comp;
-        f_residual_comp; f_univ;_} -> f_univ
-let lvm_monad : 'm . 'm lvm -> 'm FStar_Class_Monad.monad =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term; f_binder; f_binding_bv; f_br; 
-        f_comp; f_residual_comp; f_univ;_} -> lvm_monad1
-let f_term : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.term) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder; f_binding_bv;
-        f_br; f_comp; f_residual_comp; f_univ;_} -> f_term1
-let f_binder : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.binder) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv; f_br; f_comp; f_residual_comp; f_univ;_} -> f_binder1
-let f_binding_bv : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.bv) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv = f_binding_bv1; f_br; f_comp; f_residual_comp;
-        f_univ;_} -> f_binding_bv1
-let f_br : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.branch) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv = f_binding_bv1; f_br = f_br1; f_comp; f_residual_comp;
-        f_univ;_} -> f_br1
-let f_comp : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.comp) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv = f_binding_bv1; f_br = f_br1; f_comp = f_comp1;
-        f_residual_comp; f_univ;_} -> f_comp1
+  fun x16 ->
+    match x16 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} ->
+        af_residual_comp
 let f_residual_comp :
   'm . 'm lvm -> ('m, FStar_Syntax_Syntax.residual_comp) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv = f_binding_bv1; f_br = f_br1; f_comp = f_comp1;
-        f_residual_comp = f_residual_comp1; f_univ;_} -> f_residual_comp1
+  fun x16 ->
+    match x16 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} ->
+        af_residual_comp
+let __proj__Mklvm__item__f_univ :
+  'm . 'm lvm -> ('m, FStar_Syntax_Syntax.universe) endo =
+  fun x17 ->
+    match x17 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_univ
 let f_univ : 'm . 'm lvm -> ('m, FStar_Syntax_Syntax.universe) endo =
-  fun projectee ->
-    match projectee with
-    | { lvm_monad = lvm_monad1; f_term = f_term1; f_binder = f_binder1;
-        f_binding_bv = f_binding_bv1; f_br = f_br1; f_comp = f_comp1;
-        f_residual_comp = f_residual_comp1; f_univ = f_univ1;_} -> f_univ1
+  fun x17 ->
+    match x17 with
+    | { lvm_monad = alvm_monad; f_term = af_term; f_binder = af_binder;
+        f_binding_bv = af_binding_bv; f_br = af_br; f_comp = af_comp;
+        f_residual_comp = af_residual_comp; f_univ = af_univ;_} -> af_univ
 let _lvm_monad : 'm . 'm lvm -> 'm FStar_Class_Monad.monad =
   fun uu___ -> lvm_monad uu___
 let novfs : 'm . 'm FStar_Class_Monad.monad -> 'm lvm =

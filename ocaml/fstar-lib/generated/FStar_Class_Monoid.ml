@@ -3,15 +3,13 @@ type 'a monoid = {
   mzero: 'a ;
   mplus: 'a -> 'a -> 'a }
 let __proj__Mkmonoid__item__mzero : 'a . 'a monoid -> 'a =
-  fun projectee -> match projectee with | { mzero; mplus;_} -> mzero
-let __proj__Mkmonoid__item__mplus : 'a . 'a monoid -> 'a -> 'a -> 'a =
-  fun projectee -> match projectee with | { mzero; mplus;_} -> mplus
+  fun x4 -> match x4 with | { mzero = amzero; mplus = amplus;_} -> amzero
 let mzero : 'a . 'a monoid -> 'a =
-  fun projectee ->
-    match projectee with | { mzero = mzero1; mplus;_} -> mzero1
+  fun x4 -> match x4 with | { mzero = amzero; mplus = amplus;_} -> amzero
+let __proj__Mkmonoid__item__mplus : 'a . 'a monoid -> 'a -> 'a -> 'a =
+  fun x5 -> match x5 with | { mzero = amzero; mplus = amplus;_} -> amplus
 let mplus : 'a . 'a monoid -> 'a -> 'a -> 'a =
-  fun projectee ->
-    match projectee with | { mzero = mzero1; mplus = mplus1;_} -> mplus1
+  fun x5 -> match x5 with | { mzero = amzero; mplus = amplus;_} -> amplus
 let msum : 'a . 'a monoid -> 'a Prims.list -> 'a =
   fun uu___ ->
     fun xs -> FStar_Compiler_List.fold_left (mplus uu___) (mzero uu___) xs
