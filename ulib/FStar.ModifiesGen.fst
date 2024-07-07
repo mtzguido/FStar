@@ -1541,12 +1541,14 @@ let modifies_only_not_unused_in #al #c l h h' =
   )
 #pop-options
 
+#push-options "--z3rlimit 16"
 let mreference_live_loc_not_unused_in #al c #t #pre h b =
   Classical.move_requires (does_not_contain_addr_addr_unused_in h) (HS.frameOf b, HS.as_addr b);
   assert (~ (h `does_not_contain_addr` (HS.frameOf b, HS.as_addr b)));
   loc_addresses_not_unused_in c (HS.frameOf b) (Set.singleton (HS.as_addr b)) h;
   loc_includes_trans (loc_not_unused_in c h) (loc_freed_mreference b) (loc_mreference b);
   ()
+#pop-options
 
 #push-options "--z3cliopt 'smt.qi.eager_threshold=100'"
 let mreference_unused_in_loc_unused_in #al c #t #pre h b =
