@@ -1996,7 +1996,48 @@ let (ask_solver :
                             if Prims.op_Negation ans1.ok
                             then maybe_save_failing_query env prefix cfg
                             else ();
-                            ans1)) in
+                            (let ans2 =
+                               let uu___4 =
+                                 (Prims.op_Negation ans1.ok) &&
+                                   (let uu___5 =
+                                      FStar_Options.ext_getv
+                                        "fstar:__unsafe_no_fail" in
+                                    uu___5 <> "") in
+                               if uu___4
+                               then
+                                 ((let uu___6 =
+                                     let uu___7 =
+                                       let uu___8 =
+                                         FStar_Class_Show.show
+                                           (FStar_Class_Show.show_tuple2
+                                              (FStar_Class_Show.printableshow
+                                                 FStar_Class_Printable.printable_string)
+                                              (FStar_Class_Show.printableshow
+                                                 FStar_Class_Printable.printable_int))
+                                           ((cfg.query_name),
+                                             (cfg.query_index)) in
+                                       FStar_Compiler_Util.format1
+                                         "__unsafe_no_fail: query %s failed, continuing anyway\n"
+                                         uu___8 in
+                                     (FStar_Errors_Codes.Warning_ProofRecovery,
+                                       uu___7) in
+                                   FStar_Errors.log_issue cfg.query_range
+                                     uu___6);
+                                  {
+                                    ok = true;
+                                    cache_hit = (ans1.cache_hit);
+                                    quaking = (ans1.quaking);
+                                    quaking_or_retrying =
+                                      (ans1.quaking_or_retrying);
+                                    lo = (ans1.lo);
+                                    hi = (ans1.hi);
+                                    nsuccess = (ans1.nsuccess);
+                                    total_ran = (ans1.total_ran);
+                                    tried_recovery = (ans1.tried_recovery);
+                                    errs = (ans1.errs)
+                                  })
+                               else ans1 in
+                             ans2))) in
                       (configs, ans)
 let (report : FStar_TypeChecker_Env.env -> query_settings -> answer -> unit)
   =

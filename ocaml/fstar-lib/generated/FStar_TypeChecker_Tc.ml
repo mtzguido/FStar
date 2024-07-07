@@ -2041,6 +2041,9 @@ let (tc_decl' :
                      uu___6
                  else ());
                 ([], [], env))
+           | FStar_Syntax_Syntax.Sig_fail uu___2 when
+               let uu___3 = FStar_Options.ext_getv "fstar:__unsafe_no_fail" in
+               uu___3 <> "" -> ([], [], env)
            | FStar_Syntax_Syntax.Sig_fail
                { FStar_Syntax_Syntax.errs = expected_errors;
                  FStar_Syntax_Syntax.fail_in_lax = lax;
@@ -4880,7 +4883,7 @@ let (tc_decls :
                ([], env) ses) in
       match uu___ with
       | (ses1, env1) -> ((FStar_Compiler_List.rev_append ses1 []), env1)
-let (uu___875 : unit) =
+let (uu___877 : unit) =
   FStar_Compiler_Effect.op_Colon_Equals tc_decls_knot
     (FStar_Pervasives_Native.Some tc_decls)
 let (snapshot_context :
