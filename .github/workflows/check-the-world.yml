@@ -47,7 +47,7 @@ jobs:
           make -C FStar -skj$(nproc) ADMIT=1
 
       - name: Tar for artifact
-        run: tar -cvf FStar.tar --exclude FStar/.git --exclude FStar/ocaml FStar
+        run: tar -cvf FStar.tar --exclude= FStar/.git --exclude=FStar/ocaml/ FStar
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -154,10 +154,11 @@ jobs:
       - name: Build krml
         run: |
           eval $(opam env)
+          opam install ctypes-foreign
           make -C karamel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf karamel.tar --exclude karamel/.git karamel
+        run: tar -cvf karamel.tar --exclude= karamel/.git karamel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -248,7 +249,7 @@ jobs:
           make -C steel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf steel.tar --exclude steel/.git steel
+        run: tar -cvf steel.tar --exclude= steel/.git steel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -302,7 +303,7 @@ jobs:
           make -C pulse -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf pulse.tar --exclude pulse/.git pulse
+        run: tar -cvf pulse.tar --exclude= pulse/.git pulse
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -349,7 +350,7 @@ jobs:
           repository: hacl-star/hacl-star
 
       - name: Get Vale
-        run: ./tools/get_vale.sh
+        run: ./hacl-star/tools/get_vale.sh
 
       - run: find
 
@@ -359,7 +360,7 @@ jobs:
           make -C hacl-star -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf hacl-star.tar --exclude hacl-star/.git hacl-star
+        run: tar -cvf hacl-star.tar --exclude= hacl-star/.git hacl-star
 
       - name: Save artifact
         uses: actions/upload-artifact@master
