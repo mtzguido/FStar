@@ -72,10 +72,12 @@ ADD fstar.opam $HOME/fstar.opam
 RUN opam install --confirm-level=unsafe-yes --deps-only $HOME/fstar.opam && opam clean
 
 # Some karamel dependencies
-RUN opam install --confirm-level=unsafe-yes fix fileutils visitors camlp4 wasm ulex uucp && opam clean
+RUN opam install --confirm-level=unsafe-yes fix fileutils visitors camlp4 wasm ulex uucp ctypes && opam clean
 
 # Set up $HOME/bin. Note, binaries here take precedence over OPAM
 RUN mkdir $HOME/bin
 RUN echo 'export PATH=$HOME/bin:$PATH' | tee --append $HOME/.profile $HOME/.bashrc $HOME/.bash_profile
 
 WORKDIR $HOME
+
+RUN sudo apt-get install -y npm && sudo apt-get clean
