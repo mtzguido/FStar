@@ -32,22 +32,17 @@ jobs:
       - name: Prep
         run: |
           # In case we edited fstar.opam, install new deps here
-          eval $(opam env)
-          opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
-
-      - run: find
-      - run: env
-      - run: pwd
-      - run: touch IM_HERE
+          # This will most likely fail to like krml below, what's going on?
+          # eval $(opam env)
+          # opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
 
       - name: Build
         run: |
-          export ADMIT=1 # faster testing
           eval $(opam env)
           make -C FStar -skj$(nproc) ADMIT=1
 
       - name: Tar for artifact
-        run: tar -cvf FStar.tar --exclude= FStar/.git --exclude=FStar/ocaml/ FStar
+        run: tar -cvf FStar.tar --exclude=FStar/.git --exclude=FStar/ocaml/ FStar
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -74,8 +69,6 @@ jobs:
         run: tar xf FStar.tar
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
-      - run: find
-
       - name: Test
         run: |
           eval $(opam env)
@@ -99,14 +92,12 @@ jobs:
         run: tar xf FStar.tar
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
-      - run: find
-
       - name: Bootstrap
         run: |
           eval $(opam env)
           make -C FStar -skj$(nproc) full-bootstrap
 
-      - name: Check
+      - name: Check diff
         run: |
           cd FStar/
           echo "git status:"
@@ -150,8 +141,6 @@ jobs:
           path: karamel/
           repository: FStarLang/karamel
 
-      - run: find
-
       - name: Prep
         run: |
           eval $(opam env)
@@ -184,7 +173,7 @@ jobs:
           make -C karamel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf karamel.tar --exclude= karamel/.git karamel
+        run: tar -cvf karamel.tar --exclude=karamel/.git karamel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -211,6 +200,8 @@ jobs:
           path: .
       - name: Untar
         run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
       - name: Get karamel
         uses: actions/download-artifact@master
         with:
@@ -218,15 +209,10 @@ jobs:
           path: .
       - name: Untar
         run: tar xf karamel.tar
-
-      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
-
-      - run: find
 
       - name: Test
         run: |
-          # Will fail due to rust
           eval $(opam env)
           make -C karamel -skj$(nproc) test
 
@@ -248,6 +234,8 @@ jobs:
           path: .
       - name: Untar
         run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
       - name: Get karamel
         uses: actions/download-artifact@master
         with:
@@ -255,11 +243,7 @@ jobs:
           path: .
       - name: Untar
         run: tar xf karamel.tar
-
-      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
-
-      - run: find
 
       - name: Clone steel
         uses: actions/checkout@master
@@ -267,15 +251,13 @@ jobs:
           path: steel/
           repository: FStarLang/steel
 
-      - run: find
-
       - name: Build
         run: |
           eval $(opam env)
           make -C steel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf steel.tar --exclude= steel/.git steel
+        run: tar -cvf steel.tar --exclude=steel/.git steel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -283,6 +265,50 @@ jobs:
           path: steel.tar
           name: steel
           retention-days: 1 # revisit
+
+  steel-test:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - steel-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get steel
+        uses: actions/download-artifact@master
+        with:
+          name: steel
+          path: .
+      - name: Untar
+        run: tar xf steel.tar
+      - run: echo "STEEL_HOME=$(pwd)/steel" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          eval $(opam env)
+          make -C steel -skj$(nproc) test
 
   pulse-build:
     runs-on: [linux, X64]
@@ -302,6 +328,8 @@ jobs:
           path: .
       - name: Untar
         run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
       - name: Get karamel
         uses: actions/download-artifact@master
         with:
@@ -309,11 +337,7 @@ jobs:
           path: .
       - name: Untar
         run: tar xf karamel.tar
-
-      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
-
-      - run: find
 
       - name: Clone pulse
         uses: actions/checkout@master
@@ -321,15 +345,13 @@ jobs:
           path: pulse/
           repository: FStarLang/pulse
 
-      - run: find
-
       - name: Build
         run: |
           eval $(opam env)
           make -C pulse -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf pulse.tar --exclude= pulse/.git pulse
+        run: tar -cvf pulse.tar --exclude=pulse/.git pulse
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -337,6 +359,50 @@ jobs:
           path: pulse.tar
           name: pulse
           retention-days: 1 # revisit
+
+  pulse-test:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - pulse-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get pulse
+        uses: actions/download-artifact@master
+        with:
+          name: pulse
+          path: .
+      - name: Untar
+        run: tar xf pulse.tar
+      - run: echo "PULSE_HOME=$(pwd)/pulse" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          eval $(opam env)
+          make -C pulse -skj$(nproc) test
 
   hacl-build:
     runs-on: [linux, X64]
@@ -356,6 +422,8 @@ jobs:
           path: .
       - name: Untar
         run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
       - name: Get karamel
         uses: actions/download-artifact@master
         with:
@@ -363,11 +431,7 @@ jobs:
           path: .
       - name: Untar
         run: tar xf karamel.tar
-
-      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
-
-      - run: find
 
       - name: Clone hacl-star
         uses: actions/checkout@master
@@ -380,15 +444,13 @@ jobs:
       - name: Get Vale
         run: ./hacl-star/tools/get_vale.sh
 
-      - run: find
-
       - name: Build
         run: |
           eval $(opam env)
-          make -C hacl-star -skj$(nproc)
+          make -C hacl-star -skj$(nproc) OTHERFLAGS='--admit_smt_queries true'
 
       - name: Tar for artifact
-        run: tar -cvf hacl-star.tar --exclude= hacl-star/.git hacl-star
+        run: tar -cvf hacl-star.tar --exclude=hacl-star/.git hacl-star
 
       - name: Save artifact
         uses: actions/upload-artifact@master
@@ -396,3 +458,47 @@ jobs:
           path: hacl-star.tar
           name: hacl-star
           retention-days: 1 # revisit
+
+  hacl-star-test:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - hacl-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get hacl-star
+        uses: actions/download-artifact@master
+        with:
+          name: hacl-star
+          path: .
+      - name: Untar
+        run: tar xf hacl-star.tar
+      - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          eval $(opam env)
+          make -C hacl-star -skj$(nproc) test

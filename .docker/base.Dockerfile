@@ -81,3 +81,10 @@ RUN echo 'export PATH=$HOME/bin:$PATH' | tee --append $HOME/.profile $HOME/.bash
 WORKDIR $HOME
 
 RUN sudo apt-get install -y npm && sudo apt-get clean
+
+RUN sudo apt-get install -y --no-install-recommends \
+      time \
+      && sudo apt-get clean -y
+
+# To run Vale
+RUN sudo apt-get install -y dotnet-runtime-6.0
