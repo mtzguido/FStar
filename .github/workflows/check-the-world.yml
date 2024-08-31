@@ -34,6 +34,7 @@ jobs:
         run: |
           # In case we edited fstar.opam, install new deps here
           opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
+          opam install --confirm-level=unsafe-yes ctypes-foreign
 
       - run: find
       - run: env
@@ -44,7 +45,6 @@ jobs:
         run: |
           export ADMIT=1 # faster testing
           eval $(opam env)
-          opam --confirm-level=unsafe-yes install ctypes-foreign
           make -C FStar -skj$(nproc) ADMIT=1
 
       - name: Tar for artifact
