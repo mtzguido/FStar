@@ -44,7 +44,7 @@ jobs:
         run: |
           export ADMIT=1 # faster testing
           eval $(opam env)
-          opam install ctypes-foreign
+          opam --confirm-level=unsafe-yes install ctypes-foreign
           make -C FStar -skj$(nproc) ADMIT=1
 
       - name: Tar for artifact
