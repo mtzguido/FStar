@@ -1,0 +1,23 @@
+name: Build F* and test related projects
+on:
+  workflow_dispatch:
+
+jobs:
+  fstar-build:
+    runs-on: [self-hosted, linux, X64]
+    container:
+      image: ghcr.io/fstarlang/fstar-ci-base
+    defaults:
+      run:
+        # Setting the default shell to bash. This is not only more standard,
+        # but also makes sure that we run with -o pipefail, so we can safely
+        # pipe data (such as | tee LOG) without missing out on failures
+        # and getting false positives. If you want to change the default shell,
+        # keep in mind you need a way to handle this.
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          make -skj$(nproc)
