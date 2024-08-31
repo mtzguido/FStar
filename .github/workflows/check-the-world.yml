@@ -41,13 +41,14 @@ jobs:
           eval $(opam env)
           make -C FStar -skj$(nproc) ADMIT=1
 
+      # TODO: put lib/ in another artifact? Most clients should not need it.
       - name: Tar for artifact
-        run: tar -cvf FStar.tar --exclude=FStar/.git --exclude=FStar/ocaml/ FStar
+        run: tar -czf FStar.tar.gz --exclude=FStar/.git --exclude=FStar/ocaml/_build FStar
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: FStar.tar
+          path: FStar.tar.gz
           name: FStar
           retention-days: 1 # revisit
 
@@ -66,7 +67,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Test
@@ -89,7 +90,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Bootstrap
@@ -132,7 +133,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Clone karamel
@@ -173,12 +174,12 @@ jobs:
           make -C karamel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf karamel.tar --exclude=karamel/.git karamel
+        run: tar -czf karamel.tar.gz --exclude=karamel/.git --exclude=karamel/_build karamel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: karamel.tar
+          path: karamel.tar.gz
           name: karamel
           retention-days: 1 # revisit
       
@@ -199,7 +200,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -208,7 +209,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Test
@@ -233,7 +234,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -242,7 +243,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Clone steel
@@ -257,12 +258,12 @@ jobs:
           make -C steel -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf steel.tar --exclude=steel/.git steel
+        run: tar -czf steel.tar.gz --exclude=steel/.git steel
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: steel.tar
+          path: steel.tar.gz
           name: steel
           retention-days: 1 # revisit
 
@@ -284,7 +285,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -293,7 +294,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Get steel
@@ -302,7 +303,7 @@ jobs:
           name: steel
           path: .
       - name: Untar
-        run: tar xf steel.tar
+        run: tar xzf steel.tar.gz
       - run: echo "STEEL_HOME=$(pwd)/steel" >> $GITHUB_ENV
 
       - name: Test
@@ -327,7 +328,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -336,7 +337,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Clone pulse
@@ -351,12 +352,12 @@ jobs:
           make -C pulse -skj$(nproc)
 
       - name: Tar for artifact
-        run: tar -cvf pulse.tar --exclude=pulse/.git pulse
+        run: tar -czf pulse.tar.gz --exclude=pulse/.git pulse
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: pulse.tar
+          path: pulse.tar.gz
           name: pulse
           retention-days: 1 # revisit
 
@@ -378,7 +379,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -387,7 +388,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Get pulse
@@ -396,7 +397,7 @@ jobs:
           name: pulse
           path: .
       - name: Untar
-        run: tar xf pulse.tar
+        run: tar xzf pulse.tar.gz
       - run: echo "PULSE_HOME=$(pwd)/pulse" >> $GITHUB_ENV
 
       - name: Test
@@ -421,7 +422,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -430,7 +431,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Clone hacl-star
@@ -450,12 +451,12 @@ jobs:
           make -C hacl-star -skj$(nproc) OTHERFLAGS='--admit_smt_queries true'
 
       - name: Tar for artifact
-        run: tar -cvf hacl-star.tar --exclude=hacl-star/.git hacl-star
+        run: tar -czf hacl-star.tar.gz --exclude=hacl-star/.git hacl-star
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: hacl-star.tar
+          path: hacl-star.tar.gz
           name: hacl-star
           retention-days: 1 # revisit
 
@@ -477,7 +478,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf FStar.tar
+        run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Get karamel
@@ -486,7 +487,7 @@ jobs:
           name: karamel
           path: .
       - name: Untar
-        run: tar xf karamel.tar
+        run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
 
       - name: Get hacl-star
@@ -495,7 +496,7 @@ jobs:
           name: hacl-star
           path: .
       - name: Untar
-        run: tar xf hacl-star.tar
+        run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
 
       - name: Test
