@@ -90,5 +90,4 @@ RUN sudo apt-get install -y --no-install-recommends \
 RUN sudo apt-get install -y dotnet-runtime-6.0
 
 # everparse (hex for quackyducky)
-RUN opam install --confirm-level=unsafe-yes hex && opam clean
-
+RUN opam install --confirm-level=unsafe-yes hex sexplib re sha && opam clean
