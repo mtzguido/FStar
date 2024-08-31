@@ -446,7 +446,9 @@ jobs:
       - name: Build
         run: |
           eval $(opam env)
-          make -C hacl-star -skj$(nproc) OTHERFLAGS='--admit_smt_queries true'
+          NPROC=$(nproc)
+          if [ $NPROC -gt 16 ]; then NPROC=16; fi
+          make -C hacl-star -skj${NPROC} OTHERFLAGS='--admit_smt_queries true'
 
       - name: Tar for artifact
         run: tar -czf hacl-star.tar.gz --exclude=hacl-star/.git hacl-star
