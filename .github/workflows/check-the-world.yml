@@ -19,7 +19,7 @@ defaults:
 jobs:
   fstar-build:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     steps:
       - name: Cleanup
         run: find . -delete
@@ -58,7 +58,7 @@ jobs:
 
   fstar-test:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -83,7 +83,7 @@ jobs:
 
   fstar-test-boot:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -127,7 +127,7 @@ jobs:
 
   krml-build:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -168,7 +168,7 @@ jobs:
       
   krml-test:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
       - krml-build
@@ -205,7 +205,7 @@ jobs:
 
   steel-build:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
       - krml-build
@@ -259,7 +259,7 @@ jobs:
 
   pulse-build:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
       - krml-build
@@ -313,7 +313,7 @@ jobs:
 
   hacl-build:
     runs-on: [linux, X64]
-    container: mtzguido/fstar-ci-testing
+    container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
       - krml-build
