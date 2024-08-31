@@ -1,0 +1,125 @@
+name: Build F* and test related projects
+on:
+  push:
+  workflow_dispatch:
+
+defaults:
+  run:
+    # Setting the default shell to bash. This is not only more standard,
+    # but also makes sure that we run with -o pipefail, so we can safely
+    # pipe data (such as | tee LOG) without missing out on failures
+    # and getting false positives. If you want to change the default shell,
+    # keep in mind you need a way to handle this.
+    shell: bash
+
+jobs:
+  fstar-build:
+    runs-on: [self-hosted, linux, X64]
+    container: ghcr.io/fstarlang/fstar-ci-base
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      # FIXME: Why is $HOME badly set?
+      - name: Setup HOME and PATH
+        run: |
+          echo "HOME=/home/opam" >> $GITHUB_ENV
+          echo "PATH=/home/opam/bin:$PATH" >> $GITHUB_ENV
+
+      - uses: actions/checkout@master
+        with:
+          path: FStar/
+
+      - name: Prep
+        run: |
+          # In case we edited fstar.opam, install new deps here
+          opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
+
+      - run: find
+      - run: env
+      - run: pwd
+      - run: touch IM_HERE
+
+      - name: Build
+        run: |
+          export ADMIT=1 # faster testing
+          eval $(opam env)
+          make -C FStar -skj$(nproc) ADMIT=1
+
+      - name: Tar for artifact
+        run: tar -cvf fstar.tar --exclude FStar/.git --exclude FStar/ocaml --exclude FStar/lib FStar
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: fstar.tar
+          name: FStar
+          retention-days: 1 # revisit
+
+  fstar-test:
+    runs-on: [self-hosted, linux, X64]
+    container: ghcr.io/fstarlang/fstar-ci-base
+    needs: fstar-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      # FIXME: Why is $HOME badly set?
+      - name: Setup HOME and PATH
+        run: |
+          echo "HOME=/home/opam" >> $GITHUB_ENV
+          echo "PATH=/home/opam/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf fstar.tar
+      - run: echo "FSTAR_HOME=$HOME/FStar" >> $GITHUB_ENV
+
+      - run: find
+
+      - name: Run tests
+        run: |
+          eval $(opam env)
+          make -C FStar -skj$(nproc) ci-uregressions
+
+  krml-test:
+    runs-on: [self-hosted, linux, X64]
+    container: ghcr.io/fstarlang/fstar-ci-base
+    needs: fstar-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      # FIXME: Why is $HOME badly set?
+      - name: Setup HOME and PATH
+        run: |
+          echo "HOME=/home/opam" >> $GITHUB_ENV
+          echo "PATH=/home/opam/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf fstar.tar
+      - run: echo "FSTAR_HOME=$HOME/FStar" >> $GITHUB_ENV
+
+      - name: Clone karamel
+        uses: actions/checkout@master
+        with:
+          path: karamel/
+          repository: FStarLang/karamel
+
+      - run: find
+
+      - name: Build krml
+        run: |
+          eval $(opam env)
+          make -C karamel -skj$(nproc)
+
+      - name: Test karamel
+        run: |
+          eval $(opam env)
+          make -C karamel -skj$(nproc) test
