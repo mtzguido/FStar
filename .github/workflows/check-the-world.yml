@@ -78,25 +78,23 @@ jobs:
   fstar-test-boot:
     runs-on: [linux, X64]
     container: mtzguido/fstar-base-testing
-    needs: fstar-build
+    # needs: fstar-build
+    # ^ This does not really depend on the previous job, but this can be
+    # enabled if we wanted to sequentialize them for whatever reason.
     steps:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
-      - name: Get FStar
-        uses: actions/download-artifact@master
+      - uses: actions/checkout@master
         with:
-          name: FStar
-          path: .
-      - name: Untar
-        run: tar xzf FStar.tar.gz
-      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+          path: FStar/
 
       - name: Bootstrap
         run: |
           eval $(opam env)
-          make -C FStar -skj$(nproc) full-bootstrap
+          make -C FStar -skj$(nproc) 1
+          make -C FStar -skj$(nproc) full-bootstrap ADMIT=1
 
       - name: Check diff
         run: |
