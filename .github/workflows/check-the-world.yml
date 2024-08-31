@@ -75,7 +75,7 @@ jobs:
           make -C FStar -skj$(nproc) ci-uregressions
 
   krml-test:
-    runs-on: [self-hosted, linux, X64]
+    runs-on: [linux, X64]
     container: ghcr.io/fstarlang/fstar-ci-base
     needs: fstar-build
     steps:
