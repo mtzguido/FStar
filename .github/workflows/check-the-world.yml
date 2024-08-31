@@ -460,7 +460,7 @@ jobs:
           name: hacl-star
           retention-days: 1 # revisit
 
-  hacl-star-test:
+  hacl-test:
     runs-on: [linux, X64]
     container: mtzguido/fstar-base-testing
     needs:
@@ -503,3 +503,237 @@ jobs:
         run: |
           eval $(opam env)
           make -C hacl-star -skj$(nproc) test
+
+  everparse-build:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xzf FStar.tar.gz
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xzf karamel.tar.gz
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Clone everparse
+        uses: actions/checkout@master
+        with:
+          path: everparse/
+          repository: project-everest/everparse
+
+      - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          NPROC=$(nproc)
+          if [ $NPROC -gt 16 ]; then NPROC=16; fi
+          make -C everparse -skj${NPROC} OTHERFLAGS='--admit_smt_queries true'
+
+      - name: Tar for artifact
+        run: tar -czf everparse.tar.gz --exclude=everparse/.git everparse
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: everparse.tar.gz
+          name: everparse
+          retention-days: 1 # revisit
+
+  everparse-test:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - everparse-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xzf FStar.tar.gz
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xzf karamel.tar.gz
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get everparse
+        uses: actions/download-artifact@master
+        with:
+          name: everparse
+          path: .
+      - name: Untar
+        run: tar xzf everparse.tar.gz
+      - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          eval $(opam env)
+          make -C everparse -skj$(nproc) test
+
+  merkle-tree-build:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - hacl-build
+      - everparse-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xzf FStar.tar.gz
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xzf karamel.tar.gz
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get everparse
+        uses: actions/download-artifact@master
+        with:
+          name: everparse
+          path: .
+      - name: Untar
+        run: tar xzf everparse.tar.gz
+      - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
+
+      - name: Get hacl-star
+        uses: actions/download-artifact@master
+        with:
+          name: hacl-star
+          path: .
+      - name: Untar
+        run: tar xzf hacl-star.tar.gz
+      - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
+
+      - name: Clone merkle-tree
+        uses: actions/checkout@master
+        with:
+          path: merkle-tree/
+          repository: hacl-star/merkle-tree
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          NPROC=$(nproc)
+          if [ $NPROC -gt 16 ]; then NPROC=16; fi
+          make -C merkle-tree -skj${NPROC} dist/libmerkletree.a
+
+      - name: Tar for artifact
+        run: tar -czf merkle-tree.tar.gz --exclude=merkle-tree/.git merkle-tree
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: merkle-tree.tar.gz
+          name: merkle-tree
+          retention-days: 1 # revisit
+
+  merkle-tree-test:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-base-testing
+    needs:
+      - fstar-build
+      - krml-build
+      - hacl-build
+      - everparse-build
+      - merkle-tree-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xzf FStar.tar.gz
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xzf karamel.tar.gz
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - name: Get everparse
+        uses: actions/download-artifact@master
+        with:
+          name: everparse
+          path: .
+      - name: Untar
+        run: tar xzf everparse.tar.gz
+      - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
+
+      - name: Get hacl-star
+        uses: actions/download-artifact@master
+        with:
+          name: hacl-star
+          path: .
+      - name: Untar
+        run: tar xzf hacl-star.tar.gz
+      - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
+
+      - name: Get merkle-tree
+        uses: actions/download-artifact@master
+        with:
+          name: merkle-tree
+          path: .
+      - name: Untar
+        run: tar xzf merkle-tree.tar.gz
+      - run: echo "EVERPARSE_HOME=$(pwd)/merkle-tree" >> $GITHUB_ENV
+
+      - name: Test
+        run: |
+          eval $(opam env)
+          make -C merkle-tree -skj$(nproc) test
