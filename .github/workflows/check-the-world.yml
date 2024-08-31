@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 defaults:
+  container: ghcr.io/fstarlang/fstar-ci-base
   run:
     # Setting the default shell to bash. This is not only more standard,
     # but also makes sure that we run with -o pipefail, so we can safely
@@ -15,7 +16,6 @@ defaults:
 jobs:
   fstar-build:
     runs-on: [self-hosted, linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
     steps:
       - name: Cleanup
         run: find . -delete
@@ -54,7 +54,6 @@ jobs:
 
   fstar-test:
     runs-on: [self-hosted, linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -79,7 +78,6 @@ jobs:
 
   krml-build:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -120,7 +118,6 @@ jobs:
       
   krml-test:
     runs-on: [self-hosted, linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
     needs: fstar-build krml-build
     steps:
       - name: Cleanup
