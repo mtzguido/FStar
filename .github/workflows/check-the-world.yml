@@ -3,9 +3,9 @@ on:
   push:
   workflow_dispatch:
 
-    # TODO:
-    # Is there a way to set the default container? this is stupid
-    # Move to the regular fstar-ci-base too
+# TODO:
+# Is there a way to set the default container? this is stupid
+# Move to the regular fstar-ci-base too
 
 defaults:
   run:
