@@ -65,7 +65,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -129,7 +128,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -196,7 +194,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -205,7 +202,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -230,7 +226,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -239,7 +234,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -281,7 +275,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -290,7 +283,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -299,7 +291,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: steel
-          path: .
       - name: Untar
         run: tar xzf steel.tar.gz
       - run: echo "STEEL_HOME=$(pwd)/steel" >> $GITHUB_ENV
@@ -324,7 +315,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -333,7 +323,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -375,7 +364,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -384,7 +372,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -393,7 +380,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: pulse
-          path: .
       - name: Untar
         run: tar xzf pulse.tar.gz
       - run: echo "PULSE_HOME=$(pwd)/pulse" >> $GITHUB_ENV
@@ -418,7 +404,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -427,7 +412,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -476,7 +460,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -485,7 +468,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -494,7 +476,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: hacl-star
-          path: .
       - name: Untar
         run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
@@ -519,7 +500,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -528,7 +508,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -574,7 +553,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -583,7 +561,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -592,7 +569,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: everparse
-          path: .
       - name: Untar
         run: tar xzf everparse.tar.gz
       - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
@@ -619,7 +595,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -628,7 +603,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -637,7 +611,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: everparse
-          path: .
       - name: Untar
         run: tar xzf everparse.tar.gz
       - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
@@ -646,7 +619,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: hacl-star
-          path: .
       - name: Untar
         run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
@@ -692,7 +664,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: FStar
-          path: .
       - name: Untar
         run: tar xzf FStar.tar.gz
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
@@ -701,7 +672,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: karamel
-          path: .
       - name: Untar
         run: tar xzf karamel.tar.gz
       - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
@@ -710,7 +680,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: everparse
-          path: .
       - name: Untar
         run: tar xzf everparse.tar.gz
       - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
@@ -719,7 +688,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: hacl-star
-          path: .
       - name: Untar
         run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
@@ -728,7 +696,6 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: merkle-tree
-          path: .
       - name: Untar
         run: tar xzf merkle-tree.tar.gz
       - run: echo "EVERPARSE_HOME=$(pwd)/merkle-tree" >> $GITHUB_ENV
