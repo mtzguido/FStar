@@ -375,8 +375,11 @@ jobs:
           path: hacl-star/
           repository: hacl-star/hacl-star
 
+
+      - run: echo "FSTAR_HOME=$(pwd)/hacl-home" >> $GITHUB_ENV
+
       - name: Get Vale
-        run: pushd hacl-star && ./tools/get_vale.sh
+        run: ./hacl-star/tools/get_vale.sh
 
       - run: find
 
