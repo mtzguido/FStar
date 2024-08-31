@@ -169,6 +169,12 @@ jobs:
           eval $(opam env)
           make -C karamel -skj$(nproc)
 
+      # krml is a symlink to _build/default/src/Karamel.exe, which we are not including
+      # This will overwrite the link with the actual file.
+      - name: Fix for symlink
+        run: |
+          cp --remove-destination $(realpath karamel/krml) karamel/krml
+
       - name: Tar for artifact
         run: tar -czf karamel.tar.gz --exclude=karamel/.git --exclude=karamel/_build karamel
 
