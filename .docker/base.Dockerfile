@@ -33,6 +33,7 @@ RUN opam install --confirm-level=unsafe-yes --deps-only ./fstar.opam && opam cle
 RUN opam install --confirm-level=unsafe-yes fix fileutils visitors camlp4 wasm ulex uucp ctypes ctypes-foreign && opam clean
 
 # I really with I could get rid of this crap.
+ENV HOME /home/builder
 RUN opam env --set-switch | tee --append $HOME/.profile $HOME/.bashrc $HOME/.bash_profile
 
 # Move up
