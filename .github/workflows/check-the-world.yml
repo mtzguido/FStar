@@ -34,7 +34,6 @@ jobs:
         run: |
           # In case we edited fstar.opam, install new deps here
           opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
-          opam install --confirm-level=unsafe-yes ctypes-foreign
 
       - run: find
       - run: env
@@ -124,7 +123,7 @@ jobs:
             git diff
             echo "::endgroup::"
             FAILED=true
-          else
+          fi
           if $FAILED; then false; fi
 
   krml-build:
@@ -152,6 +151,10 @@ jobs:
           repository: FStarLang/karamel
 
       - run: find
+
+      - name: Prep
+        run: |
+          opam install --confirm-level=unsafe-yes --deps-only ./karamel/karamel.opam
 
       - name: Build krml
         run: |
@@ -351,7 +354,7 @@ jobs:
           repository: hacl-star/hacl-star
 
       - name: Get Vale
-        run: ./hacl-star/tools/get_vale.sh
+        run: pushd hacl-star && ./tools/get_vale.sh
 
       - run: find
 
