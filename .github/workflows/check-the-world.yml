@@ -43,12 +43,12 @@ jobs:
           make -C FStar -skj$(nproc) ADMIT=1
 
       - name: Tar for artifact
-        run: tar -cvf fstar.tar --exclude FStar/.git --exclude FStar/ocaml --exclude FStar/lib FStar
+        run: tar -cvf FStar.tar --exclude FStar/.git --exclude FStar/ocaml --exclude FStar/lib FStar
 
       - name: Save artifact
         uses: actions/upload-artifact@master
         with:
-          path: fstar.tar
+          path: FStar.tar
           name: FStar
           retention-days: 1 # revisit
 
@@ -67,7 +67,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf fstar.tar
+        run: tar xf FStar.tar
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - run: find
@@ -77,7 +77,7 @@ jobs:
           eval $(opam env)
           make -C FStar -skj$(nproc) ci-uregressions
 
-  krml-test:
+  krml-build:
     runs-on: [linux, X64]
     container: ghcr.io/fstarlang/fstar-ci-base
     needs: fstar-build
@@ -92,7 +92,7 @@ jobs:
           name: FStar
           path: .
       - name: Untar
-        run: tar xf fstar.tar
+        run: tar xf FStar.tar
       - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
       - name: Clone karamel
@@ -108,7 +108,47 @@ jobs:
           eval $(opam env)
           make -C karamel -skj$(nproc)
 
-      - name: Test karamel
+      - name: Tar for artifact
+        run: tar -cvf karamel.tar karamel
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: karamel.tar
+          name: karamel
+          retention-days: 1 # revisit
+      
+  krml-test:
+    runs-on: [self-hosted, linux, X64]
+    container: ghcr.io/fstarlang/fstar-ci-base
+    needs: fstar-build krml-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - run: find
+
+      - name: Run tests
         run: |
+          # Will fail due to rust
           eval $(opam env)
           make -C karamel -skj$(nproc) test
