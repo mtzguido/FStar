@@ -14,27 +14,15 @@ FROM ubuntu:23.10
 
 RUN apt-get update
 
-# Install editors, for the rare cases where we spin up a container to
-# see the status. Not a big deal to have them here, only installed
-# nightly and the files are shared by all subcontainers due to
-# overlayfs.
-RUN apt-get -y --no-install-recommends install vim emacs
-
 # Base dependencies: opam
-# CI dependencies: jq (to identify F* branch)
 # python3 (for interactive tests)
 RUN apt-get install -y --no-install-recommends \
-      jq \
-      bc \
-      ca-certificates \
-      curl \
-      wget \
       git \
-      gnupg \
       sudo \
       python3 \
       python-is-python3 \
       opam \
+      rustc \
       && apt-get clean -y
 
 # Create a new user and give them sudo rights
@@ -90,13 +78,4 @@ RUN opam install --confirm-level=unsafe-yes fix fileutils visitors camlp4 wasm u
 RUN mkdir $HOME/bin
 RUN echo 'export PATH=$HOME/bin:$PATH' | tee --append $HOME/.profile $HOME/.bashrc $HOME/.bash_profile
 
-# Install runlim
-RUN git clone --depth 1 https://github.com/mtzguido/runlim
-RUN (cd runlim && ./configure.sh --prefix=$HOME/bin && make && make install)
-RUN rm -rf runlim
-
 WORKDIR $HOME
-
-# Configure the git user for hint refresh
-RUN git config --global user.name "Dzomo, the Everest Yak" && \
-    git config --global user.email "24394600+dzomo@users.noreply.github.com"

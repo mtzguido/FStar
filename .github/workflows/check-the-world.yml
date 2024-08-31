@@ -3,6 +3,10 @@ on:
   push:
   workflow_dispatch:
 
+    # TODO:
+    # Is there a way to set the default container? this is stupid
+    # Move to the regular fstar-ci-base too
+
 defaults:
   run:
     # Setting the default shell to bash. This is not only more standard,
@@ -15,7 +19,7 @@ defaults:
 jobs:
   fstar-build:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
+    container: mtzguido/fstar-ci-testing
     steps:
       - name: Cleanup
         run: find . -delete
@@ -54,7 +58,7 @@ jobs:
 
   fstar-test:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
+    container: mtzguido/fstar-ci-testing
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -72,14 +76,57 @@ jobs:
 
       - run: find
 
-      - name: Run tests
+      - name: Test
         run: |
           eval $(opam env)
           make -C FStar -skj$(nproc) ci-uregressions
 
+  fstar-test-boot:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-ci-testing
+    needs: fstar-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+
+      - run: find
+
+      - name: Bootstrap
+        run: |
+          eval $(opam env)
+          make -C FStar -skj$(nproc) full-bootstrap
+
+      - name: Check
+          echo "git status:"
+          git status
+          FAILED=false
+          if ! git diff --exit-code ocaml/; then
+            echo "::group::DIFF"
+            git diff
+            echo "::endgroup::"
+            FAILED=true
+          fi
+          if git ls-files --others --exclude-standard -- ocaml/ | grep -q; then
+            echo "::group::EXTRA FILES"
+            git diff
+            echo "::endgroup::"
+            FAILED=true
+          else
+          if $FAILED; then false; fi
+
   krml-build:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
+    container: mtzguido/fstar-ci-testing
     needs: fstar-build
     steps:
       - name: Cleanup
@@ -120,7 +167,7 @@ jobs:
       
   krml-test:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
+    container: mtzguido/fstar-ci-testing
     needs:
       - fstar-build
       - krml-build
@@ -149,15 +196,69 @@ jobs:
 
       - run: find
 
-      - name: Run tests
+      - name: Test
         run: |
           # Will fail due to rust
           eval $(opam env)
           make -C karamel -skj$(nproc) test
 
+  steel-build:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-ci-testing
+    needs:
+      - fstar-build
+      - krml-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - run: find
+
+      - name: Clone steel
+        uses: actions/checkout@master
+        with:
+          path: steel/
+          repository: FStarLang/steel
+
+      - run: find
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          make -C steel -skj$(nproc)
+
+      - name: Tar for artifact
+        run: tar -cvf steel.tar --exclude steel/.git steel
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: steel.tar
+          name: steel
+          retention-days: 1 # revisit
+
   pulse-build:
     runs-on: [linux, X64]
-    container: ghcr.io/fstarlang/fstar-ci-base
+    container: mtzguido/fstar-ci-testing
     needs:
       - fstar-build
       - krml-build
@@ -194,7 +295,7 @@ jobs:
 
       - run: find
 
-      - name: Build krml
+      - name: Build
         run: |
           eval $(opam env)
           make -C pulse -skj$(nproc)
@@ -207,4 +308,58 @@ jobs:
         with:
           path: pulse.tar
           name: pulse
+          retention-days: 1 # revisit
+
+  hacl-build:
+    runs-on: [linux, X64]
+    container: mtzguido/fstar-ci-testing
+    needs:
+      - fstar-build
+      - krml-build
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
+      - name: Get FStar
+        uses: actions/download-artifact@master
+        with:
+          name: FStar
+          path: .
+      - name: Untar
+        run: tar xf FStar.tar
+      - name: Get karamel
+        uses: actions/download-artifact@master
+        with:
+          name: karamel
+          path: .
+      - name: Untar
+        run: tar xf karamel.tar
+
+      - run: echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
+      - run: echo "KRML_HOME=$(pwd)/karamel" >> $GITHUB_ENV
+
+      - run: find
+
+      - name: Clone hacl-star
+        uses: actions/checkout@master
+        with:
+          path: hacl-star/
+          repository: hacl-star/hacl-star
+
+      - run: find
+
+      - name: Build
+        run: |
+          eval $(opam env)
+          make -C hacl-star -skj$(nproc)
+
+      - name: Tar for artifact
+        run: tar -cvf hacl-star.tar --exclude hacl-star/.git hacl-star
+
+      - name: Save artifact
+        uses: actions/upload-artifact@master
+        with:
+          path: hacl-star.tar
+          name: hacl-star
           retention-days: 1 # revisit
