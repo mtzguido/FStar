@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Cleanup
         run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+
 
       - uses: actions/checkout@master
         with:
@@ -57,6 +59,7 @@ jobs:
     steps:
       - name: Cleanup
         run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
       - name: Get FStar
         uses: actions/download-artifact@master
@@ -81,6 +84,7 @@ jobs:
     steps:
       - name: Cleanup
         run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
       - name: Get FStar
         uses: actions/download-artifact@master
