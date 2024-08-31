@@ -107,6 +107,7 @@ jobs:
           make -C FStar -skj$(nproc) full-bootstrap
 
       - name: Check
+        run: |
           echo "git status:"
           git status
           FAILED=false
