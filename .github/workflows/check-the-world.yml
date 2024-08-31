@@ -25,7 +25,6 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/builder" >> $GITHUB_ENV
 
-
       - uses: actions/checkout@master
         with:
           path: FStar/
@@ -33,6 +32,7 @@ jobs:
       - name: Prep
         run: |
           # In case we edited fstar.opam, install new deps here
+          eval $(opam env)
           opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
 
       - run: find
@@ -154,6 +154,7 @@ jobs:
 
       - name: Prep
         run: |
+          eval $(opam env)
           opam install --confirm-level=unsafe-yes --deps-only ./karamel/karamel.opam
 
       - name: Build krml

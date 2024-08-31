@@ -35,6 +35,3 @@ RUN opam install --confirm-level=unsafe-yes fix fileutils visitors camlp4 wasm u
 # I really with I could get rid of this crap.
 ENV HOME /home/builder
 RUN opam env --set-switch | tee --append $HOME/.profile $HOME/.bashrc $HOME/.bash_profile
-
-# Move up
-RUN rm ./fstar.opam
