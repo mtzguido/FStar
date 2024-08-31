@@ -155,7 +155,28 @@ jobs:
       - name: Prep
         run: |
           eval $(opam env)
-          opam install --confirm-level=unsafe-yes --deps-only ./karamel/karamel.opam
+          # Fails mysteriously:
+          #
+          # Error:  Package conflict!
+          #   * No agreement on the version of ocaml:
+          #     - (invariant) -> ocaml-base-compiler = 4.14.2 -> ocaml = 4.14.2
+          # No solution found, exiting
+          #     - karamel -> fstar -> ocaml < 4.06.0
+          #     You can temporarily relax the switch invariant with `--update-invariant'
+          #   * No agreement on the version of ocaml-base-compiler:
+          #     - (invariant) -> ocaml-base-compiler = 4.14.2
+          #     - karamel -> fstar -> ocaml < 4.06.0 -> ocaml-base-compiler = 3.07+1
+          #   * Missing dependency:
+          #     - karamel -> fstar -> z3 = 4.8.5 -> conf-python-2-7
+          #     depends on the unavailable system package 'python2.7'. Use `--no-depexts' to attempt installation anyway, or it is possible that a depext package name in the opam file is incorrect.
+          #   * Missing dependency:
+          #     - karamel -> fstar -> ocaml < 4.06.0 -> ocaml-variants >= 3.11.1 -> ocaml-beta
+          #     unmet availability conditions: 'enable-ocaml-beta-repository'
+          #   * Missing dependency:
+          #     - karamel -> fstar -> ocaml < 4.06.0 -> ocaml-variants >= 3.11.1 -> system-msvc
+          #     unmet availability conditions: 'os = "win32"'
+          # 
+          # opam install --confirm-level=unsafe-yes --deps-only ./karamel/karamel.opam
 
       - name: Build krml
         run: |
