@@ -486,6 +486,9 @@ jobs:
         run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
 
+      - name: Get Vale (again)
+        run: ./hacl-star/tools/get_vale.sh
+
       - name: Test
         run: |
           eval $(opam env)
@@ -697,9 +700,6 @@ jobs:
       - name: Untar
         run: tar xzf hacl-star.tar.gz
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
-
-      - name: Get Vale (again)
-        run: ./hacl-star/tools/get_vale.sh
 
       - name: Get merkle-tree
         uses: actions/download-artifact@master
