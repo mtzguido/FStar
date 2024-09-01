@@ -18,7 +18,7 @@ defaults:
 
 jobs:
   fstar-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
       - name: Cleanup
@@ -53,7 +53,7 @@ jobs:
           retention-days: 1 # revisit
 
   fstar-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs: fstar-build
     steps:
@@ -75,7 +75,7 @@ jobs:
           make -C FStar -skj$(nproc) ci-uregressions
 
   fstar-test-boot:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     # needs: fstar-build
     # ^ This does not really depend on the previous job, but this can be
@@ -116,7 +116,7 @@ jobs:
           if $FAILED; then false; fi
 
   krml-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs: fstar-build
     steps:
@@ -186,7 +186,7 @@ jobs:
           retention-days: 1 # revisit
       
   krml-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -218,7 +218,7 @@ jobs:
           make -C karamel -skj$(nproc) test
 
   steel-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -266,7 +266,7 @@ jobs:
           retention-days: 1 # revisit
 
   steel-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -307,7 +307,7 @@ jobs:
           make -C steel -skj$(nproc) test
 
   pulse-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -355,7 +355,7 @@ jobs:
           retention-days: 1 # revisit
 
   pulse-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -396,7 +396,7 @@ jobs:
           make -C pulse -skj$(nproc) test
 
   hacl-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -451,7 +451,7 @@ jobs:
           retention-days: 1 # revisit
 
   hacl-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -495,7 +495,7 @@ jobs:
           make -C hacl-star -skj$(nproc) test
 
   everparse-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -547,7 +547,7 @@ jobs:
           retention-days: 1 # revisit
 
   everparse-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -588,7 +588,7 @@ jobs:
           make -C everparse -skj$(nproc) test
 
   merkle-tree-build:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
@@ -656,7 +656,7 @@ jobs:
           retention-days: 1 # revisit
 
   merkle-tree-test:
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - fstar-build
