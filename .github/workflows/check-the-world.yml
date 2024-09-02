@@ -17,7 +17,7 @@ defaults:
     shell: bash
 
 jobs:
-  fstar-build:
+  build-fstar:
     # runs-on: ubuntu-latest
     runs-on: [linux, X64]
     container: mtzguido/fstar-base-testing
@@ -48,10 +48,10 @@ jobs:
           path: FStar
           extra: --exclude=FStar/.git
 
-  fstar-test:
+  test-fstar:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
-    needs: fstar-build
+    needs: build-fstar
     steps:
       - name: Cleanup
         run: find . -delete
@@ -67,10 +67,10 @@ jobs:
           eval $(opam env)
           make -C FStar -skj$(nproc) ci-uregressions
 
-  fstar-test-boot:
+  test-fstar-boot:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
-    # needs: fstar-build
+    # needs: build-fstar
     # ^ This does not really depend on the previous job, but this can be
     # enabled if we wanted to sequentialize them for whatever reason.
     steps:
@@ -108,10 +108,10 @@ jobs:
           fi
           if $FAILED; then false; fi
 
-  krml-build:
+  build-krml:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
-    needs: fstar-build
+    needs: build-fstar
     steps:
       - name: Cleanup
         run: find . -delete
@@ -171,12 +171,12 @@ jobs:
           path: karamel
           extra: --exclude=karamel/.git
 
-  krml-test:
+  test-krml:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
+      - build-fstar
+      - build-krml
     steps:
       - name: Cleanup
         run: find . -delete
@@ -197,12 +197,12 @@ jobs:
           eval $(opam env)
           make -C karamel -skj$(nproc) test
 
-  steel-build:
+  build-steel:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
+      - build-fstar
+      - build-krml
     steps:
       - name: Cleanup
         run: find . -delete
@@ -235,13 +235,13 @@ jobs:
           path: steel
           extra: --exclude=steel/.git
 
-  steel-test:
+  test-steel:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - steel-build
+      - build-fstar
+      - build-krml
+      - build-steel
     steps:
       - name: Cleanup
         run: find . -delete
@@ -267,12 +267,12 @@ jobs:
           eval $(opam env)
           make -C steel -skj$(nproc) test
 
-  pulse-build:
+  build-pulse:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
+      - build-fstar
+      - build-krml
     steps:
       - name: Cleanup
         run: find . -delete
@@ -305,13 +305,13 @@ jobs:
           path: pulse
           extra: --exclude=pulse/.git
 
-  pulse-test:
+  test-pulse:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - pulse-build
+      - build-fstar
+      - build-krml
+      - build-pulse
     steps:
       - name: Cleanup
         run: find . -delete
@@ -337,12 +337,12 @@ jobs:
           eval $(opam env)
           make -C pulse -skj$(nproc) test
 
-  hacl-build:
+  build-hacl:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
+      - build-fstar
+      - build-krml
     steps:
       - name: Cleanup
         run: find . -delete
@@ -382,13 +382,13 @@ jobs:
           path: hacl-star
           extra: --exclude=hacl-star/.git
 
-  hacl-test:
+  test-hacl:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - hacl-build
+      - build-fstar
+      - build-krml
+      - build-hacl
     steps:
       - name: Cleanup
         run: find . -delete
@@ -417,12 +417,12 @@ jobs:
           eval $(opam env)
           make -C hacl-star -skj$(nproc) test
 
-  everparse-build:
+  build-everparse:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
+      - build-fstar
+      - build-krml
     steps:
       - name: Cleanup
         run: find . -delete
@@ -459,13 +459,13 @@ jobs:
           path: everparse
           extra: --exclude=everparse/.git
 
-  everparse-test:
+  test-everparse:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - everparse-build
+      - build-fstar
+      - build-krml
+      - build-everparse
     steps:
       - name: Cleanup
         run: find . -delete
@@ -491,14 +491,14 @@ jobs:
           eval $(opam env)
           make -C everparse -skj$(nproc) test
 
-  merkle-tree-build:
+  build-merkle-tree:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - hacl-build
-      - everparse-build
+      - build-fstar
+      - build-krml
+      - build-hacl
+      - build-everparse
     steps:
       - name: Cleanup
         run: find . -delete
@@ -543,15 +543,15 @@ jobs:
           path: merkle-tree
           extra: --exclude=merkle-tree/.git
 
-  merkle-tree-test:
+  test-merkle-tree:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
-      - fstar-build
-      - krml-build
-      - hacl-build
-      - everparse-build
-      - merkle-tree-build
+      - build-fstar
+      - build-krml
+      - build-hacl
+      - build-everparse
+      - build-merkle-tree
     steps:
       - name: Cleanup
         run: find . -delete
