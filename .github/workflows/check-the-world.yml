@@ -45,6 +45,7 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: FStar
+          path: FStar
           extra: --exclude=FStar/.git
 
   fstar-test:
