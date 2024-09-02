@@ -24,21 +24,20 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
-      - run: env
-      - run: echo $GITHUB_ENV
-      - run: echo $GITHUB_ENV
-      - run: echo ${{ env.GITHUB_ENV }}
-      - run: cat ${{ env.GITHUB_ENV }}
+      # - run: env
+      # - run: echo $GITHUB_ENV
+      # - run: echo $GITHUB_ENV
+      # - run: echo ${{ env.GITHUB_ENV }}
+      # - run: cat ${{ env.GITHUB_ENV }}
       - run: touch test
       - uses: mtzguido/set-opam-env@master
-        with:
-          output: test
           # ${{ env.GITHUB_ENV }}
       - run: env
-      - run: cat test
-      - run: cat test >>$GITHUB_ENV
-      - run: echo ${{ env.GITHUB_ENV }}
-      - run: cat ${{ env.GITHUB_ENV }}
+      - run: cat .opam.env
+      - run: cat .opam.env >>$GITHUB_ENV
+      # - run: echo ${{ env.GITHUB_ENV }}
+      # - run: cat ${{ env.GITHUB_ENV }}
+      - run: env
 
       - name: Checkout
         uses: actions/checkout@master
