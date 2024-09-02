@@ -25,15 +25,14 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
-      - run: id
-      - run: whomai
-      - run: env
-      - run: opam list
-      - run: opam switch
+      - run: id || true
+      - run: whomai || true
+      - run: env || true
+      - run: opam list || true
+      - run: opam switch || true
       - run: lsb_release -a || true
-      - run: find /
-      - run: fail
-        
+      - run: find / || true
+      - run: false
 
       - name: Checkout
         uses: actions/checkout@master
@@ -79,7 +78,7 @@ jobs:
   test-fstar-boot:
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
-    # needs: build-fstar
+    needs: build-fstar
     # ^ This does not really depend on the previous job, but this can be
     # enabled if we wanted to sequentialize them for whatever reason.
     #   We start from scratch since we need a git repo to check the
