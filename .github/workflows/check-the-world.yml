@@ -62,7 +62,7 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
-      - uses: mtzguido/gci-download
+      - uses: mtzguido/gci-download@master
         with:
           name: FStar
           hometag: FSTAR
