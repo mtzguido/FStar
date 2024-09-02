@@ -25,6 +25,16 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
+      - run: id
+      - run: whomai
+      - run: env
+      - run: opam list
+      - run: opam switch
+      - run: lsb_release -a || true
+      - run: find /
+      - run: fail
+        
+
       - name: Checkout
         uses: actions/checkout@master
         with:
