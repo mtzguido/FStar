@@ -39,6 +39,11 @@ jobs:
       # - run: cat ${{ env.GITHUB_ENV }}
       - run: env
 
+      - name: dune in path
+        run: |
+          echo $PATH
+          which dune
+
       - name: Checkout
         uses: actions/checkout@master
         with:
