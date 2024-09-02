@@ -23,16 +23,7 @@ jobs:
     steps:
       - name: Cleanup
         run: find . -delete
-      # - run: echo "HOME=/home/opam" >> $GITHUB_ENV
-
-      - run: id || true
-      - run: whomai || true
-      - run: env || true
-      - run: opam list || true
-      - run: opam switch || true
-      - run: lsb_release -a || true
-      - run: find / || true
-      - run: false
+      - uses: mtzguido/set-opam-env@master
 
       - name: Checkout
         uses: actions/checkout@master
@@ -47,14 +38,14 @@ jobs:
           # opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
 
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C FStar -skj$(nproc)
+        run: make -C FStar -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
           name: FStar
           extra: --exclude=FStar/ocaml/_build
+
+      - run: false # stop
 
   test-fstar:
     runs-on: ubuntu-latest
