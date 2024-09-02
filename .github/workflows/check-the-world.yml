@@ -45,7 +45,7 @@ jobs:
         with:
           name: FStar
           path: FStar
-          extra: --exclude=FStar/.git
+          extra: --exclude=FStar/.git --exclude=FSTar/ocaml/_build
 
   test-fstar:
     runs-on: ubuntu-latest
@@ -168,7 +168,7 @@ jobs:
         with:
           name: karamel
           path: karamel
-          extra: --exclude=karamel/.git
+          extra: --exclude=karamel/.git --exclude=karamel/_build
 
   test-krml:
     runs-on: ubuntu-latest
