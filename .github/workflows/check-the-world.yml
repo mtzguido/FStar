@@ -18,8 +18,7 @@ defaults:
 
 jobs:
   build-fstar:
-    # runs-on: ubuntu-latest
-    runs-on: [linux, X64]
+    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
       - name: Cleanup
@@ -451,7 +450,7 @@ jobs:
           eval $(opam env)
           NPROC=$(nproc)
           if [ $NPROC -gt 16 ]; then NPROC=16; fi
-          make -C everparse -skj${NPROC} OTHERFLAGS='--admit_smt_queries true'
+          make -C everparse -skj${NPROC}
 
       - uses: mtzguido/gci-upload@master
         with:
