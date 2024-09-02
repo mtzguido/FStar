@@ -61,7 +61,9 @@ jobs:
           env
 
       - name: Build
-        run: make -C FStar -skj$(nproc)
+        run: |
+          eval $(opam env)
+          make -C FStar -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
