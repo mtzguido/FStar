@@ -29,6 +29,7 @@ jobs:
       - run: echo $GITHUB_ENV
       - run: echo ${{ env.GITHUB_ENV }}
       - run: cat ${{ env.GITHUB_ENV }}
+      - run: touch test
       - uses: mtzguido/set-opam-env@master
         with:
           output: test
