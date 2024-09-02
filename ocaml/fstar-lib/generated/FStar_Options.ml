@@ -709,15 +709,7 @@ let (get_profile_component :
   unit -> Prims.string Prims.list FStar_Pervasives_Native.option) =
   fun uu___ -> lookup_opt "profile_component" (as_option (as_list as_string))
 let (universe_include_path_base_dirs : Prims.string Prims.list) =
-  let sub_dirs = ["legacy"; "experimental"; ".cache"] in
-  FStar_Compiler_List.collect
-    (fun d ->
-       let uu___ =
-         FStar_Compiler_List.map
-           (fun s ->
-              let uu___1 = FStar_Compiler_String.op_Hat "/" s in
-              FStar_Compiler_String.op_Hat d uu___1) sub_dirs in
-       d :: uu___) ["/ulib"; "/lib/fstar"]
+  ["/ulib"; "/lib/fstar"]
 let (_version : Prims.string FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref ""
 let (_platform : Prims.string FStar_Compiler_Effect.ref) =
@@ -997,7 +989,7 @@ let (interp_quake_arg : Prims.string -> (Prims.int * Prims.int * Prims.bool))
           let uu___ = ios f1 in let uu___1 = ios f2 in (uu___, uu___1, true)
         else FStar_Compiler_Effect.failwith "unexpected value for --quake"
     | uu___ -> FStar_Compiler_Effect.failwith "unexpected value for --quake"
-let (uu___451 : (((Prims.string -> unit) -> unit) * (Prims.string -> unit)))
+let (uu___448 : (((Prims.string -> unit) -> unit) * (Prims.string -> unit)))
   =
   let cb = FStar_Compiler_Util.mk_ref FStar_Pervasives_Native.None in
   let set1 f =
@@ -1009,11 +1001,11 @@ let (uu___451 : (((Prims.string -> unit) -> unit) * (Prims.string -> unit)))
     | FStar_Pervasives_Native.Some f -> f msg in
   (set1, call)
 let (set_option_warning_callback_aux : (Prims.string -> unit) -> unit) =
-  match uu___451 with
+  match uu___448 with
   | (set_option_warning_callback_aux1, option_warning_callback) ->
       set_option_warning_callback_aux1
 let (option_warning_callback : Prims.string -> unit) =
-  match uu___451 with
+  match uu___448 with
   | (set_option_warning_callback_aux1, option_warning_callback1) ->
       option_warning_callback1
 let (set_option_warning_callback : (Prims.string -> unit) -> unit) =
@@ -3724,7 +3716,7 @@ let (settable_specs :
     (fun uu___ ->
        match uu___ with | ((uu___1, x, uu___2), uu___3) -> settable x)
     all_specs
-let (uu___672 :
+let (uu___669 :
   (((unit -> FStar_Getopt.parse_cmdline_res) -> unit) *
     (unit -> FStar_Getopt.parse_cmdline_res)))
   =
@@ -3741,11 +3733,11 @@ let (uu___672 :
   (set1, call)
 let (set_error_flags_callback_aux :
   (unit -> FStar_Getopt.parse_cmdline_res) -> unit) =
-  match uu___672 with
+  match uu___669 with
   | (set_error_flags_callback_aux1, set_error_flags) ->
       set_error_flags_callback_aux1
 let (set_error_flags : unit -> FStar_Getopt.parse_cmdline_res) =
-  match uu___672 with
+  match uu___669 with
   | (set_error_flags_callback_aux1, set_error_flags1) -> set_error_flags1
 let (set_error_flags_callback :
   (unit -> FStar_Getopt.parse_cmdline_res) -> unit) =
@@ -3842,6 +3834,53 @@ let (module_name_eq : Prims.string -> Prims.string -> Prims.bool) =
 let (should_print_message : Prims.string -> Prims.bool) =
   fun m ->
     let uu___ = should_verify m in if uu___ then m <> "Prims" else false
+let (read_fstar_include :
+  Prims.string -> Prims.string Prims.list FStar_Pervasives_Native.option) =
+  fun fn ->
+    try
+      (fun uu___ ->
+         match () with
+         | () ->
+             let s = FStar_Compiler_Util.file_get_contents fn in
+             let subdirs =
+               FStar_Compiler_List.filter
+                 (fun s1 ->
+                    (s1 <> "") &&
+                      (let uu___1 =
+                         let uu___2 =
+                           FStar_Compiler_String.get s1 Prims.int_zero in
+                         uu___2 = 35 in
+                       Prims.op_Negation uu___1))
+                 (FStar_Compiler_String.split [10] s) in
+             FStar_Pervasives_Native.Some subdirs) ()
+    with
+    | uu___ ->
+        ((let uu___2 = FStar_Compiler_String.op_Hat "Could not read " fn in
+          FStar_Compiler_Effect.failwith uu___2);
+         FStar_Pervasives_Native.None)
+let rec (expand_include_d : Prims.string -> Prims.string Prims.list) =
+  fun dirname ->
+    let dot_inc_path = FStar_Compiler_String.op_Hat dirname "/fstar.include" in
+    if FStar_Compiler_Util.file_exists dot_inc_path
+    then
+      let subdirs =
+        let uu___ = read_fstar_include dot_inc_path in
+        FStar_Pervasives_Native.__proj__Some__item__v uu___ in
+      let uu___ =
+        FStar_Compiler_List.collect
+          (fun subd ->
+             let uu___1 =
+               let uu___2 = FStar_Compiler_String.op_Hat "/" subd in
+               FStar_Compiler_String.op_Hat dirname uu___2 in
+             expand_include_d uu___1) subdirs in
+      dirname :: uu___
+    else [dirname]
+let (expand_include_ds : Prims.string Prims.list -> Prims.string Prims.list)
+  = fun dirnames -> FStar_Compiler_List.collect expand_include_d dirnames
+let (get_expanded_include : unit -> Prims.string Prims.list) =
+  fun uu___ ->
+    let uu___1 = let uu___2 = get_include () in "." :: uu___2 in
+    expand_include_ds uu___1
 let (include_path : unit -> Prims.string Prims.list) =
   fun uu___ ->
     let cache_dir =
@@ -3849,14 +3888,12 @@ let (include_path : unit -> Prims.string Prims.list) =
       match uu___1 with
       | FStar_Pervasives_Native.None -> []
       | FStar_Pervasives_Native.Some c -> [c] in
-    let uu___1 = get_no_default_includes () in
-    if uu___1
-    then
-      let uu___2 = get_include () in
-      FStar_Compiler_List.op_At cache_dir uu___2
-    else
-      (let lib_paths =
-         let uu___3 =
+    let lib_paths =
+      let uu___1 = get_no_default_includes () in
+      if uu___1
+      then []
+      else
+        (let uu___3 =
            FStar_Compiler_Util.expand_environment_variable "FSTAR_LIB" in
          match uu___3 with
          | FStar_Pervasives_Native.None ->
@@ -3864,17 +3901,16 @@ let (include_path : unit -> Prims.string Prims.list) =
                FStar_Compiler_String.op_Hat fstar_bin_directory "/.." in
              let defs = universe_include_path_base_dirs in
              let uu___4 =
-               FStar_Compiler_List.map
-                 (fun x -> FStar_Compiler_String.op_Hat fstar_home x) defs in
-             FStar_Compiler_List.filter FStar_Compiler_Util.file_exists
-               uu___4
-         | FStar_Pervasives_Native.Some s -> [s] in
-       let uu___3 =
-         let uu___4 =
-           let uu___5 = get_include () in
-           FStar_Compiler_List.op_At uu___5 ["."] in
-         FStar_Compiler_List.op_At lib_paths uu___4 in
-       FStar_Compiler_List.op_At cache_dir uu___3)
+               let uu___5 =
+                 FStar_Compiler_List.map
+                   (fun x -> FStar_Compiler_String.op_Hat fstar_home x) defs in
+               FStar_Compiler_List.filter FStar_Compiler_Util.file_exists
+                 uu___5 in
+             expand_include_ds uu___4
+         | FStar_Pervasives_Native.Some s -> [s]) in
+    let include_paths = get_expanded_include () in
+    FStar_Compiler_List.op_At cache_dir
+      (FStar_Compiler_List.op_At lib_paths include_paths)
 let (find_file : Prims.string -> Prims.string FStar_Pervasives_Native.option)
   =
   let file_map = FStar_Compiler_Util.smap_create (Prims.of_int (100)) in
