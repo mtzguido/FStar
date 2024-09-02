@@ -25,6 +25,8 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
       - run: env
+      - run: echo $GITHUB_ENV
+      - run: echo $GITHUB_ENV
       - run: echo ${{ env.GITHUB_ENV }}
       - run: cat ${{ env.GITHUB_ENV }}
       - uses: mtzguido/set-opam-env@master
