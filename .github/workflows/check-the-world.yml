@@ -24,25 +24,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
-      # - run: env
-      # - run: echo $GITHUB_ENV
-      # - run: echo $GITHUB_ENV
-      # - run: echo ${{ env.GITHUB_ENV }}
-      # - run: cat ${{ env.GITHUB_ENV }}
-      - run: touch test
       - uses: mtzguido/set-opam-env@master
-          # ${{ env.GITHUB_ENV }}
-      - run: env
-      - run: cat .opam.env
-      - run: cat .opam.env >>$GITHUB_ENV
-      # - run: echo ${{ env.GITHUB_ENV }}
-      # - run: cat ${{ env.GITHUB_ENV }}
-      - run: env
-
-      - name: dune in path
-        run: |
-          echo $PATH
-          which dune
 
       - name: Checkout
         uses: actions/checkout@master
@@ -53,29 +35,14 @@ jobs:
         run: |
           # In case we edited fstar.opam, install new deps here
           # This will most likely fail to like krml below, what's going on?
-          # eval $(opam env)
           # opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
-
-      - name: env1
-        run: |
-          env
-
-      - name: env2
-        run: |
-          eval $(opam env)
-          env
-
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C FStar -skj$(nproc)
+        run: make -C FStar -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
           name: FStar
           extra: --exclude=FStar/ocaml/_build
-
-      - run: false # stop
 
   test-fstar:
     runs-on: ubuntu-latest
@@ -85,6 +52,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -92,9 +60,7 @@ jobs:
           hometag: FSTAR
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C FStar -skj$(nproc) ci-uregressions
+        run: make -C FStar -skj$(nproc) ci-uregressions
 
   test-fstar-boot:
     runs-on: ubuntu-latest
@@ -110,6 +76,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: actions/checkout@master
         with:
@@ -117,7 +84,6 @@ jobs:
 
       - name: Bootstrap
         run: |
-          eval $(opam env)
           make -C FStar -skj$(nproc) 1
           make -C FStar -skj$(nproc) full-bootstrap ADMIT=1
 
@@ -149,6 +115,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -163,7 +130,6 @@ jobs:
 
       - name: Prep
         run: |
-          eval $(opam env)
           # Fails mysteriously:
           #
           # Error:  Package conflict!
@@ -188,9 +154,7 @@ jobs:
           # opam install --confirm-level=unsafe-yes --deps-only ./karamel/karamel.opam
 
       - name: Build krml
-        run: |
-          eval $(opam env)
-          make -C karamel -skj$(nproc)
+        run: make -C karamel -skj$(nproc)
 
       # krml is a symlink to _build/default/src/Karamel.exe, but we want to exclude _build.
       # So, overwrite the link with the actual file.
@@ -213,6 +177,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -225,9 +190,7 @@ jobs:
           hometag: KRML
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C karamel -skj$(nproc) test
+        run: make -C karamel -skj$(nproc) test
 
   build-steel:
     runs-on: ubuntu-latest
@@ -239,6 +202,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -257,9 +221,7 @@ jobs:
           repository: FStarLang/steel
 
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C steel -skj$(nproc)
+        run: make -C steel -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
@@ -276,6 +238,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -293,9 +256,7 @@ jobs:
           hometag: STEEL
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C steel -skj$(nproc) test
+        run: make -C steel -skj$(nproc) test
 
   build-pulse:
     runs-on: ubuntu-latest
@@ -307,6 +268,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -325,9 +287,7 @@ jobs:
           repository: FStarLang/pulse
 
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C pulse -skj$(nproc)
+        run: make -C pulse -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
@@ -344,6 +304,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -361,9 +322,7 @@ jobs:
           hometag: PULSE
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C pulse -skj$(nproc) test
+        run: make -C pulse -skj$(nproc) test
 
   build-hacl:
     runs-on: ubuntu-latest
@@ -376,6 +335,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -400,7 +360,6 @@ jobs:
 
       - name: Build
         run: |
-          eval $(opam env)
           NPROC=$(nproc)
           if [ $NPROC -gt 16 ]; then NPROC=16; fi
           make -C hacl-star -skj${NPROC}
@@ -420,6 +379,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -440,9 +400,7 @@ jobs:
         run: ./hacl-star/tools/get_vale.sh
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C hacl-star -skj$(nproc) test
+        run: make -C hacl-star -skj$(nproc) test
 
   build-everparse:
     runs-on: ubuntu-latest
@@ -454,6 +412,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -471,11 +430,8 @@ jobs:
           path: everparse/
           repository: project-everest/everparse
 
-      - run: echo "EVERPARSE_HOME=$(pwd)/everparse" >> $GITHUB_ENV
-
       - name: Build
         run: |
-          eval $(opam env)
           NPROC=$(nproc)
           if [ $NPROC -gt 16 ]; then NPROC=16; fi
           make -C everparse -skj${NPROC}
@@ -495,6 +451,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -512,9 +469,7 @@ jobs:
           hometag: EVERPARSE
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C everparse -skj$(nproc) test
+        run: make -C everparse -skj$(nproc) test
 
   build-merkle-tree:
     runs-on: ubuntu-latest
@@ -528,6 +483,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -557,7 +513,6 @@ jobs:
 
       - name: Build
         run: |
-          eval $(opam env)
           NPROC=$(nproc)
           if [ $NPROC -gt 16 ]; then NPROC=16; fi
           make -C merkle-tree -skj${NPROC} dist/libmerkletree.a
@@ -579,6 +534,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -605,9 +561,7 @@ jobs:
           name: merkle-tree
 
       - name: Test
-        run: |
-          eval $(opam env)
-          make -C merkle-tree -skj$(nproc) test
+        run: make -C merkle-tree -skj$(nproc) test
 
   build-mitls-fstar:
     runs-on: ubuntu-latest
@@ -621,6 +575,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -649,9 +604,7 @@ jobs:
           repository: project-everest/mitls-fstar
 
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C mitls-fstar/src/tls -skj$(nproc)
+        run: make -C mitls-fstar/src/tls -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
@@ -670,6 +623,7 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
 
       - uses: mtzguido/gci-download@master
         with:
@@ -697,6 +651,4 @@ jobs:
           hometag: MITLS
 
       - name: Build
-        run: |
-          eval $(opam env)
-          make -C mitls-fstar/src/tls -skj$(nproc) test
+        run: make -C mitls-fstar/src/tls -skj$(nproc) test
