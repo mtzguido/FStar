@@ -13,7 +13,6 @@ defaults:
 
 jobs:
   build-fstar:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
       - name: Cleanup
@@ -40,7 +39,6 @@ jobs:
           extra: --exclude=FStar/ocaml/_build
 
   test-fstar:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs: build-fstar
     steps:
@@ -58,7 +56,6 @@ jobs:
         run: make -C FStar -skj$(nproc) ci-uregressions
 
   test-fstar-boot:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     # needs: build-fstar
     # ^ This does not really depend on the previous job, but this can be
@@ -103,7 +100,6 @@ jobs:
           if $FAILED; then false; fi
 
   build-krml:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs: build-fstar
     steps:
@@ -163,7 +159,6 @@ jobs:
           extra: --exclude=karamel/_build
 
   test-krml:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -188,7 +183,6 @@ jobs:
         run: make -C karamel -skj$(nproc) test
 
   build-steel:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -223,7 +217,6 @@ jobs:
           name: steel
 
   test-steel:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -254,7 +247,6 @@ jobs:
         run: make -C steel -skj$(nproc) test
 
   build-pulse:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -289,7 +281,6 @@ jobs:
           name: pulse
 
   test-pulse:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -320,8 +311,6 @@ jobs:
         run: make -C pulse -skj$(nproc) test
 
   build-hacl:
-    runs-on: ubuntu-latest
-    # runs-on: [linux, X64] # For HACL, we build on a better machine
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -364,7 +353,6 @@ jobs:
           name: hacl-star
 
   test-hacl:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -398,7 +386,6 @@ jobs:
         run: make -C hacl-star -skj$(nproc) test
 
   build-everparse:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -436,7 +423,6 @@ jobs:
           name: everparse
 
   test-everparse:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -467,7 +453,6 @@ jobs:
         run: make -C everparse -skj$(nproc) test
 
   build-merkle-tree:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -517,7 +502,6 @@ jobs:
           name: merkle-tree
 
   test-merkle-tree:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -559,7 +543,6 @@ jobs:
         run: make -C merkle-tree -skj$(nproc) test
 
   build-mitls-fstar:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
@@ -606,7 +589,6 @@ jobs:
           name: mitls-fstar
 
   test-mitls-fstar:
-    runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
