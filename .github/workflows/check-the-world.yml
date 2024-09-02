@@ -25,7 +25,8 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@master
         with:
           path: FStar/
 
@@ -44,8 +45,7 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: FStar
-          path: FStar
-          extra: --exclude=FStar/.git --exclude=FSTar/ocaml/_build
+          extra: --exclude=FStar/ocaml/_build
 
   test-fstar:
     runs-on: ubuntu-latest
@@ -121,7 +121,7 @@ jobs:
           name: FStar
           hometag: FSTAR
 
-      - name: Clone karamel
+      - name: Checkout karamel
         uses: actions/checkout@master
         with:
           path: karamel/
@@ -158,8 +158,8 @@ jobs:
           eval $(opam env)
           make -C karamel -skj$(nproc)
 
-      # krml is a symlink to _build/default/src/Karamel.exe, which we are not including
-      # This will overwrite the link with the actual file.
+      # krml is a symlink to _build/default/src/Karamel.exe, but we want to exclude _build.
+      # So, overwrite the link with the actual file.
       - name: Fix for symlink
         run: |
           cp --remove-destination $(realpath karamel/krml) karamel/krml
@@ -167,8 +167,7 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: karamel
-          path: karamel
-          extra: --exclude=karamel/.git --exclude=karamel/_build
+          extra: --exclude=karamel/_build
 
   test-krml:
     runs-on: ubuntu-latest
@@ -217,7 +216,7 @@ jobs:
           name: karamel
           hometag: KRML
 
-      - name: Clone steel
+      - name: Checkout steel
         uses: actions/checkout@master
         with:
           path: steel/
@@ -231,8 +230,6 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: steel
-          path: steel
-          extra: --exclude=steel/.git
 
   test-steel:
     runs-on: ubuntu-latest
@@ -287,7 +284,7 @@ jobs:
           name: karamel
           hometag: KRML
 
-      - name: Clone pulse
+      - name: Checkout pulse
         uses: actions/checkout@master
         with:
           path: pulse/
@@ -301,8 +298,6 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: pulse
-          path: pulse
-          extra: --exclude=pulse/.git
 
   test-pulse:
     runs-on: ubuntu-latest
@@ -357,7 +352,7 @@ jobs:
           name: karamel
           hometag: KRML
 
-      - name: Clone hacl-star
+      - name: Checkout hacl-star
         uses: actions/checkout@master
         with:
           path: hacl-star/
@@ -378,8 +373,6 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: hacl-star
-          path: hacl-star
-          extra: --exclude=hacl-star/.git
 
   test-hacl:
     runs-on: ubuntu-latest
@@ -437,7 +430,7 @@ jobs:
           name: karamel
           hometag: KRML
 
-      - name: Clone everparse
+      - name: Checkout everparse
         uses: actions/checkout@master
         with:
           path: everparse/
@@ -455,8 +448,6 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: everparse
-          path: everparse
-          extra: --exclude=everparse/.git
 
   test-everparse:
     runs-on: ubuntu-latest
@@ -523,7 +514,7 @@ jobs:
           name: hacl-star
           hometag: HACL
 
-      - name: Clone merkle-tree
+      - name: Checkout merkle-tree
         uses: actions/checkout@master
         with:
           path: merkle-tree/
@@ -539,8 +530,6 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: merkle-tree
-          path: merkle-tree
-          extra: --exclude=merkle-tree/.git
 
   test-merkle-tree:
     runs-on: ubuntu-latest
