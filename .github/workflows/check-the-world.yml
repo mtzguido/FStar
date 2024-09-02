@@ -45,8 +45,8 @@ jobs:
       - uses: mtzguido/gci-upload@master
         with:
           name: FStar
-          exclude:
-            - .git
+          exclude: |
+            .git
 
   fstar-test:
     runs-on: ubuntu-latest
