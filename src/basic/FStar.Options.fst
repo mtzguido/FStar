@@ -504,11 +504,7 @@ let get_profile_component       ()      = lookup_opt "profile_component"        
 // Note: the "ulib/fstar" is for the case where package is installed in the
 // standard "unix" way (e.g. opam) and the lib directory is $PREFIX/lib/fstar
 let universe_include_path_base_dirs =
-  let sub_dirs = ["legacy"; "experimental"; ".cache"] in
   ["/ulib"; "/lib/fstar"]
-  |> List.collect (fun d -> d :: (sub_dirs |> List.map (fun s -> d ^ "/" ^ s)))
-
-
 
 // See comment in the interface file
 let _version = Util.mk_ref ""
