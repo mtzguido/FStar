@@ -40,18 +40,13 @@ jobs:
       - name: Build
         run: |
           eval $(opam env)
-          make -C FStar -skj$(nproc) ADMIT=1
+          # make -C FStar -skj$(nproc) ADMIT=1
 
-      # TODO: put lib/ in another artifact? Most clients should not need it.
-      - name: Tar for artifact
-        run: tar -czf FStar.tar.gz --exclude=FStar/.git --exclude=FStar/ocaml/_build FStar
-
-      - name: Save artifact
-        uses: actions/upload-artifact@master
+      - uses: mtzguido/gci-upload@master
         with:
-          path: FStar.tar.gz
           name: FStar
-          retention-days: 1 # revisit
+          exclude:
+            - .git
 
   fstar-test:
     runs-on: ubuntu-latest
