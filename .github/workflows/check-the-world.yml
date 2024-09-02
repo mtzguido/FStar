@@ -332,7 +332,8 @@ jobs:
           make -C pulse -skj$(nproc) test
 
   build-hacl:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: [linux, X64] # For HACL, we build on a better machine
     container: mtzguido/fstar-base-testing
     needs:
       - build-fstar
