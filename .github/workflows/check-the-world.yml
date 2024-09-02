@@ -24,7 +24,9 @@ jobs:
       - name: Cleanup
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - run: env
       - uses: mtzguido/set-opam-env@master
+      - run: env
 
       - name: Checkout
         uses: actions/checkout@master
