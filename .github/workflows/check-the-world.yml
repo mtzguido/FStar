@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Cleanup
         run: find . -delete
-      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      # - run: echo "HOME=/home/opam" >> $GITHUB_ENV
 
       - run: id || true
       - run: whomai || true
