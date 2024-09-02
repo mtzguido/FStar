@@ -25,10 +25,14 @@ jobs:
         run: find . -delete
       - run: echo "HOME=/home/opam" >> $GITHUB_ENV
       - run: env
+      - run: echo ${{ env.GITHUB_ENV }}
+      - run: cat ${{ env.GITHUB_ENV }}
       - uses: mtzguido/set-opam-env@master
         with:
           output: ${{ env.GITHUB_ENV }}
       - run: env
+      - run: echo ${{ env.GITHUB_ENV }}
+      - run: cat ${{ env.GITHUB_ENV }}
 
       - name: Checkout
         uses: actions/checkout@master
