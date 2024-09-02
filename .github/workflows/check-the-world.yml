@@ -361,8 +361,7 @@ jobs:
         uses: actions/checkout@master
         with:
           path: hacl-star/
-          repository: mtzguido/hacl-star
-          ref: fix
+          repository: hacl-star/hacl-star
 
       - run: echo "HACL_HOME=$(pwd)/hacl-star" >> $GITHUB_ENV
 
