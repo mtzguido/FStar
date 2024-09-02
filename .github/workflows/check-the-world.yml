@@ -51,6 +51,15 @@ jobs:
           # eval $(opam env)
           # opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
 
+      - name: env1
+        run: |
+          env
+
+      - name: env2
+        run: |
+          eval $(opam env)
+          env
+
       - name: Build
         run: make -C FStar -skj$(nproc)
 
