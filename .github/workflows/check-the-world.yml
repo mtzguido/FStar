@@ -72,6 +72,10 @@ jobs:
     # needs: build-fstar
     # ^ This does not really depend on the previous job, but this can be
     # enabled if we wanted to sequentialize them for whatever reason.
+    #   We start from scratch since we need a git repo to check the
+    # diff, and that is not contained in the artifact. We could just
+    # take the ulib checked files from the artifact, if we really wanted
+    # to, but checking ulib with ADMIT is quite fast anyway.
     steps:
       - name: Cleanup
         run: find . -delete
