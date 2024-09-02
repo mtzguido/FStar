@@ -27,7 +27,7 @@ jobs:
       - run: env
       - uses: mtzguido/set-opam-env@master
         with:
-          output: $GITHUB_ENV
+          output: ${{ env.GITHUB_ENV }}
       - run: env
 
       - name: Checkout
