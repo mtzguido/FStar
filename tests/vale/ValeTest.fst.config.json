@@ -4,8 +4,5 @@
     "--cache_dir", ".cache"
   ],
   "include_dirs": [
-    "../../ulib/",
-    "../../ulib/experimental",
-    "../../ulib/legacy"
   ]
 }
