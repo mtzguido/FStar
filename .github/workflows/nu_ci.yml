@@ -39,4 +39,4 @@ jobs:
         run: make -Otarget -C FStar -skj$(nproc) ci
 
       - name: Check for snapshot diff
-        run: ./.scripts/check-snapshot-diff.sh
+        run: cd FStar && ./.scripts/check-snapshot-diff.sh
