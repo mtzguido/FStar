@@ -1,7 +1,10 @@
 name: F* CI
 on:
+  push:
+    branches-ignore:
+      - _**
   pull_request:
-  workflow_call:
+  workflow_dispatch:
 
 defaults:
   run:
@@ -33,7 +36,7 @@ jobs:
           echo FSTAR_CI_TEST_KARAMEL=1  >>$GITHUB_ENV
 
       - name: Build
-        run: make -C FStar -skj$(nproc) ci
+        run: make -Otarget -C FStar -skj$(nproc) ci
 
       - name: Check for snapshot diff
         run: ./.scripts/check-snapshot-diff.sh
