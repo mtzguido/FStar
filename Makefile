@@ -216,8 +216,12 @@ ci-karamel-test: ci-krmllib
 # krmllib needs FStar.ModifiesGen already checked, so we add the dependency on
 # ulib-extra here. This is possibly spurious and fixable by tweaking krml's makefiles.
 .PHONY: ci-krmllib
-ci-krmllib: ci-ulib-extra
+ci-krmllib: ci-ulib-extra ci-build-karamel
 	+$(Q)OTHERFLAGS="${OTHERFLAGS} --admit_smt_queries true" $(MAKE) -C $(KRML_HOME)/krmllib
+
+.PHONY: ci-build-karamel
+ci-build-karamel:
+	+$(Q)$(MAKE) -C $(KRML_HOME) minimal
 
 # Shortcuts:
 

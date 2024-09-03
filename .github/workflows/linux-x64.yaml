@@ -1,9 +1,9 @@
 name: Build and test FStar
 on:
-  push:
-    branches-ignore:
-    - _**
-  pull_request:
+  # push:
+  #   branches-ignore:
+  #   - _**
+  # pull_request:
   workflow_dispatch:
     inputs:
       ci_refresh_hints:
