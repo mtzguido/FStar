@@ -17,6 +17,8 @@ module FStar.Math.Lemmas
 
 open FStar.Mul
 
+let _ = assert False
+
 (* Lemma: definition of Euclidean division *)
 val euclidean_div_axiom: a:int -> b:pos -> Lemma
   (a - b * (a / b) >= 0 /\ a - b * (a / b) < b)
