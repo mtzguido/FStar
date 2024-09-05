@@ -1,8 +1,19 @@
-name: Build F* and test related projects
+name: test
 on:
   # push:
   workflow_dispatch:
+    inputs:
+      fstar_ref:
+        type: string
+        default:
+      env:
+        type: environment
+
   workflow_call:
+    inputs:
+      fstar_ref:
+        type: string
+        default:
 
 # TODO:
 # Is there a way to set the default container?
@@ -26,16 +37,6 @@ jobs:
         uses: actions/checkout@master
         with:
           path: FStar/
+          ref: ${{ inputs.fstar_ref }}
 
-      - name: Prep
-        run: |
-          # In case we edited fstar.opam, install new deps here
-          # This will most likely fail to like krml below, what's going on?
-          # opam install --confirm-level=unsafe-yes --deps-only ./FStar/fstar.opam
-      - name: Build
-        run: make -C FStar -skj$(nproc)
-
-      - uses: mtzguido/gci-upload@master
-        with:
-          name: FStar
-          extra: --exclude=FStar/ocaml/_build
+      - run: cat FStar/ulib/FStar.Math.Lemmas.fsti | head -n 30

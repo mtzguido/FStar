@@ -31,6 +31,8 @@ jobs:
     needs: comment_start
     name: Check world workflow
     uses: ./.github/workflows/check-the-world.yml
+    with:
+      fstar_ref: pull/${{github.event.issue.number}}/head
 
   comment_done:
     name: Run PR comment hook
