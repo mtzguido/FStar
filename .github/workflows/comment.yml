@@ -13,7 +13,7 @@ jobs:
       )
       && contains(github.event.comment.body, '/check-world')
 
-    runs-on: []
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -36,7 +36,7 @@ jobs:
     name: Run PR comment hook
     needs: call-check-world
 
-    runs-on: []
+    runs-on: ubuntu-latest
 
     defaults:
       run:
