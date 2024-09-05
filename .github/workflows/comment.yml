@@ -1,0 +1,60 @@
+name: Comment hook for PRs
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  comment_start:
+    name: Run PR comment hook
+    if: |
+      github.event.issue.pull_request
+      && ( github.event.comment.user.login == 'mtzguido'
+        || github.event.comment.user.login == 'nikswamy' 
+      )
+      && contains(github.event.comment.body, '/check-world')
+
+    runs-on: []
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Startup reaction
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          reactions: |
+            rocket
+
+  call-check-world:
+    needs: comment_start
+    name: Check world workflow
+    uses: ./.github/workflows/check-the-world.yml
+
+  comment_done:
+    name: Run PR comment hook
+    needs: call-check-world
+
+    runs-on: []
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Comment
+        if: ${{ failure() }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Something failed when running the workflow, please check the logs.
+
+      - name: Failure comment
+        if: ${{ success() }}
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Seems like we're good
