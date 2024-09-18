@@ -49,7 +49,7 @@ let rng_included r1 r2 =
     r2.end_pos >=? r1.end_pos
 
 let string_of_pos pos =
-    format2 "%s,%s" (string_of_int pos.line) (string_of_int pos.col)
+    format2 "%s.%s" (string_of_int <| pos.line) (string_of_int <| 1 + pos.col)
 let string_of_file_name f =
     if Options.ide () then
       if Options.Ext.get "fstar:no_absolute_paths" = "1" then
@@ -68,7 +68,7 @@ let file_of_range r       =
     string_of_file_name f
 let set_file_of_range r (f:string) = {r with def_range = {r.def_range with file_name = f}}
 let string_of_rng r =
-    format3 "%s(%s-%s)" (string_of_file_name r.file_name) (string_of_pos r.start_pos) (string_of_pos r.end_pos)
+    format3 "%s:%s-%s" (string_of_file_name r.file_name) (string_of_pos r.start_pos) (string_of_pos r.end_pos)
 let string_of_def_range r = string_of_rng r.def_range
 let string_of_use_range r = string_of_rng r.use_range
 let string_of_range r     = string_of_def_range r
