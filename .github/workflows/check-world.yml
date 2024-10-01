@@ -689,3 +689,56 @@ jobs:
 
       - name: Build
         run: make -C mitls-fstar/src/tls -skj$(nproc) test
+
+
+  ### Nix jobs, for some Inria projects
+  #
+  # NOTE: these jobs are not containerized
+  # 1- it should not be needed since Nix takes care of isolating the environment
+  # 2- it would actually fail to setup Nix due to permissions in the container, and I haven't
+  #    found a clear reference on what the permissions/uids should be.
+
+  comparse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - uses: actions/checkout@master
+        with:
+          repository: TWal/comparse
+
+      - name: Update fstar flake and check
+        run: |
+          nix flake update --override-input fstar-flake "github:${{github.repository}}?rev=${{github.sha}}"
+          nix flake check
+
+  dy-star:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - uses: actions/checkout@master
+        with:
+          repository: REPROSEC/dolev-yao-star-extrinsic
+
+      - name: Update fstar flake and check
+        run: |
+          nix flake update --override-input fstar-flake "github:${{github.repository}}?rev=${{github.sha}}"
+          nix flake check
+
+  mls-star:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - uses: actions/checkout@master
+        with:
+          repository: Inria-Prosecco/mls-star
+
+      - name: Update fstar flake and check
+        run: |
+          nix flake update --override-input fstar-flake "github:${{github.repository}}?rev=${{github.sha}}"
+          nix flake check
