@@ -46,6 +46,7 @@ val proofstate_of_all_implicits: Range.range -> env -> implicits -> proofstate &
 (* Metaprogramming primitives (not all of them).
  * Documented in `ulib/FStar.Tactics.Builtins.fst` *)
 
+val fixup_range (r : Range.range) : tac (Range.range)
 val compress               : term -> tac term
 val top_env                : unit -> tac env
 val fresh                  : unit -> tac Z.t

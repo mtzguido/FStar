@@ -73,6 +73,9 @@ open FStar.Class.Monad
 open FStar.Class.PP
 open FStar.Class.Setlike
 
+let fixup_range (r : FStar.Compiler.Range.range) : tac (FStar.Compiler.Range.range) =
+  return (Errors.maybe_bound_range r)
+
 let compress (t:term) : tac term =
   return ();!
   return (SS.compress t)
