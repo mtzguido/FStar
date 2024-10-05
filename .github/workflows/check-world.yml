@@ -697,8 +697,22 @@ jobs:
   # 1- it should not be needed since Nix takes care of isolating the environment
   # 2- it would actually fail to setup Nix due to permissions in the container, and I haven't
   #    found a clear reference on what the permissions/uids should be.
+  #
+  # The fstar-nix job is here to
+  # 1- Test the nix build in this workflow too
+  # 2- Reuse the built F* in the following projects, via the magic-nix-cache (note the 'needs')
+
+  fstar-nix:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DeterminateSystems/nix-installer-action@main
+    - uses: DeterminateSystems/magic-nix-cache-action@main
+    - name: Build
+      run: nix build -L
 
   comparse:
+    needs: fstar-nix
     runs-on: ubuntu-latest
     steps:
       - uses: DeterminateSystems/nix-installer-action@main
@@ -714,6 +728,7 @@ jobs:
           nix flake check
 
   dy-star:
+    needs: fstar-nix
     runs-on: ubuntu-latest
     steps:
       - uses: DeterminateSystems/nix-installer-action@main
@@ -729,6 +744,7 @@ jobs:
           nix flake check
 
   mls-star:
+    needs: fstar-nix
     runs-on: ubuntu-latest
     steps:
       - uses: DeterminateSystems/nix-installer-action@main
