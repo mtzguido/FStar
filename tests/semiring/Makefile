@@ -10,7 +10,7 @@ OCAMLOPT=OCAMLPATH="$(FSTAR_HOME)/lib" ocamlfind opt
 .PHONY: %.native %.interpreted
 .PRECIOUS: %.fst.checked %.ml %.cmxs
 
-all: CanonCommSemiring.interpreted CanonCommSemiring.native
+all: CanonCommSemiring.native
 
 %.fst.checked: %.fst
 	$(FSTAR) --cache_checked_modules $*.fst
@@ -22,12 +22,7 @@ all: CanonCommSemiring.interpreted CanonCommSemiring.native
 %.cmxs: %.ml $(FSTAR_HOME)/bin/fstar.exe
 	$(OCAMLOPT) -shared -package fstar.lib -o $@ $*.ml
 
-# REMARK: --load will compile $*.ml if $*.cmxs does not exist, but we compile it before
 %.native: %.cmxs %.fst %.Test.fst
-	$(FSTAR) --load $* $*.Test.fst
-	@touch $@
-
-%.interpreted: %.fst.checked %.Test.fst
 	$(FSTAR) $*.Test.fst
 	@touch $@
 

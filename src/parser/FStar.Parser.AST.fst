@@ -758,6 +758,7 @@ let string_of_pragma = function
   | PopOptions -> "pop-options"
   | RestartSolver -> "restart-solver"
   | PrintEffectsGraph -> "print-effects-graph"
+  | Load s -> "load " ^ show s
 
 let restriction_to_string: FStar.Syntax.Syntax.restriction -> string =
   let open FStar.Syntax.Syntax in

@@ -57,6 +57,7 @@ type pragma =
   | PopOptions
   | RestartSolver
   | PrintEffectsGraph  //#print-effects-graph dumps the current effects graph in a dot file named "effects.graph"
+  | Load of string
 
 instance val showable_pragma : showable pragma
 

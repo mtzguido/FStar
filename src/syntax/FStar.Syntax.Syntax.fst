@@ -48,6 +48,7 @@ let pragma_to_string (p:pragma) : string =
   | RestartSolver         -> "#restart-solver"
   | PrintEffectsGraph     -> "#print-effects-graph"
   | PopOptions            -> "#pop-options"
+  | Load s                -> format1 "#load \"%s\"" s
 
 instance showable_pragma = {
   show = pragma_to_string;

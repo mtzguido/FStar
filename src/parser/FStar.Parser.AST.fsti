@@ -230,6 +230,7 @@ type pragma =
   | PopOptions
   | RestartSolver
   | PrintEffectsGraph
+  | Load of string
 
 type dep_scan_callbacks = {
    scan_term: term -> unit;

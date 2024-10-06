@@ -967,6 +967,27 @@ let add_sigelt_to_env (env:Env.env) (se:sigelt) (from_cache:bool) : Env.env =
       BU.write_file "effects.graph" (Env.print_effects_graph env);
       env
 
+    | Sig_pragma (Load s) ->
+      let autoload_plugin (ext:string) : bool =
+        if Debug.any () then
+          print1 "Trying to find a plugin for extension %s\n" ext;
+        match Options.find_file (ext ^ ".cmxs") with
+        | Some fn ->
+          if Debug.any () then
+            print1 "Autoloading plugin %s ...\n" fn;
+          FStar.Tactics.Load.load_tactics [fn];
+          true
+        | None ->
+          false
+      in
+      if autoload_plugin s then
+        env
+      else
+        let open FStar.Pprint in
+        raise_error se Fatal_ModuleFileNotFound [
+          text "Could not find a plugin named" ^/^ dquotes (doc_of_string s);
+        ]
+
     | Sig_new_effect ne ->
       let env = Env.push_new_effect env (ne, se.sigquals) in
       ne.actions |> List.fold_left (fun env a -> Env.push_sigelt env (U.action_as_lb ne.mname a a.action_defn.pos)) env

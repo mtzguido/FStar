@@ -7,6 +7,8 @@ open FStar.Mul
 
 #set-options "--max_fuel 0 --max_ifuel 0 --z3rlimit 10 --tactics_info"
 
+#load "CanonCommSemiring"
+
 ///
 ///  Ring of integers
 ///

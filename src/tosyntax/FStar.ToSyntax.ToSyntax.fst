@@ -180,6 +180,7 @@ let trans_pragma = function
   | AST.PopOptions -> S.PopOptions
   | AST.RestartSolver -> S.RestartSolver
   | AST.PrintEffectsGraph -> S.PrintEffectsGraph
+  | AST.Load s -> S.Load s
 
 let as_imp = function
     | Hash -> S.as_aqual_implicit true

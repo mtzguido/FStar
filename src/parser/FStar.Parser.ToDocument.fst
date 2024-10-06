@@ -830,6 +830,7 @@ and p_pragma = function
   | PopOptions -> str "#pop-options"
   | RestartSolver -> str "#restart-solver"
   | PrintEffectsGraph -> str "#print-effects-graph"
+  | Load s -> str "#load" ^^ space ^^ dquotes (str s)
 
 (* TODO : needs to take the F# specific type instantiation *)
 and p_typars (bs: list binder): document = p_binders true bs
