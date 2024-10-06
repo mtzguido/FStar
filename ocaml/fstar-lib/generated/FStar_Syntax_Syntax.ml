@@ -16,7 +16,8 @@ type pragma =
   | PushOptions of Prims.string FStar_Pervasives_Native.option 
   | PopOptions 
   | RestartSolver 
-  | PrintEffectsGraph [@@deriving yojson,show]
+  | PrintEffectsGraph 
+  | Load of Prims.string [@@deriving yojson,show]
 let (uu___is_ShowOptions : pragma -> Prims.bool) =
   fun projectee ->
     match projectee with | ShowOptions -> true | uu___ -> false
@@ -45,6 +46,10 @@ let (uu___is_RestartSolver : pragma -> Prims.bool) =
 let (uu___is_PrintEffectsGraph : pragma -> Prims.bool) =
   fun projectee ->
     match projectee with | PrintEffectsGraph -> true | uu___ -> false
+let (uu___is_Load : pragma -> Prims.bool) =
+  fun projectee -> match projectee with | Load _0 -> true | uu___ -> false
+let (__proj__Load__item___0 : pragma -> Prims.string) =
+  fun projectee -> match projectee with | Load _0 -> _0
 let (pragma_to_string : pragma -> Prims.string) =
   fun p ->
     match p with
@@ -59,6 +64,7 @@ let (pragma_to_string : pragma -> Prims.string) =
     | RestartSolver -> "#restart-solver"
     | PrintEffectsGraph -> "#print-effects-graph"
     | PopOptions -> "#pop-options"
+    | Load s -> FStar_Compiler_Util.format1 "#load \"%s\"" s
 let (showable_pragma : pragma FStar_Class_Show.showable) =
   { FStar_Class_Show.show = pragma_to_string }
 type 'a memo =

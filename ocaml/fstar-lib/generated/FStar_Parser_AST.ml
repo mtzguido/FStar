@@ -823,6 +823,7 @@ type pragma =
   | PopOptions 
   | RestartSolver 
   | PrintEffectsGraph 
+  | Load of Prims.string 
 let (uu___is_ShowOptions : pragma -> Prims.bool) =
   fun projectee ->
     match projectee with | ShowOptions -> true | uu___ -> false
@@ -851,6 +852,10 @@ let (uu___is_RestartSolver : pragma -> Prims.bool) =
 let (uu___is_PrintEffectsGraph : pragma -> Prims.bool) =
   fun projectee ->
     match projectee with | PrintEffectsGraph -> true | uu___ -> false
+let (uu___is_Load : pragma -> Prims.bool) =
+  fun projectee -> match projectee with | Load _0 -> true | uu___ -> false
+let (__proj__Load__item___0 : pragma -> Prims.string) =
+  fun projectee -> match projectee with | Load _0 -> _0
 type dep_scan_callbacks =
   {
   scan_term: term -> unit ;
@@ -2530,6 +2535,12 @@ let (string_of_pragma : pragma -> Prims.string) =
     | PopOptions -> "pop-options"
     | RestartSolver -> "restart-solver"
     | PrintEffectsGraph -> "print-effects-graph"
+    | Load s ->
+        let uu___1 =
+          FStar_Class_Show.show
+            (FStar_Class_Show.printableshow
+               FStar_Class_Printable.printable_string) s in
+        Prims.strcat "load " uu___1
 let (restriction_to_string : FStar_Syntax_Syntax.restriction -> Prims.string)
   =
   fun uu___ ->

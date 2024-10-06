@@ -5069,6 +5069,47 @@ let (add_sigelt_to_env :
                       FStar_TypeChecker_Env.print_effects_graph env1 in
                     FStar_Compiler_Util.write_file "effects.graph" uu___3);
                    env1)
+              | FStar_Syntax_Syntax.Sig_pragma (FStar_Syntax_Syntax.Load s)
+                  ->
+                  let autoload_plugin ext =
+                    (let uu___3 = FStar_Compiler_Debug.any () in
+                     if uu___3
+                     then
+                       FStar_Compiler_Util.print1
+                         "Trying to find a plugin for extension %s\n" ext
+                     else ());
+                    (let uu___3 =
+                       FStar_Options.find_file (Prims.strcat ext ".cmxs") in
+                     match uu___3 with
+                     | FStar_Pervasives_Native.Some fn ->
+                         ((let uu___5 = FStar_Compiler_Debug.any () in
+                           if uu___5
+                           then
+                             FStar_Compiler_Util.print1
+                               "Autoloading plugin %s ...\n" fn
+                           else ());
+                          FStar_Tactics_Load.load_tactics [fn];
+                          true)
+                     | FStar_Pervasives_Native.None -> false) in
+                  let uu___2 = autoload_plugin s in
+                  if uu___2
+                  then env1
+                  else
+                    (let uu___4 =
+                       let uu___5 =
+                         let uu___6 =
+                           FStar_Errors_Msg.text
+                             "Could not find a plugin named" in
+                         let uu___7 =
+                           let uu___8 = FStar_Pprint.doc_of_string s in
+                           FStar_Pprint.dquotes uu___8 in
+                         FStar_Pprint.op_Hat_Slash_Hat uu___6 uu___7 in
+                       [uu___5] in
+                     FStar_Errors.raise_error
+                       FStar_Syntax_Syntax.has_range_sigelt se
+                       FStar_Errors_Codes.Fatal_ModuleFileNotFound ()
+                       (Obj.magic FStar_Errors_Msg.is_error_message_list_doc)
+                       (Obj.magic uu___4))
               | FStar_Syntax_Syntax.Sig_new_effect ne ->
                   let env2 =
                     FStar_TypeChecker_Env.push_new_effect env1

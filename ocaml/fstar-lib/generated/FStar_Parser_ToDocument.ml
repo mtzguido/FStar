@@ -1437,6 +1437,12 @@ and (p_pragma : FStar_Parser_AST.pragma -> FStar_Pprint.document) =
     | FStar_Parser_AST.PopOptions -> str "#pop-options"
     | FStar_Parser_AST.RestartSolver -> str "#restart-solver"
     | FStar_Parser_AST.PrintEffectsGraph -> str "#print-effects-graph"
+    | FStar_Parser_AST.Load s ->
+        let uu___1 = str "#load" in
+        let uu___2 =
+          let uu___3 = let uu___4 = str s in FStar_Pprint.dquotes uu___4 in
+          FStar_Pprint.op_Hat_Hat FStar_Pprint.space uu___3 in
+        FStar_Pprint.op_Hat_Hat uu___1 uu___2
 and (p_typars : FStar_Parser_AST.binder Prims.list -> FStar_Pprint.document)
   = fun bs -> p_binders true bs
 and (p_typeDeclWithKw :

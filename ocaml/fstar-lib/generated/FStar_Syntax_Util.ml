@@ -3669,7 +3669,8 @@ let (process_pragma :
                (Obj.magic FStar_Errors_Msg.is_error_message_string)
                (Obj.magic "Cannot #pop-options, stack would become empty")
            else ()
-       | FStar_Syntax_Syntax.PrintEffectsGraph -> ())
+       | FStar_Syntax_Syntax.PrintEffectsGraph -> ()
+       | FStar_Syntax_Syntax.Load uu___1 -> ())
 let rec (unbound_variables :
   FStar_Syntax_Syntax.term' FStar_Syntax_Syntax.syntax ->
     FStar_Syntax_Syntax.bv Prims.list)
