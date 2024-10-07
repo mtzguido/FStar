@@ -85,7 +85,16 @@ let (register_extension_extractor :
       FStar_Compiler_Util.smap_add extension_extractor_table ext callback
 let (lookup_extension_extractor :
   Prims.string -> extension_extractor FStar_Pervasives_Native.option) =
-  fun ext -> FStar_Compiler_Util.smap_try_find extension_extractor_table ext
+  fun ext ->
+    let uu___ =
+      FStar_Compiler_Util.smap_try_find extension_extractor_table ext in
+    match uu___ with
+    | FStar_Pervasives_Native.None ->
+        let uu___1 = FStar_Compiler_Plugins.autoload_plugin ext in
+        if uu___1
+        then FStar_Compiler_Util.smap_try_find extension_extractor_table ext
+        else FStar_Pervasives_Native.None
+    | r -> r
 type env_t = FStar_Extraction_ML_UEnv.uenv
 let (fail_exp :
   FStar_Ident.lident ->
