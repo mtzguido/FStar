@@ -601,6 +601,12 @@ let (showable_ctx_uvar_meta :
              let uu___1 = FStar_Class_Show.show showable_term r in
              Prims.strcat "Ctx_uvar_meta_tac " uu___1)
   }
+let (showable_bqual :
+  FStar_Syntax_Syntax.binder_qualifier FStar_Class_Show.showable) =
+  {
+    FStar_Class_Show.show =
+      (fun b -> bqual_to_string (FStar_Pervasives_Native.Some b))
+  }
 let (showable_aqual : FStar_Syntax_Syntax.aqual FStar_Class_Show.showable) =
   { FStar_Class_Show.show = aqual_to_string }
 let (tscheme_to_string : FStar_Syntax_Syntax.tscheme -> Prims.string) =
