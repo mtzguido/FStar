@@ -1,5 +1,5 @@
 {
-  "fstar_exe": "./bin/fstar.exe",
+  "fstar_exe": "./stage2/full/bin/fstar.exe",
   "options": [
     "--cache_dir", ".cache",
     "--ext", "context_pruning"
