@@ -27,7 +27,7 @@ printed/%.fst: %.fst | printed
 inplace/%.fst: %.fst | inplace
 	$(call msg, "PPRINT", $(basename $(notdir $@)))
 	$(Q)cp $< $@
-	$(Q)$(FSTAR)--print_in_place $@
+	$(Q)$(FSTAR) --print_in_place $@
 
 
 # Note how these two rules make an empty touch file for 
