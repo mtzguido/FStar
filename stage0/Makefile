@@ -1,5 +1,8 @@
 include $(FSTAR_HOME)/.common.mk
 
+FSTAR_DUNE_BUILD_OPTIONS += --no-print-directory
+FSTAR_DUNE_BUILD_OPTIONS += --display=quiet
+
 .DEFAULT_GOAL := fstar
 
 .PHONY: fstar
