@@ -16,7 +16,6 @@
 module TestMApply
 
 open FStar.Tactics.V2
-open FStar.Tactics.MApply (* testing the full version *)
 
 assume val p : Type0
 assume val q : Type0
