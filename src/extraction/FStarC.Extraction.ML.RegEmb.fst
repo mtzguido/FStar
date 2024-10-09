@@ -828,9 +828,11 @@ let maybe_register_plugin (g:uenv) (se:sigelt) : list mlmodule1 =
       | _ -> Some None
     )
   in
-  if Options.codegen() <> Some Options.Plugin then
+  if not <| List.mem (Options.codegen()) [Some Options.Plugin; Some Options.PluginNoLib]
+  then
     []
-  else match plugin_with_arity se.sigattrs with
+  else
+    match plugin_with_arity se.sigattrs with
     | None -> []
     (* ignore projectors and discriminators, they get a @@plugin attribute inherited
     from the type, but we should not do anything for them. *)

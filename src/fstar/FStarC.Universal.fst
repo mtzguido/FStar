@@ -299,17 +299,19 @@ let load_interface_decls env interface_file_name : TcEnv.env_t =
 (* Extraction to OCaml, F# or Krml *)
 let emit dep_graph (mllibs:list (uenv & MLSyntax.mllib)) =
   let opt = Options.codegen () in
+  let fail #a () : a = failwith ("Unrecognized extraction backend: " ^ show opt) in
   if opt <> None then
     let ext = match opt with
       | Some Options.FSharp -> ".fs"
       | Some Options.OCaml
-      | Some Options.Plugin -> ".ml"
+      | Some Options.Plugin
+      | Some Options.PluginNoLib -> ".ml"
       | Some Options.Krml -> ".krml"
       | Some Options.Extension -> ".ast"
-      | _ -> failwith "Unrecognized option"
+      | _ -> fail ()
     in
     match opt with
-    | Some Options.FSharp | Some Options.OCaml | Some Options.Plugin ->
+    | Some Options.FSharp | Some Options.OCaml | Some Options.Plugin | Some Options.PluginNoLib ->
       (* When bootstrapped in F#, this will use the old printer in
          FStarC.Extraction.ML.Code for both OCaml and F# extraction.
          When bootstarpped in OCaml, this will use the old printer
@@ -354,7 +356,7 @@ let emit dep_graph (mllibs:list (uenv & MLSyntax.mllib)) =
       in
       save_value_to_file oname bin
 
-   | _ -> failwith "Unrecognized option"
+    | _ -> fail ()
 
 let tc_one_file
         (env:uenv)

@@ -841,7 +841,7 @@ let rec specs_with_types warn_unsafe : list (char & string & opt_type & Pprint.d
 
   ( noshort,
     "codegen",
-    EnumStr ["OCaml"; "FSharp"; "krml"; "Plugin"; "Extension"],
+    EnumStr ["OCaml"; "FSharp"; "krml"; "Plugin"; "PluginNoLib"; "Extension"],
     text "Generate code for further compilation to executable code, or build a compiler plugin");
 
   ( noshort,
@@ -954,7 +954,7 @@ let rec specs_with_types warn_unsafe : list (char & string & opt_type & Pprint.d
     "extract",
     Accumulated (SimpleStr "One or more semicolon separated occurrences of '[TargetName:]ModuleSelector'"),
     text "Extract only those modules whose names or namespaces match the provided options. \
-     'TargetName' ranges over {OCaml, krml, FSharp, Plugin, Extension}. \
+     'TargetName' ranges over {OCaml, krml, FSharp, Plugin, PluginNoLib, Extension}. \
      A 'ModuleSelector' is a space or comma-separated list of '[+|-]( * | namespace | module)'. \
      For example --extract 'OCaml:A -A.B' --extract 'krml:A -A.C' --extract '*' means \
      for OCaml, extract everything in the A namespace only except A.B; \
@@ -1993,6 +1993,7 @@ let parse_codegen =
   | "FSharp" -> Some FSharp
   | "krml" -> Some Krml
   | "Plugin" -> Some Plugin
+  | "PluginNoLib" -> Some PluginNoLib
   | "Extension" -> Some Extension
   | _ -> None
 
@@ -2002,6 +2003,7 @@ let print_codegen =
   | FSharp -> "FSharp"
   | Krml -> "krml"
   | Plugin -> "Plugin"
+  | PluginNoLib -> "PluginNoLib"
   | Extension -> "Extension"
 
 let codegen                      () =
@@ -2256,7 +2258,7 @@ let extract_settings
         | Some x -> [tgt,x]
       in
       {
-        target_specific_settings = List.collect merge_target [OCaml;FSharp;Krml;Plugin;Extension];
+        target_specific_settings = List.collect merge_target [OCaml;FSharp;Krml;Plugin;PluginNoLib;Extension];
         default_settings = merge_setting p0.default_settings p1.default_settings
       }
     in
@@ -2483,3 +2485,7 @@ let set_vconfig (vcfg:vconfig) : unit =
   set_option "trivial_pre_for_unannotated_effectful_fns" (Bool vcfg.trivial_pre_for_unannotated_effectful_fns);
   set_option "reuse_hint_for"                            (option_as String vcfg.reuse_hint_for);
   ()
+
+instance showable_codegen_t : showable codegen_t = {
+  show = print_codegen;
+}

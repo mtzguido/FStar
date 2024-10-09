@@ -53,6 +53,10 @@ module Const = FStarC.Parser.Const
 
 open FStarC.Class.Show
 
+let plug () = Options.codegen () = Some Options.Plugin
+           || Options.codegen () = Some Options.PluginNoLib
+let plug_no_lib () = Options.codegen () = Some Options.PluginNoLib
+
 (**** Type definitions *)
 
 (** A top-level F* type definition, i.e., a type abbreviation,
@@ -249,10 +253,9 @@ let is_fv_type g fv =
     g.tydefs |> BU.for_some (fun tydef -> fv_eq fv tydef.tydef_fv)
 
 let no_fstar_stubs_ns (ns : list mlsymbol) : list mlsymbol =
-  let pl = Options.codegen () = Some Options.Plugin in
   match ns with
-  | "Prims" :: [] when pl -> "Fstar_guts.Prims" :: []
-  | "FStar"::"Stubs"::rest when pl -> "Fstar_guts.FStarC"::rest
+  | "Prims" :: [] when plug () -> "Fstar_guts.Prims" :: []
+  | "FStar"::"Stubs"::rest when plug () -> "Fstar_guts.FStarC"::rest
   | "FStar"::"Stubs"::rest -> "FStar"::rest // unclear
   | _ -> ns
 
@@ -278,7 +281,7 @@ let lookup_record_field_name g (type_name, fn) =
     | None -> failwith ("Field name not found: " ^ string_of_lid key)
     | Some mlp -> 
       let ns, id = mlp in
-      if Options.codegen () = Some Options.Plugin
+      if plug ()
       then List.filter (fun s -> s <> "Stubs") ns, id
       else ns, id
 
@@ -302,7 +305,9 @@ let initial_mlident_map =
             (match Options.codegen() with
               | Some Options.FSharp -> fsharpkeywords
               | Some Options.OCaml
-              | Some Options.Plugin -> ocamlkeywords
+              | Some Options.Plugin
+              | Some Options.PluginNoLib ->
+                ocamlkeywords
               | Some Options.Krml -> krml_keywords
               | Some Options.Extension -> []  // TODO
               | None -> [])
@@ -440,7 +445,7 @@ let new_mlpath_of_lident (g:uenv) (x : lident) : mlpath & uenv =
     | "FStar.Pervasives.delta_namespace"
     | "FStar.Pervasives.unmeta"
     | "FStar.Pervasives.unascribe"
-      when Options.codegen () = Some Options.Plugin
+      when plug ()
       -> guts mlp
     | _ -> mlp
   in
