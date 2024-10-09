@@ -160,9 +160,12 @@ do-install:
 test1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
 test1: tests examples
 
+.PHONY: test2
+test2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
+test2: tests examples
+
 .PHONY: test
-test: FSTAR_EXE=$(CURDIR)/out2/bin/fstar.exe
-test: tests examples check-stage3-diff
+test: test2 check-stage3-diff
 
 .PHONY: tests
 tests:
@@ -170,7 +173,7 @@ tests:
 
 .PHONY: examples
 examples:
-	+$(MAKE) -C examples
+	+$(MAKE) -C examples all FSTAR_EXE=$(FSTAR_EXE)
 
 .PHONY: ci
 ci:

@@ -1,5 +1,9 @@
-FSTAR_HOME := $(shell $(FSTAR_EXE) --locate)/..
+## FIXME: this thing should either be internal
+## or external, we cannot serve both.
 
+FSTAR_HOME ?= $(shell $(FSTAR_EXE) --locate)/..
+
+include $(FSTAR_HOME)/mk/common.mk
 include $(FSTAR_HOME)/gmake/fstar.mk
 
 #################################################################################

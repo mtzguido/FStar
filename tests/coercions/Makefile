@@ -1,4 +1,4 @@
-FSTAR_HOME=../..
+FSTAR_HOME?=../..
 
 FSTAR_FILES = $(wildcard *.fst)
 
