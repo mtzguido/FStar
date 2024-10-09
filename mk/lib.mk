@@ -28,6 +28,9 @@ FSTAR_OPTIONS += --cache_checked_modules
 FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
 FSTAR_OPTIONS += --no_default_includes
 FSTAR_OPTIONS += --include $(SRC)
+ifeq ($(ADMIT),1)
+FSTAR_OPTIONS += --admit_smt_queries true
+endif
 
 FSTAR_REALIZED_MODULES=All Buffer Bytes Char CommonST Constructive Dyn Float Ghost Heap Monotonic.Heap \
 	HyperStack.All HyperStack.ST HyperStack.IO Int16 Int32 Int64 Int8 IO \
