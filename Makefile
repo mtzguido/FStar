@@ -10,37 +10,42 @@ FSTAR_DEFAULT_GOAL ?= full
 
 ### STAGES
 
-.PHONY: 0
-0:
-	$(call msg, "STAGE0")
-	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
-	$(MAKE) -C stage0
-
-stage0/bin/fstar.exe: 0
-
 ifneq ($(FSTAR_EXTERNAL_STAGE0),)
-FSTAR_STAGE0 := $(realpath $(FSTAR_EXTERNAL_STAGE0))
+FSTAR0_EXE := $(realpath $(FSTAR_EXTERNAL_STAGE0))
 endif
 
-FSTAR_STAGE0 ?= stage0/bin/fstar.exe
-
+FSTAR0_EXE ?= stage0/bin/fstar.exe
 FSTAR1_BARE_EXE := stage1/bare/bin/fstar.exe
 FSTAR1_FULL_EXE := stage1/full/bin/fstar.exe
 FSTAR2_BARE_EXE := stage2/bare/bin/fstar.exe
 FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
 
-.PHONY: $(FSTAR1_BARE_EXE)
-$(FSTAR1_BARE_EXE): | $(FSTAR_STAGE0)
+.PHONY: 0
+0: $(FSTAR0_EXE)
+.PHONY: 1.bare
+1.bare: $(FSTAR1_BARE_EXE)
+.PHONY: 1
+1: $(FSTAR1_FULL_EXE)
+.PHONY: 2.bare
+2.bare: $(FSTAR2_BARE_EXE)
+.PHONY: 2
+2: $(FSTAR2_FULL_EXE)
+
+$(FSTAR0_EXE):
+	$(call msg, "STAGE0")
+	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
+	$(MAKE) -C stage0
+
+$(FSTAR1_BARE_EXE): | $(FSTAR0_EXE)
 	$(call msg, "EXTRACT", "STAGE1 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
 		SRC=$(CURDIR)/src \
-		FSTAR_BOOT=$(FSTAR_STAGE0) \
+		FSTAR_BOOT=$(FSTAR0_EXE) \
 		CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
 		OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
 		CODEGEN=OCaml
 	$(MAKE) -C stage1 fstar-bare
 
-.PHONY: $(FSTAR1_FULL_EXE)
 $(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE1 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
@@ -51,10 +56,6 @@ $(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
 		CODEGEN=Plugin
 	$(MAKE) -C stage1 fstar
 
-.PHONY: 1
-1: $(FSTAR1_FULL_EXE)
-
-.PHONY: $(FSTAR2_BARE_EXE)
 $(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE2 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
@@ -65,7 +66,6 @@ $(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
 		CODEGEN=OCaml
 	$(MAKE) -C stage2 fstar-bare
 
-.PHONY: $(FSTAR2_FULL_EXE)
 $(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE2 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
@@ -76,13 +76,13 @@ $(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
 		CODEGEN=Plugin
 	$(MAKE) -C stage2 fstar
 
-.PHONY: 2
-2: $(FSTAR2_FULL_EXE)
+# Stage 3 is different, we don't build it, we just check that the
+# extracted OCaml files coincide exactly with stage2. We also do not
+# extract the plugins, as is stage2/fstarc and stage3/fstarc coincide,
+# then they are exactly the same compiler and will extract the plugins
+# in the same way.
 
-# Stage 3 is different, we don't build it, we just check that the extracted
-# OCaml files coincide exactly with stage2.
-
-.PHONY: stage3 # PHONY since we cannot capture its dependencies here
+.PHONY: stage3-bare
 stage3-bare: | $(FSTAR2_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE3 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
@@ -99,13 +99,6 @@ check-stage3-diff: stage3-bare
 
 .PHONY: 3
 3: check-stage3-diff
-
-.PHONY: stage1
-stage1: 1
-
-.PHONY: stage2
-stage2: 2
-
 
 ### LIBRARY
 
