@@ -154,7 +154,7 @@ do-install:
 	  PREFIX=$(CURDIR)/out2 \
 	  FSTARC=$(CURDIR)/stage2/full \
 	  FSTARLIB=$(CURDIR)/stage2/fstarlib
-	ln -sf out2 out # stage2 is the final stage
+	ln -Tsf out2 out # stage2 is the final stage
 
 .PHONY: test
 test: tests examples check-stage3-diff
