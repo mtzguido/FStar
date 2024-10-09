@@ -35,7 +35,7 @@ $(FSTAR0_EXE):
 .PHONY: $(FSTAR1_BARE_EXE)
 $(FSTAR1_BARE_EXE): $(FSTAR0_EXE)
 	$(call msg, "EXTRACT", "STAGE1 FSTARC")
-	$(MAKE) -f src/fstar.mk ocaml \
+	$(MAKE) -f mk/fstar.mk ocaml \
 	  SRC=$(CURDIR)/src \
 	  FSTAR_EXE=$(FSTAR0_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
@@ -46,7 +46,7 @@ $(FSTAR1_BARE_EXE): $(FSTAR0_EXE)
 .PHONY: $(FSTAR1_FULL_EXE)
 $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE1 PLUGINS")
-	$(MAKE) -f src/plugins.mk ocaml \
+	$(MAKE) -f mk/plugins.mk ocaml \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_BARE_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
@@ -57,7 +57,7 @@ $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 .PHONY: $(FSTAR2_BARE_EXE)
 $(FSTAR2_BARE_EXE): $(FSTAR1_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE2 FSTARC")
-	$(MAKE) -f src/fstar.mk ocaml \
+	$(MAKE) -f mk/fstar.mk ocaml \
 	  SRC=$(CURDIR)/src \
 	  FSTAR_EXE=$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/fstarc.checked \
@@ -68,7 +68,7 @@ $(FSTAR2_BARE_EXE): $(FSTAR1_FULL_EXE)
 .PHONY: $(FSTAR2_FULL_EXE)
 $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE2 PLUGINS")
-	$(MAKE) -f src/plugins.mk ocaml \
+	$(MAKE) -f mk/plugins.mk ocaml \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_BARE_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/plugins.checked \
@@ -85,7 +85,7 @@ $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 .PHONY: stage3-bare
 stage3-bare: | $(FSTAR2_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE3 FSTARC")
-	$(MAKE) -f src/fstar.mk ocaml \
+	$(MAKE) -f mk/fstar.mk ocaml \
 	  SRC=$(CURDIR)/src \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage3/fstarc.checked \
@@ -107,7 +107,7 @@ check-stage3-diff: stage3-bare
 	$(call msg, "LIB", "STAGE1")
 	$(Q)mkdir -p stage1/ulib.checked # stupid
 	$(Q)mkdir -p stage1/ulib.ml # stupid
-	+$(MAKE) -f ulib/lib.mk all \
+	+$(MAKE) -f mk/lib.mk all \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
@@ -119,7 +119,7 @@ check-stage3-diff: stage3-bare
 2.lib: $(FSTAR2_FULL_EXE)
 	mkdir -p stage2/ulib.checked # stupid
 	mkdir -p stage2/ulib.ml # stupid
-	+$(MAKE) -f ulib/lib.mk all \
+	+$(MAKE) -f mk/lib.mk all \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
