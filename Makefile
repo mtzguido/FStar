@@ -26,8 +26,9 @@ FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
 2.full: $(FSTAR2_FULL_EXE)
 
 # This one we assume it's rather stable, and do not
-# mark it PHONY.
-$(FSTAR0_EXE):
+# mark it PHONY. Still adding '0' allows to force this
+# build by 'make 0'.
+0 $(FSTAR0_EXE):
 	$(call msg, "STAGE0")
 	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
 	$(MAKE) -C stage0
