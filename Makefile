@@ -114,7 +114,7 @@ check-stage3-diff: stage3-bare
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.ml \
 	  CODEGEN=OCaml
-	+$(MAKE) -C stage1/fstarlib fstarlib
+	+$(MAKE) -C stage1/ fstarlib
 
 .PHONY: 2.lib
 2.lib: $(FSTAR2_FULL_EXE)

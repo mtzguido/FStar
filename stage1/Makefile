@@ -3,21 +3,32 @@ include $(FSTAR_HOME)/mk/common.mk
 FSTAR_DUNE_BUILD_OPTIONS += --no-print-directory
 FSTAR_DUNE_BUILD_OPTIONS += --display=quiet
 
-# Creates _build/default/fstar-bare/main.exe
 .PHONY: fstar-bare
-fstar-bare: bin/fstar-bare.exe
-.PHONY: bin/fstar-bare.exe
-bin/fstar-bare.exe:
+fstar-bare: bare/bin/fstar.exe
+.PHONY: bare/bin/fstar.exe
+bare/bin/fstar.exe:
 	$(call msg, "DUNE BUILD", "BARE")
-	$(Q)dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=bare
-	$(Q)dune install --root=bare --prefix=. # NB: prefix interepreted wrt to root, so it's bare/
+	dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=bare
+	dune install --root=bare --prefix=$(CURDIR)/bare
 
 .PHONY: fstar
-fstar: bin/fstar.exe
-.PHONY: bin/fstar.exe
-bin/fstar.exe:
+fstar: full/bin/fstar.exe
+.PHONY: full/bin/fstar.exe
+full/bin/fstar.exe:
 	$(call msg, "DUNE BUILD", "FULL")
-	$(Q)env OCAMLPATH="$(CURDIR)/bare/lib" \
-		dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=full
-	$(Q)env OCAMLPATH="$(CURDIR)/bare/lib" \
-		dune install --root=full --prefix=.
+	env OCAMLPATH="$(CURDIR)/bare/lib" \
+	  dune build --root=full $(FSTAR_DUNE_BUILD_OPTIONS)
+	env OCAMLPATH="$(CURDIR)/bare/lib" \
+	  dune install --root=full --prefix=$(CURDIR)/full
+
+.PHONY: fstarlib
+fstarlib:
+	$(call msg, "DUNE BUILD", "LIB")
+	dune build   --root=fstarlib $(FSTAR_DUNE_BUILD_OPTIONS)
+	dune install --root=fstarlib --prefix=$(CURDIR)
+
+.PHONY: fstar-pluginlib
+fstar-pluginlib:
+	$(call msg, "DUNE BUILD", "PLUGIN LIB")
+	env OCAMLPATH="$(CURDIR):$(CURDIR)/bare/:$(OCAMLPATH)" \
+	  dune build --root=fstar-pluginlib $(FSTAR_DUNE_BUILD_OPTIONS)
