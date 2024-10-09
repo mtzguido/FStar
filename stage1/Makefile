@@ -30,5 +30,5 @@ fstarlib:
 .PHONY: fstar-pluginlib
 fstar-pluginlib:
 	$(call msg, "DUNE BUILD", "PLUGIN LIB")
-	env OCAMLPATH="$(CURDIR):$(CURDIR)/bare/:$(OCAMLPATH)" \
+	env OCAMLPATH="$(CURDIR)/fstarlib/lib:$(CURDIR)/bare/lib" \
 	  dune build --root=fstar-pluginlib $(FSTAR_DUNE_BUILD_OPTIONS)

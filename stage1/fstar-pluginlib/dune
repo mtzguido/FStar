@@ -3,7 +3,7 @@
  (name fstar_plugin_lib)
  (public_name fstar_plugin_lib)
  (libraries
-    fstar_guts
+    fstar-guts
     fstar_lib
  )
  (modes native)
