@@ -122,11 +122,7 @@ lib-ocaml: | lib
 
 .PHONY: full
 full: lib-ocaml
-	$(Q)dune install --root=stage2/full --prefix=$(CURDIR)/out
-	$(Q)dune install --root=ulib-ocaml --prefix=$(CURDIR)/out
-	mkdir -p out/ulib
-	cp ulib/*.fst $(CURDIR)/out/ulib/
-	cp ulib/*.fsti $(CURDIR)/out/ulib/
+	$(MAKE) PREFIX=$(CURDIR)/out install
 
 .PHONY: test
 test: tests examples check-stage3-diff
@@ -164,16 +160,15 @@ save:
 	echo 'bin/' >> stage0/.gitignore
 	echo 'lib/' >> stage0/.gitignore
 
-INSTALL_EXEC := install
-install_dir = cd $(1) && find . -type f -exec $(INSTALL_EXEC) -m 644 -D {} $(PREFIX)/$(2)/{} \;
-
 .PHONY: install
-install: stage2
+install: lib-ocaml
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
-	@# Install the binary and the binary library
-	cd stage2 && dune install --profile=release --prefix=$(PREFIX)
-	@# Then the standard library sources and checked files
-	+$(MAKE) -C $(FSTAR_HOME)/ulib install
+	mkdir -p $(PREFIX)
+	$(Q)dune install --root=stage2/full --prefix=$(PREFIX)
+	$(Q)dune install --root=ulib-ocaml --prefix=$(PREFIX)
+	mkdir -p $(PREFIX)/ulib
+	cp ulib/*.fst $(PREFIX)/ulib/
+	cp ulib/*.fsti $(PREFIX)/ulib/
 
 .PHONY: package
 package:
