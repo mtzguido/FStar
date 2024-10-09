@@ -1,11 +1,9 @@
 export FSTAR_HOME=$(CURDIR)
 include .common.mk
 
-MAKEFLAGS += -s
-
 FSTAR_DEFAULT_GOAL ?= full
 
-.DEFAULT_GOAL := stage2/full/bin/fstar.exe  # $(FSTAR_DEFAULT_GOAL)
+.DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
 
 ### STAGES
 
@@ -100,13 +98,13 @@ check-stage3-diff: stage3-bare
 
 # Depends on some F* being there
 .PHONY: lib
-lib: | $(FSTAR2_FULL_EXE)
+lib: $(FSTAR2_FULL_EXE)
 	+$(MAKE) -C ulib all
 
 .PHONY: lib-ocaml
-lib-ocaml: | lib
+lib-ocaml: lib
 	+$(Q)$(MAKE) -C ulib -f Makefile.extract
-	$(Q)dune build --root=ulib-ocaml
+	+$(Q)$(MAKE) -C ulib-ocaml ulib-ocaml
 
 full0: lib-ocaml
 
@@ -153,8 +151,8 @@ save:
 install: lib-ocaml
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	mkdir -p $(PREFIX)
-	$(Q)dune install --root=stage2/full --prefix=$(PREFIX)
-	$(Q)dune install --root=ulib-ocaml --prefix=$(PREFIX)
+	$(Q)dune install --root=stage2/full --prefix=$(realpath $(PREFIX))
+	$(Q)dune install --root=ulib-ocaml --prefix=$(realpath $(PREFIX))
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
 	cp ulib/*.fsti $(PREFIX)/ulib/
