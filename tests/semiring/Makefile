@@ -26,12 +26,13 @@ all: CanonCommSemiring.interpreted CanonCommSemiring.native
 
 %.cmxs: %.ml $(FSTAR_EXE)
 	$(call msg, "OCAMLOPT", $<)
-	$(OCAMLOPT) -shared -package fstar-guts -package fstar_lib -o $@ $*.ml
+	$(OCAMLOPT) -w -8 -shared -package fstar-guts -package fstar_lib -o $@ $*.ml
 
-# REMARK: --load will compile $*.ml if $*.cmxs does not exist, but we compile it before
+# REMARK: --load will compile $*.ml if $*.cmxs does not exist, but we
+# compile it before and use --load_cmxs
 %.native: %.cmxs %.fst %.Test.fst
 	$(call msg, "CHECK NATIVE", $<)
-	$(FSTAR) --load $* $*.Test.fst
+	$(FSTAR) --load_cmxs $* $*.Test.fst
 	@touch $@
 
 %.interpreted: %.fst.checked %.Test.fst
