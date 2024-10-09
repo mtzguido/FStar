@@ -52,7 +52,7 @@ $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_BARE_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
-	  CODEGEN=Plugin
+	  CODEGEN=PluginNoLib
 	$(MAKE) -C stage1 fstar
 
 .PHONY: $(FSTAR2_BARE_EXE)
