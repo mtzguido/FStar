@@ -17,15 +17,13 @@ FSTAR2_BARE_EXE := stage2/bare/bin/fstar.exe
 FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
 
 .PHONY: 0
-.PHONY: 1.bare
-.PHONY: 1
-.PHONY: 2.bare
-.PHONY: 2
+.PHONY: 1.bare 1.full 1.lib 1
+.PHONY: 2.bare 2.full 2.lib 2
 0: $(FSTAR0_EXE)
 1.bare: $(FSTAR1_BARE_EXE)
-1: $(FSTAR1_FULL_EXE)
+1.full: $(FSTAR1_FULL_EXE)
 2.bare: $(FSTAR2_BARE_EXE)
-2: $(FSTAR2_FULL_EXE)
+2.full: $(FSTAR2_FULL_EXE)
 
 # This one we assume it's rather stable, and do not
 # mark it PHONY.
@@ -127,29 +125,44 @@ check-stage3-diff: stage3-bare
 	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.ml \
 	  CODEGEN=OCaml
+	
+.PHONY: do-install
+do-install:
+	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
+	$(call msg, "INSTALL", $(PREFIX))
+	mkdir -p $(PREFIX)
+	$(Q)dune install --root=$(FSTARC)   --prefix=$(shell realpath $(PREFIX))
+	$(Q)dune install --root=$(FSTARLIB) --prefix=$(shell realpath $(PREFIX))
+	mkdir -p $(PREFIX)/ulib
+	cp ulib/*.fst $(PREFIX)/ulib/
+	cp ulib/*.fsti $(PREFIX)/ulib/
+	cp ulib/fstar.include $(PREFIX)/ulib/
+	cp -r ulib/experimental $(PREFIX)/ulib/
+	cp -r ulib/legacy $(PREFIX)/ulib/
+	cp -r ulib/LowStar $(PREFIX)/ulib/
+	cp -r $(FSTARLIB)/../ulib.checked $(PREFIX)/ulib/.cache
 
-# Depends on some F* being there
-.PHONY: lib-verify
-lib-verify: $(FSTAR2_FULL_EXE)
-	+$(MAKE) -C ulib all
+1: 1.lib
+	$(MAKE) do-install \
+	  PREFIX=$(CURDIR)/out1 \
+	  FSTARC=$(CURDIR)/stage1/full \
+	  FSTARLIB=$(CURDIR)/stage1/fstarlib
 
-.PHONY: lib
-lib: lib-verify
-	+$(Q)$(MAKE) -C ulib -f Makefile.extract
-	+$(Q)$(MAKE) -C ulib-ocaml ulib-ocaml
-
-full: PREFIX:=$(CURDIR)/out
-full: install
+2: 2.lib
+	$(MAKE) do-install \
+	  PREFIX=$(CURDIR)/out2 \
+	  FSTARC=$(CURDIR)/stage2/full \
+	  FSTARLIB=$(CURDIR)/stage2/fstarlib
 
 .PHONY: test
 test: tests examples check-stage3-diff
 
 .PHONY: tests
-tests: | lib
+tests:
 	+$(MAKE) -C tests all
 
 .PHONY: examples
-examples: | lib
+examples:
 	+$(MAKE) -C examples
 
 .PHONY: ci
@@ -176,22 +189,6 @@ save:
 	cp -r version.txt            stage0
 	echo 'bin/' >> stage0/.gitignore
 	echo 'lib/' >> stage0/.gitignore
-
-.PHONY: install
-install: lib
-	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
-	$(call msg, "INSTALL", $(PREFIX))
-	mkdir -p $(PREFIX)
-	$(Q)dune install --root=stage2/full --prefix=$(shell realpath $(PREFIX))
-	$(Q)dune install --root=ulib-ocaml --prefix=$(shell realpath $(PREFIX))
-	mkdir -p $(PREFIX)/ulib
-	cp ulib/*.fst $(PREFIX)/ulib/
-	cp ulib/*.fsti $(PREFIX)/ulib/
-	cp ulib/fstar.include $(PREFIX)/ulib/
-	cp -r ulib/experimental $(PREFIX)/ulib/
-	cp -r ulib/legacy $(PREFIX)/ulib/
-	cp -r ulib/LowStar $(PREFIX)/ulib/
-	cp -r ulib/.cache $(PREFIX)/ulib/
 
 .PHONY: package
 package:
