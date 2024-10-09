@@ -145,16 +145,16 @@ do-install:
 
 1: 1.lib
 	$(MAKE) do-install \
-	  PREFIX=$(CURDIR)/out1 \
+	  PREFIX=$(CURDIR)/stage1/out \
 	  FSTARC=$(CURDIR)/stage1/full \
 	  FSTARLIB=$(CURDIR)/stage1/fstarlib
 
 2: 2.lib
 	$(MAKE) do-install \
-	  PREFIX=$(CURDIR)/out2 \
+	  PREFIX=$(CURDIR)/stage2/out \
 	  FSTARC=$(CURDIR)/stage2/full \
 	  FSTARLIB=$(CURDIR)/stage2/fstarlib
-	ln -Tsf out2 out # stage2 is the final stage
+	ln -Tsf stage2/out out # stage2 is the final stage
 
 .PHONY: test
 test: FSTAR_EXE=$(CURDIR)/out2/bin/fstar.exe
