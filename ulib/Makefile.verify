@@ -69,6 +69,7 @@ verify-all: verify-core verify-extra
 	@# contain the $(SIL) flag nor the $(RUNLIM) for monitoring resources.
 	@# You can debug with --debug $(basename $(notdir $<))
 	$(Q)$(RUNLIM) $(MY_FSTAR) $(SIL) $(COMPAT_INDEXED_EFFECTS) $<
+	$(Q)touch -c $@
 
 # Benchmarking rules
 #
