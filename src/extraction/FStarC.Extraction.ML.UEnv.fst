@@ -281,9 +281,8 @@ let lookup_record_field_name g (type_name, fn) =
     | None -> failwith ("Field name not found: " ^ string_of_lid key)
     | Some mlp -> 
       let ns, id = mlp in
-      if plug ()
-      then List.filter (fun s -> s <> "Stubs") ns, id
-      else ns, id
+      let ns = no_fstar_stubs_ns ns in
+      ns, id
 
 (**** Naming conventions and freshness (internal) *)
 
