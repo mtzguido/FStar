@@ -116,6 +116,20 @@ check-stage3-diff: stage3-bare
 	  CODEGEN=OCaml
 	+$(MAKE) -C stage1/ fstarlib
 
+.PHONY: 1.pluglib
+1.pluglib: $(FSTAR1_FULL_EXE)
+	#NB: shares .depend and checked from 1.lib
+	$(call msg, "LIB", "STAGE1")
+	$(Q)mkdir -p stage1/ulib.checked # stupid
+	$(Q)mkdir -p stage1/ulib.pluginml # stupid
+	+$(MAKE) -f mk/lib.mk all \
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.pluginml \
+	  CODEGEN=Plugin
+	+$(MAKE) -C stage1/ fstar-pluginlib
+
 .PHONY: 2.lib
 2.lib: $(FSTAR2_FULL_EXE)
 	mkdir -p stage2/ulib.checked # stupid
