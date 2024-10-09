@@ -157,11 +157,12 @@ do-install:
 	ln -Tsf out2 out # stage2 is the final stage
 
 .PHONY: test
+test: FSTAR_EXE=$(CURDIR)/out2/bin/fstar.exe
 test: tests examples check-stage3-diff
 
 .PHONY: tests
 tests:
-	+$(MAKE) -C tests all
+	+$(MAKE) -C tests all FSTAR_EXE=$(FSTAR_EXE)
 
 .PHONY: examples
 examples:

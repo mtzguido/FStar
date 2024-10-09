@@ -1,18 +1,8 @@
-FSTAR_HOME?=$(realpath ..)
+FSTAR_HOME := $(shell $(FSTAR_EXE) --locate)/..
 include $(FSTAR_HOME)/.common.mk
-FSTAR_ULIB=$(shell $(FSTAR_HOME)/out/bin/fstar.exe --locate_lib)
+FSTAR_ULIB=$(shell $(FSTAR_EXE) --locate_lib)
 include $(FSTAR_HOME)/gmake/z3.mk
 include $(FSTAR_HOME)/gmake/fstar.mk
-
-ifeq ($(OS),Windows_NT)
-  ifndef FSTAR_HOME
-     $(error "Please define the `FSTAR_HOME` variable before including this makefile.")
-  endif
-  MSBUILD = $(FSTAR_HOME)/src/msbuild.bat
-else
-  # If can't find msbuild, use xbuild, but throw a warning
-  MSBUILD = $(shell which msbuild || (echo '\n\n\033[0;31mWarning:\033[0m could not find "msbuild", trying (deprecated) "xbuild"\n\n'>&2; which xbuild))
-endif
 
 # we ignore the return result in benchmark runs because we can have micro-benchmarks which
 # produce error asserts when executed with '--admit_smt_queries true'

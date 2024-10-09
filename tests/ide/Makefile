@@ -14,7 +14,7 @@ test_incremental: $(patsubst $(FSTAR_HOME)/ulib/%, %.test-incr, $(INCR_TEST_FILE
 
 %.test-incr: $(FSTAR_HOME)/ulib/%
 	$(call msg, "IDE_INCR", $<)
-	$(Q)python3 test-incremental.py $(FSTAR_HOME)/bin/fstar.exe $< $(if $(V),,>/dev/null)
+	$(Q)python3 test-incremental.py $(FSTAR_EXE) $< $(if $(V),,>/dev/null)
 	@touch $@
 
 clean: $(addsuffix .clean, $(ALL_TEST_DIRS))
