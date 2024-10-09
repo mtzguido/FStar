@@ -151,8 +151,8 @@ save:
 install: lib-ocaml
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	mkdir -p $(PREFIX)
-	$(Q)dune install --root=stage2/full --prefix=$(realpath $(PREFIX))
-	$(Q)dune install --root=ulib-ocaml --prefix=$(realpath $(PREFIX))
+	$(Q)dune install --root=stage2/full --prefix=$(shell realpath $(PREFIX))
+	$(Q)dune install --root=ulib-ocaml --prefix=$(shell realpath $(PREFIX))
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
 	cp ulib/*.fsti $(PREFIX)/ulib/
