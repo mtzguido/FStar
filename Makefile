@@ -94,7 +94,7 @@ stage3-bare: | $(FSTAR2_FULL_EXE)
 	  CODEGEN=OCaml
 
 check-stage3-diff: stage3-bare
-	$(call msg, "DIFF", "STAGE2 vs STAGE3")
+	$(call msg, "DIFF", "STAGE2 STAGE3")
 	@# No output expected the gitignore line
 	diff -r stage2/fstarc.ml stage3/fstarc.ml
 
@@ -113,7 +113,8 @@ check-stage3-diff: stage3-bare
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.ml \
-	  CODEGEN=OCaml
+	  CODEGEN=OCaml \
+	  TAG=lib
 	+$(MAKE) -C stage1/ fstarlib
 
 .PHONY: 1.pluglib
@@ -127,7 +128,8 @@ check-stage3-diff: stage3-bare
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.pluginml \
-	  CODEGEN=Plugin
+	  CODEGEN=Plugin \
+	  TAG=pluginlib
 	+$(MAKE) -C stage1/ fstar-pluginlib
 
 .PHONY: 2.lib

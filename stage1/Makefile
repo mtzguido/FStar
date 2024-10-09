@@ -25,7 +25,7 @@ full/bin/fstar.exe:
 fstarlib:
 	$(call msg, "DUNE BUILD", "LIB")
 	dune build   --root=fstarlib $(FSTAR_DUNE_BUILD_OPTIONS)
-	dune install --root=fstarlib --prefix=$(CURDIR)
+	dune install --root=fstarlib --prefix=$(CURDIR)/fstarlib
 
 .PHONY: fstar-pluginlib
 fstar-pluginlib:

@@ -5,6 +5,7 @@ $(call need, CACHE_DIR, directory for checked files)
 $(call need, OUTPUT_DIR, directory for extracted OCaml files)
 $(call need, CODEGEN, backend (OCaml / Plugin))
 $(call need, SRC, source directory)
+$(call need, TAG, a tag for the .depend, to prevent clashes. Sorry.)
 
 .PHONY: clean
 clean:
@@ -132,13 +133,13 @@ ROOTS += $(shell find $(SRC) -name *.fsti)
 FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
 ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
 
-$(CACHE_DIR)/.fstar_depend:
+$(CACHE_DIR)/.$(TAG)depend:
 	$(call msg, "DEPEND")
 	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
 	mkdir -p $(CACHE_DIR)
 
-depend: $(CACHE_DIR)/.fstar_depend
-include $(CACHE_DIR)/.fstar_depend
+depend: $(CACHE_DIR)/.$(TAG)depend
+include $(CACHE_DIR)/.$(TAG)depend
 
 all-ml: $(ALL_ML_FILES)
 all-checked: $(ALL_CHECKED_FILES)

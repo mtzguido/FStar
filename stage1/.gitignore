@@ -1,5 +1,6 @@
 *.checked/**
 *.ml/**
+*.pluginml/**
 bin/
 lib/
 .fstar_depend
