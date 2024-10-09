@@ -15,19 +15,12 @@ stage0/bin/fstar.exe:
 	$(call msg, "STAGE0")
 	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
 	$(MAKE) -C stage0
-	ln -sf ../$@ bin/fstar-stage0.exe
-
-.PHONY: setlink-0
-setlink-0: stage0/bin/fstar.exe
-	ln -sf fstar-stage0.exe bin/fstar.exe
 
 .PHONY: 0
-0: setlink-0
+0: stage0/bin/fstar.exe
 
 ifneq ($(FSTAR_EXTERNAL_STAGE0),)
 FSTAR_STAGE0 := $(realpath $(FSTAR_EXTERNAL_STAGE0))
-_: $(shell ln -sf $(FSTAR_STAGE0) bin/fstar-stage0.exe)
-	# ^ Top-level effect, not good
 endif
 
 FSTAR_STAGE0 ?= stage0/bin/fstar.exe
@@ -47,7 +40,6 @@ $(FSTAR1_BARE_EXE): | $(FSTAR_STAGE0)
 		OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
 		CODEGEN=OCaml
 	$(MAKE) -C stage1 fstar-bare
-	ln -sf ../$@ bin/fstar-stage1-bare.exe
 
 .PHONY: $(FSTAR1_FULL_EXE)
 $(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
@@ -59,14 +51,9 @@ $(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
 		OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
 		CODEGEN=Plugin
 	$(MAKE) -C stage1 fstar
-	ln -sf ../$@ bin/fstar-stage1.exe
-
-.PHONY: setlink-1
-setlink-1: $(FSTAR1_FULL_EXE)
-	ln -sf fstar-stage1.exe bin/fstar.exe
 
 .PHONY: 1
-1: setlink-1
+1: $(FSTAR1_FULL_EXE)
 
 .PHONY: $(FSTAR2_BARE_EXE)
 $(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
@@ -78,7 +65,6 @@ $(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
 		OUTPUT_DIR=$(CURDIR)/stage2/fstarc.ml \
 		CODEGEN=OCaml
 	$(MAKE) -C stage2 fstar-bare
-	ln -sf ../$@ bin/fstar-stage2-bare.exe
 
 .PHONY: $(FSTAR2_FULL_EXE)
 $(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
@@ -90,14 +76,9 @@ $(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
 		OUTPUT_DIR=$(CURDIR)/stage2/plugins.ml \
 		CODEGEN=Plugin
 	$(MAKE) -C stage2 fstar
-	ln -sf ../$@ bin/fstar-stage2.exe
-
-.PHONY: setlink-2
-setlink-2: $(FSTAR2_FULL_EXE)
-	ln -sf fstar-stage2.exe bin/fstar.exe
 
 .PHONY: 2
-2: setlink-2
+2: $(FSTAR2_FULL_EXE)
 
 # Stage 3 is different, we don't build it, we just check that the extracted
 # OCaml files coincide exactly with stage2.
