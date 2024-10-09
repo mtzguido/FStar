@@ -54,9 +54,9 @@ EXTRACT += --extract '* $(NOEXTRACT_MODULES)'
 # recent than its dependences.
 %.checked:
 	$(call msg, "CHECK", $(basename $(basename $(notdir $@))))
-	$(Q)$(FSTAR) $<
+	$(FSTAR) $<
 	@# HACK: finding FStarC modules
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # And then, in a separate invocation, from each .checked.lax we
 # extract an .ml file
@@ -65,8 +65,8 @@ EXTRACT += --extract '* $(NOEXTRACT_MODULES)'
 	@# HACK we use notdir to get the module name since we need to pass in the
 	@# fst (not the checked file), but we don't know where it is, so this is
 	@# relying on F* looking in its include path. sigh.
-	$(Q)$(FSTAR) $(notdir $(subst .checked,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked,,$<)))
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	$(FSTAR) $(notdir $(subst .checked,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked,,$<)))
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 ROOTS :=
 ROOTS += $(shell find $(SRC) -name *.fst)
@@ -78,8 +78,8 @@ ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
 
 $(CACHE_DIR)/.fstar_depend:
 	$(call msg, "DEPEND")
-	$(Q)$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
-	$(Q)mkdir -p $(CACHE_DIR)
+	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
+	mkdir -p $(CACHE_DIR)
 
 depend: $(CACHE_DIR)/.fstar_depend
 include $(CACHE_DIR)/.fstar_depend

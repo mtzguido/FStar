@@ -22,6 +22,7 @@
 # It also defines some other utilities for resource monitoring and
 # paths manipulation for cygwin
 
+MAKEFLAGS += --no-builtin-rules
 Q?=@
 SIL?=--silent
 RUNLIM=
@@ -31,7 +32,6 @@ ifneq ($(V),)
 else
 	MAKEFLAGS += -s
 endif
-MAKEFLAGS += --no-builtin-rules
 
 define NO_RUNLIM_ERR
 runlim not found:

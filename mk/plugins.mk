@@ -85,15 +85,15 @@ EXTRACT += --extract -FStar.Version
 # recent than its dependences.
 %.checked.lax:
 	$(call msg, "LAXCHECK", $(basename $(basename $(notdir $@))))
-	$(Q)$(FSTAR) $(if $(findstring /ulib/,$<),,--MLish) $<
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	$(FSTAR) $(if $(findstring /ulib/,$<),,--MLish) $<
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # And then, in a separate invocation, from each .checked.lax we
 # extract an .ml file
 %.ml:
 	$(call msg, "EXTRACT", $(notdir $@))
-	$(Q)$(FSTAR) $(notdir $(subst .checked.lax,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	$(FSTAR) $(notdir $(subst .checked.lax,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # --------------------------------------------------------------------
 # Dependency analysis for bootstrapping
@@ -129,8 +129,8 @@ ROOTS += ../ulib/FStar.Tactics.Visit.fst
 
 $(CACHE_DIR)/.depend:
 	$(call msg, "DEPEND")
-	$(Q)$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
-	$(Q)mkdir -p $(CACHE_DIR)
+	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
+	mkdir -p $(CACHE_DIR)
 
 depend: $(CACHE_DIR)/.depend
 include $(CACHE_DIR)/.depend

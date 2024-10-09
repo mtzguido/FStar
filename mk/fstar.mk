@@ -56,9 +56,9 @@ EXTRACT += --extract +FStar.Seq.Properties
 # recent than its dependences.
 %.checked.lax:
 	$(call msg, "LAXCHECK", $(basename $(basename $(notdir $@))))
-	$(Q)$(FSTAR) $(if $(findstring FStarC,$<),--MLish,) $<
+	$(FSTAR) $(if $(findstring FStarC,$<),--MLish,) $<
 	@# HACK: finding FStarC modules
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # And then, in a separate invocation, from each .checked.lax we
 # extract an .ml file
@@ -67,8 +67,8 @@ EXTRACT += --extract +FStar.Seq.Properties
 	@# HACK we use notdir to get the module name since we need to pass in the
 	@# fst (not the checked file), but we don't know where it is, so this is
 	@# relying on F* looking in its include path. sigh.
-	$(Q)$(FSTAR) $(notdir $(subst .checked.lax,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
-	$(Q)@touch -c $@  ## SHOULD NOT BE NEEDED
+	$(FSTAR) $(notdir $(subst .checked.lax,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
+	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # --------------------------------------------------------------------
 # Dependency analysis for bootstrapping
@@ -84,8 +84,8 @@ ROOTS += $(SRC)/fstar/FStarC.Main.fst
 
 $(CACHE_DIR)/.fstar_depend:
 	$(call msg, "DEPEND")
-	$(Q)$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
-	$(Q)mkdir -p $(CACHE_DIR)
+	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
+	mkdir -p $(CACHE_DIR)
 
 depend: $(CACHE_DIR)/.fstar_depend
 include $(CACHE_DIR)/.fstar_depend
