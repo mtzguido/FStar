@@ -3,12 +3,12 @@ FSTAR:=../../out/bin/fstar.exe
 .PHONY: all
 all: run
 
-Hello.ml: Hello.fst Makefile
+Hello.ml: Hello.fst # Makefile
 	$(FSTAR) --codegen OCaml Hello.fst --extract Hello
 
 OCAMLPATH=$(shell $(FSTAR) --locate_ocaml)
 
-hello.exe: Hello.ml
+bin/hello.exe: Hello.ml
 	OCAMLPATH=$(OCAMLPATH) dune build @install --profile=release
 	OCAMLPATH=$(OCAMLPATH) dune install --prefix=.
 
