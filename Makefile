@@ -156,6 +156,19 @@ do-install:
 	  FSTARLIB=$(CURDIR)/stage2/fstarlib
 	ln -Tsf stage2/out out # stage2 is the final stage
 
+package: fstar.tar.gz
+.PHONY: fstar.tar.gz
+fstar.tar.gz: 2.lib
+	rm -rf _build
+	mkdir _build
+	$(MAKE) do-install \
+	  PREFIX=$(CURDIR)/_build \
+	  FSTARC=$(CURDIR)/stage2/full \
+	  FSTARLIB=$(CURDIR)/stage2/fstarlib
+	$(call msg, "ARCHIVE", $@)
+	tar czf $@ -C _build .
+	rm -rf _build
+
 .PHONY: test1
 test1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
 test1: tests examples
@@ -199,13 +212,6 @@ save:
 	cp -r version.txt            stage0
 	echo 'bin/' >> stage0/.gitignore
 	echo 'lib/' >> stage0/.gitignore
-
-.PHONY: package
-package:
-	rm -rf _build
-	mkdir _build
-	+$(MAKE) install PREFIX=$(CURDIR)/_build/
-	tar czf fstar.tar.gz -C _build .
 
 watch:
 	while true; do \

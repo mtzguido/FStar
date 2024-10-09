@@ -1,6 +1,8 @@
 /stage1/out
 /stage2/out
 /out
+/fstar.tar.gz
+/_build
 # ^ build output
 
 *~
