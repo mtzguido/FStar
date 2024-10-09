@@ -1,7 +1,6 @@
 FSTAR_HOME := $(shell $(FSTAR_EXE) --locate)/..
-include $(FSTAR_HOME)/.common.mk
+include $(FSTAR_HOME)/../.common.mk # Fixme
 FSTAR_ULIB=$(shell $(FSTAR_EXE) --locate_lib)
-include $(FSTAR_HOME)/gmake/z3.mk
 include $(FSTAR_HOME)/gmake/fstar.mk
 
 # we ignore the return result in benchmark runs because we can have micro-benchmarks which

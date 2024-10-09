@@ -45,11 +45,12 @@ define msg =
 endef
 
 # Check that we are under FSTAR_HOME. Otherwise abort now.
-REL_CURDIR=$(shell realpath --relative-base=$(FSTAR_HOME) $(CURDIR))
-REL_CURDIR_0=$(shell echo $(REL_CURDIR) | head -c 1)
-ifeq ($(REL_CURDIR_0),/)
-  $(error "FSTAR_HOME points outside of this repo.")
-endif
+# REL_CURDIR=$(shell realpath --relative-base=$(FSTAR_HOME) $(CURDIR))
+# REL_CURDIR_0=$(shell echo $(REL_CURDIR) | head -c 1)
+# ifeq ($(REL_CURDIR_0),/)
+#   $(error "FSTAR_HOME points outside of this repo. ($(FSTAR_HOME))")
+# endif
+# Hmmmmm, no longer useful with sub-installs.
 
 # Passing RESOURCEMONITOR=1 will create .runlim files through the source tree with
 # information about the time and space taken by each F* invocation.

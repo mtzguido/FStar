@@ -1,4 +1,4 @@
-FSTAR_HOME=../..
+FSTAR_HOME = ../..
 all: check-all
 
 FSTAR_FILES=$(wildcard *.fst)
