@@ -10,14 +10,13 @@ FSTAR_DEFAULT_GOAL ?= full
 
 ### STAGES
 
-.PHONY: stage0/bin/fstar.exe # PHONY since we cannot capture its dependencies here
-stage0/bin/fstar.exe:
+.PHONY: 0
+0:
 	$(call msg, "STAGE0")
 	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
 	$(MAKE) -C stage0
 
-.PHONY: 0
-0: stage0/bin/fstar.exe
+stage0/bin/fstar.exe: 0
 
 ifneq ($(FSTAR_EXTERNAL_STAGE0),)
 FSTAR_STAGE0 := $(realpath $(FSTAR_EXTERNAL_STAGE0))
