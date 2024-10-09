@@ -96,7 +96,7 @@ stage3-bare: | $(FSTAR2_FULL_EXE)
 check-stage3-diff: stage3-bare
 	$(call msg, "DIFF", "STAGE2 vs STAGE3")
 	@# No output expected the gitignore line
-	! diff -r stage2/fstarc.ml stage3/fstarc.ml
+	diff -r stage2/fstarc.ml stage3/fstarc.ml
 
 .PHONY: 3
 3: check-stage3-diff

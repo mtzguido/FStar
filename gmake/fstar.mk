@@ -15,7 +15,7 @@ ifdef FSTAR_HOME
   ifeq ($(OS),Windows_NT)
     FSTAR_HOME := $(shell cygpath -m $(FSTAR_HOME))
   endif
-  FSTAR_EXE?=$(FSTAR_HOME)/bin/fstar.exe
+  FSTAR_EXE?=$(FSTAR_HOME)/out/bin/fstar.exe
 else
 # FSTAR_HOME not defined, assume fstar.exe reachable from PATH
 FSTAR_EXE?=fstar.exe
