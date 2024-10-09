@@ -1,4 +1,4 @@
-.PHONY: .FORCE rebuild-all check-all accept-all
+.PHONY: .FORCE rebuild-all check-all
 .SUFFIXES:
 
 ALL := $(wildcard *.in)
@@ -7,7 +7,7 @@ DISABLED=FailRange.in
 
 IN=$(filter-out $(DISABLED), $(ALL))
 
-all: check
+all: $(if $(ACCEPT),accept,check)
 
 # Rebuild all .out files
 BUILD_TARGETS := $(IN:.in=.out)
@@ -38,13 +38,8 @@ touch:
 
 %.in: .FORCE
 
-FSTAR_HOME = ../../..
-include $(FSTAR_HOME)/ulib/gmake/z3.mk
-include $(FSTAR_HOME)/.common.mk
-
-ifdef Z3
-SMT=--smt $(Z3)
-endif
+FSTAR_HOME ?= ../../..
+include $(FSTAR_HOME)/mk/common.mk
 
 JSON_CLEANUP:=python ../cleanup.py
 
