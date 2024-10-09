@@ -1,12 +1,13 @@
-FSTAR_HOME = ../..
-FSTAR=$(FSTAR_HOME)/bin/fstar.exe
+FSTAR_HOME ?= ../..
 EXCLUDED_FILES=
-include $(FSTAR_HOME)/.common.mk
+include $(FSTAR_HOME)/mk/common.mk
 
 BASES=$(filter-out $(EXCLUDED_FILES), $(wildcard *.fst))
 
 TESTS=$(patsubst %.fst, .%.test.print, $(BASES))
 TESTS_IN_PLACE=$(patsubst %.fst, .%.test.inplace, $(BASES))
+
+FSTAR := $(FSTAR_EXE) $(SIL)
 
 # GM: Do we really want to test the --print_in_place feature for every
 # base file? It seems unlikely this will ever regress. But it doesn't
@@ -21,12 +22,12 @@ printed:
 
 printed/%.fst: %.fst | printed
 	$(call msg, "PPRINT", $(basename $(notdir $@)))
-	$(Q)$(FSTAR) $(SIL) --print $< > $@
+	$(Q)$(FSTAR) --print $< > $@
 
 inplace/%.fst: %.fst | inplace
 	$(call msg, "PPRINT", $(basename $(notdir $@)))
 	$(Q)cp $< $@
-	$(Q)$(FSTAR) $(SIL) --print_in_place $@
+	$(Q)$(FSTAR)--print_in_place $@
 
 
 # Note how these two rules make an empty touch file for 

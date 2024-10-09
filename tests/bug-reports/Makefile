@@ -1,4 +1,4 @@
-FSTAR_HOME=../..
+FSTAR_HOME?=../..
 include $(FSTAR_HOME)/examples/Makefile.include
 
 OTHERFLAGS+=--warn_error +240

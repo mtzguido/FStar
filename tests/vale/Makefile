@@ -1,4 +1,4 @@
-FSTAR_HOME=../..
+FSTAR_HOME?=../..
 
 OTHERFLAGS += \
 --z3cliopt smt.QI.EAGER_THRESHOLD=100 \

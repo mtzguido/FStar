@@ -1,11 +1,13 @@
 FSTAR_HOME?=../..
-FSTAR=$(FSTAR_HOME)/bin/fstar.exe $(OTHERFLAGS)
+FSTAR=$(FSTAR_EXE) $(OTHERFLAGS)
 
 # This tests that the semiring tactic can be made into a plugin.
 # We should make it so in the library and just remove this, along
 # with its hacks.
 
-OCAMLOPT=OCAMLPATH="$(FSTAR_HOME)/src/ocaml-output/fstarlib" ocamlfind opt
+OCAMLOPT=OCAMLPATH="$(shell $(FSTAR_EXE) --locate_ocaml)" ocamlfind opt
+
+FSTAR := $(FSTAR_EXE)
 
 .PHONY: %.native %.interpreted
 .PRECIOUS: %.fst.checked %.ml %.cmxs
@@ -19,7 +21,7 @@ all: CanonCommSemiring.interpreted CanonCommSemiring.native
 	$(FSTAR) --codegen Plugin --extract $* $*.fst
 	cat $*.ml.fixup >> $*.ml
 
-%.cmxs: %.ml $(FSTAR_HOME)/bin/fstar.exe
+%.cmxs: %.ml $(FSTAR_EXE)
 	$(OCAMLOPT) -shared -package fstar.lib -o $@ $*.ml
 
 # REMARK: --load will compile $*.ml if $*.cmxs does not exist, but we compile it before

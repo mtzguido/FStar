@@ -1,10 +1,14 @@
+FSTAR_HOME?=../..
+include $(FSTAR_HOME)/mk/common.mk
+$(call need, FSTAR_EXE, asd)
+
+include $(FSTAR_HOME)/examples/Makefile.include
+
 .PHONY: %.run clean
 .PRECIOUS: %.exe %.out
 
-FSTAR_HOME=../..
 
-include $(FSTAR_HOME)/examples/Makefile.include
-include $(FSTAR_HOME)/ulib/ml/Makefile.include
+FSTAR := $(FSTAR_EXE) $(SIL) $(FSTAR_DEFAULT_ARGS)
 
 MODULES=$(wildcard Test*.fst)
 
@@ -15,9 +19,9 @@ accept: $(patsubst %.fst,%.run-accept,$(MODULES))
 %.exe: %.fst | out
 	$(call msg, "BUILD", $(notdir $@))
 	$(eval B := $(patsubst %.exe,%,$@))
-	$(Q)$(FSTAR) $(SIL) $(FSTAR_DEFAULT_ARGS) --odir out --codegen OCaml --extract '${B}' '${B}.fst'
+	$(Q)$(FSTAR) --odir out --codegen OCaml --extract '${B}' '${B}.fst'
 	$(Q)/bin/echo -e '\n\nlet _ = main ()\n' >> out/${B}.ml
-	$(Q)$(OCAMLOPT) out/${B}.ml -o $@
+	$(Q)$(OCAMLOPT) -package fstar_lib -linkpkg out/${B}.ml -o $@
 
 %.out: %.exe
 	$(call msg, "OUTPUT", $(notdir $@))
@@ -36,7 +40,7 @@ out:
 # we give it 1.5GB
 out/BigList.memcheck: BigList.fst
 	$(call msg, "MEMCHECK", $<)
-	$(Q)( ulimit -v 1500000 && $(FSTAR) $(SIL) BigList.fst )
+	$(Q)( ulimit -v 1500000 && $(FSTAR) BigList.fst )
 	$(Q)touch $@
 
 clean:

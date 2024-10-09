@@ -1,11 +1,11 @@
-FSTAR_HOME=../..
+FSTAR_HOME?=../..
 OTHERFLAGS+=--warn_error +240
 FSTAR_FILES = $(wildcard *.fst)
 
 all: verify-all ns-resolution
 
 ns-resolution:
-	+$(MAKE) -C ns_resolution
+	+$(MAKE) -C ns_resolution all
 
 include $(FSTAR_HOME)/examples/Makefile.common
 

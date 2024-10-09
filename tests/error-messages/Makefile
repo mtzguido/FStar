@@ -1,4 +1,4 @@
-FSTAR_HOME = ../..
+FSTAR_HOME ?= ../..
 all: $(if $(ACCEPT),accept,check-all)
 
 FSTAR_FILES=$(wildcard *.fst)

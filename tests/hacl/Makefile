@@ -1,4 +1,4 @@
-FSTAR_HOME=../..
+FSTAR_HOME?=../..
 
 FSTAR_FILES = $(wildcard *.fst *.fsti)
 OTHERFLAGS += --ext context_pruning --z3rlimit_factor 2

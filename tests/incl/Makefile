@@ -1,8 +1,8 @@
 # Test the 'include' functionality
 
-FSTAR_HOME=../..
-include $(FSTAR_HOME)/ulib/gmake/fstar.mk
-include $(FSTAR_HOME)/.common.mk
+FSTAR_HOME ?= ../..
+include $(FSTAR_HOME)/gmake/fstar.mk
+include $(FSTAR_HOME)/mk/common.mk
 
 # Do not warn about missing checked files in these tests.
 OTHERFLAGS += --warn_error -241

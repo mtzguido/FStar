@@ -2,6 +2,8 @@ FSTAR_HOME?=..
 include $(FSTAR_HOME)/mk/common.mk
 include $(FSTAR_HOME)/gmake/fstar.mk
 
+OCAMLOPT=OCAMLPATH="$(shell $(FSTAR_EXE) --locate_ocaml)" ocamlfind opt
+
 # we ignore the return result in benchmark runs because we can have micro-benchmarks which
 # produce error asserts when executed with '--admit_smt_queries true'
 %.uver: %.fst

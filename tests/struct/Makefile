@@ -1,8 +1,8 @@
 # Test the 'struct' functionality
 
-FSTAR_HOME=../..
-include $(FSTAR_HOME)/ulib/gmake/fstar.mk
-include $(FSTAR_HOME)/.common.mk
+FSTAR_HOME?=../..
+include $(FSTAR_HOME)/gmake/fstar.mk
+include $(FSTAR_HOME)/mk/common.mk
 
 POSTESTS=$(wildcard *.pos)
 POSTESTS:=$(filter-out jsonparser.pos, $(POSTESTS))

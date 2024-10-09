@@ -1,6 +1,5 @@
-FSTAR_EXAMPLES=$(realpath ../../examples)
-include $(FSTAR_EXAMPLES)/Makefile.include
-include $(FSTAR_ULIB)/ml/Makefile.include
+FSTAR_HOME ?= ../..
+include $(FSTAR_HOME)/examples/Makefile.include
 
 all: inline_let all_cmi Eta_expand.test Div.test ExtractAs.test
 

@@ -1,5 +1,5 @@
-FSTAR_HOME=../..
-include ../../examples/Makefile.include
+FSTAR_HOME?=../..
+include $(FSTAR_HOME)/examples/Makefile.include
 
 ALL_TEST_DIRS=\
 lsp \
