@@ -1,7 +1,7 @@
 include $(FSTAR_HOME)/.common.mk
 
 .PHONY: all
-all: ocaml
+all: verify ocaml
 
 .PHONY: ocaml
 ocaml: all-ml
