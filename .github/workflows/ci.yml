@@ -22,11 +22,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Build stage 1
-        run: make -skj$(nproc) stage1
-
-      - name: Build stage 2
-        run: make -skj$(nproc) stage2
+      - name: Build
+        run: make -skj$(nproc)
 
       - name: Test
         run: make -skj$(nproc) test
@@ -62,4 +59,4 @@ jobs:
       - run: tar xzf fstar.tar.gz
 
       - name: Smoke test
-        run: ./bin/fstar.exe lib/fstar/Prims.fst -f
+        run: ./bin/fstar.exe ulib/Prims.fst -f
