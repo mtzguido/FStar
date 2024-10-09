@@ -254,9 +254,8 @@ let is_fv_type g fv =
 
 let no_fstar_stubs_ns (ns : list mlsymbol) : list mlsymbol =
   match ns with
-  | "Prims" :: [] when plug () -> "Fstar_guts.Prims" :: []
+  | "Prims" :: [] when plug_no_lib () -> "Fstar_guts.Prims" :: []
   | "FStar"::"Stubs"::rest when plug () -> "Fstar_guts.FStarC"::rest
-  | "FStar"::"Stubs"::rest -> "FStar"::rest // unclear
   | _ -> ns
 
 let no_fstar_stubs (p : mlpath) : mlpath =
