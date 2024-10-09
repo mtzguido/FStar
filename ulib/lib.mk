@@ -1,5 +1,4 @@
 include $(FSTAR_HOME)/.common.mk
-export FSTAR_HOME # because of the recursive calls to `make`
 
 .PHONY: all
 all: ocaml
@@ -18,12 +17,36 @@ FSTAR_OPTIONS += --cache_checked_modules
 FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
 FSTAR_OPTIONS += --no_default_includes
 FSTAR_OPTIONS += --include $(SRC)
+FSTAR_OPTIONS += --admit_smt_queries true
+
+FSTAR_REALIZED_MODULES=All Buffer Bytes Char CommonST Constructive Dyn Float Ghost Heap Monotonic.Heap \
+	HyperStack.All HyperStack.ST HyperStack.IO Int16 Int32 Int64 Int8 IO \
+	List List.Tot.Base Mul Option Pervasives.Native ST Exn String \
+	UInt16 UInt32 UInt64 UInt8 \
+	Pointer.Derived1 Pointer.Derived2 \
+	Pointer.Derived3 \
+	BufferNG \
+	TaggedUnion \
+	Bytes Util \
+	Tactics \
+	Reflection \
+	InteractiveHelpers \
+	Class \
+	Range \
+	Vector.Base Vector.Properties Vector TSet
+	# prims is realized by default hence not included in this list
+
+NOEXTRACT_STEEL_MODULES = -FStar.MSTTotal -FStar.MST -FStar.NMSTTotal -FStar.NMST
+
+NOEXTRACT_MODULES:=$(addprefix -FStar., $(FSTAR_REALIZED_MODULES) Printf) \
+  -FStar.ModifiesGen \
+  -LowStar.Printf +FStar.List.Pure.Base +FStar.List.Tot.Properties +FStar.Int.Cast.Full $(NOEXTRACT_STEEL_MODULES)
+
 
 FSTAR := $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 
 EXTRACT :=
-EXTRACT += --extract '*'
-EXTRACT += --extract '-LowStar.Printf'
+EXTRACT += --extract '* $(NOEXTRACT_MODULES)'
 
 # We first lax type-check each file, producing a .checked.lax file
 # We touch the file, because if F* determined that the .checked.lax
@@ -49,6 +72,10 @@ EXTRACT += --extract '-LowStar.Printf'
 ROOTS :=
 ROOTS += $(shell find $(SRC) -name *.fst)
 ROOTS += $(shell find $(SRC) -name *.fsti)
+
+# Filter out legacy/
+FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
+ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
 
 $(CACHE_DIR)/.fstar_depend:
 	$(call msg, "DEPEND")

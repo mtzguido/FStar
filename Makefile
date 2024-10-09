@@ -106,14 +106,16 @@ check-stage3-diff: stage3-bare
 
 .PHONY: 1.lib
 1.lib: $(FSTAR1_FULL_EXE)
-	mkdir -p stage1/ulib.checked # stupid
-	mkdir -p stage1/ulib.ml # stupid
+	$(call msg, "LIB", "STAGE1")
+	$(Q)mkdir -p stage1/ulib.checked # stupid
+	$(Q)mkdir -p stage1/ulib.ml # stupid
 	+$(MAKE) -f ulib/lib.mk all \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.ml \
 	  CODEGEN=OCaml
+	+$(MAKE) -C stage1/fstarlib fstarlib
 
 .PHONY: 2.lib
 2.lib: $(FSTAR2_FULL_EXE)
