@@ -10,19 +10,14 @@ fstar-bare: bin/fstar-bare.exe
 bin/fstar-bare.exe:
 	$(call msg, "DUNE BUILD", "BARE")
 	$(Q)dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=bare
-	$(call msg, "DUNE INSTALL", "BARE")
 	$(Q)dune install --root=bare --prefix=. # NB: prefix interepreted wrt to root, so it's bare/
 
 .PHONY: fstar
 fstar: bin/fstar.exe
 .PHONY: bin/fstar.exe
 bin/fstar.exe:
-	$(call msg, "DUNE BUILD", "PLUGINS")
-	$(Q)env OCAMLPATH="$(CURDIR)/bare/lib" \
-		dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=full fstar-plugins
 	$(call msg, "DUNE BUILD", "FULL")
 	$(Q)env OCAMLPATH="$(CURDIR)/bare/lib" \
 		dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=full
-	$(call msg, "DUNE INSTALL", "FULL")
 	$(Q)env OCAMLPATH="$(CURDIR)/bare/lib" \
 		dune install --root=full --prefix=.

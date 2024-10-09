@@ -1,12 +1,11 @@
 export FSTAR_HOME=$(CURDIR)
 include .common.mk
 
-.PHONY: all
-all: setlink-1
+MAKEFLAGS += -s
 
 FSTAR_DEFAULT_GOAL ?= full
 
-.DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
+.DEFAULT_GOAL := stage2/full/bin/fstar.exe  # $(FSTAR_DEFAULT_GOAL)
 
 ### STAGES
 
@@ -21,22 +20,13 @@ FSTAR2_BARE_EXE := stage2/bare/bin/fstar.exe
 FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
 
 .PHONY: 0
-0: $(FSTAR0_EXE)
-.PHONY: 1.bare
-1.bare: $(FSTAR1_BARE_EXE)
-.PHONY: 1
-1: $(FSTAR1_FULL_EXE)
-.PHONY: 2.bare
-2.bare: $(FSTAR2_BARE_EXE)
-.PHONY: 2
-2: $(FSTAR2_FULL_EXE)
-
-$(FSTAR0_EXE):
+0 $(FSTAR0_EXE):
 	$(call msg, "STAGE0")
 	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
 	$(MAKE) -C stage0
 
-$(FSTAR1_BARE_EXE): | $(FSTAR0_EXE)
+.PHONY: 1.bare
+1.bare $(FSTAR1_BARE_EXE): $(FSTAR0_EXE)
 	$(call msg, "EXTRACT", "STAGE1 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
 		SRC=$(CURDIR)/src \
@@ -46,7 +36,9 @@ $(FSTAR1_BARE_EXE): | $(FSTAR0_EXE)
 		CODEGEN=OCaml
 	$(MAKE) -C stage1 fstar-bare
 
-$(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
+.PHONY: 1
+1: 1.bare
+1 $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE1 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
 		SRC=$(CURDIR)/ulib \
@@ -56,7 +48,9 @@ $(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
 		CODEGEN=Plugin
 	$(MAKE) -C stage1 fstar
 
-$(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
+.PHONY: 2.bare
+2.bare: 1
+2.bare $(FSTAR2_BARE_EXE): $(FSTAR1_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE2 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
 		SRC=$(CURDIR)/src \
@@ -66,7 +60,9 @@ $(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
 		CODEGEN=OCaml
 	$(MAKE) -C stage2 fstar-bare
 
-$(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
+.PHONY: 2
+2: 2.bare
+2 $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE2 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
 		SRC=$(CURDIR)/ulib \
