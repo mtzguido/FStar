@@ -129,7 +129,8 @@ check-stage3-diff: stage3-bare
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.pluginml \
 	  CODEGEN=Plugin \
-	  TAG=pluginlib
+	  TAG=pluginlib \
+	  DEPFLAGS='--extract +FStar.Tactics.Effect'
 	+$(MAKE) -C stage1/ fstar-pluginlib
 
 .PHONY: 2.lib

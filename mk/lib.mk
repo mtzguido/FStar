@@ -135,7 +135,7 @@ ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
 
 $(CACHE_DIR)/.$(TAG)depend:
 	$(call msg, "DEPEND")
-	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) --output_deps_to $@
+	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) $(DEPFLAGS) --output_deps_to $@
 	mkdir -p $(CACHE_DIR)
 
 depend: $(CACHE_DIR)/.$(TAG)depend
