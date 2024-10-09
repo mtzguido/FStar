@@ -13,5 +13,5 @@ bin/hello.exe: Hello.ml
 	OCAMLPATH=$(OCAMLPATH) dune install --prefix=.
 
 .PHONY: run
-run: hello.exe
+run: bin/hello.exe
 	./bin/hello.exe | grep "Hi!"

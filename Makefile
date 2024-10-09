@@ -105,16 +105,14 @@ check-stage3-diff: stage3-bare
 ### LIBRARY
 
 # Depends on some F* being there
-.PHONY: lib
-lib: $(FSTAR2_FULL_EXE)
+.PHONY: lib-verify
+lib-verify: $(FSTAR2_FULL_EXE)
 	+$(MAKE) -C ulib all
 
-.PHONY: lib-ocaml
-lib-ocaml: lib
+.PHONY: lib
+lib: lib-verify
 	+$(Q)$(MAKE) -C ulib -f Makefile.extract
 	+$(Q)$(MAKE) -C ulib-ocaml ulib-ocaml
-
-full0: lib-ocaml
 
 full: PREFIX:=$(CURDIR)/out
 full: install
@@ -156,8 +154,9 @@ save:
 	echo 'lib/' >> stage0/.gitignore
 
 .PHONY: install
-install: lib-ocaml
+install: lib
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
+	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
 	$(Q)dune install --root=stage2/full --prefix=$(shell realpath $(PREFIX))
 	$(Q)dune install --root=ulib-ocaml --prefix=$(shell realpath $(PREFIX))
