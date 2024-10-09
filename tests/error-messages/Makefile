@@ -1,5 +1,5 @@
 FSTAR_HOME = ../..
-all: check-all
+all: $(if $(ACCEPT),accept,check-all)
 
 FSTAR_FILES=$(wildcard *.fst)
 
