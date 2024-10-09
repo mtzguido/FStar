@@ -13,11 +13,22 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 *)
-module FStar.Tactics.V2
+module FStar.Tactics.V2.Bare
 
-(* The bare version, plus some particular things we expose to users
-for convenience. Crucially, mapply must be here, so we can open
-tactics.v2.bare in typeclasses and not trigger a cycle. *)
-include FStar.Tactics.V2.Bare
-include FStar.Tactics.MApply0
-include FStar.Tactics.MApply
+include FStar.Stubs.Reflection.Types
+include FStar.Reflection.V2
+include FStar.Reflection.V2.Formula
+
+include FStar.Stubs.Tactics.Types
+include FStar.Tactics.Effect
+include FStar.Stubs.Tactics.V2.Builtins
+include FStar.Tactics.V2.Derived
+include FStar.Tactics.V2.SyntaxHelpers
+include FStar.Tactics.V2.Logic
+include FStar.Tactics.V2.SyntaxCoercions
+include FStar.Tactics.Util
+include FStar.Tactics.Print
+include FStar.Tactics.Visit
+include FStar.Tactics.NamedView
+
+include FStar.Reflection.TermEq.Simple
