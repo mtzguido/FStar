@@ -77,9 +77,16 @@ EXTRACT += --extract -FStar.Version
 
 # And then, in a separate invocation, from each .checked.lax we
 # extract an .ml file
+%.ml: FF=$(notdir $(subst .checked.lax,,$<))
+%.ml: MM=$(basename $(FF))
 %.ml:
 	$(call msg, "EXTRACT", $(notdir $@))
-	$(FSTAR) $(notdir $(subst .checked.lax,,$<)) --codegen $(CODEGEN) --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
+	@# HACK we use notdir to get the module name since we need to pass in the
+	@# fst (not the checked file), but we don't know where it is, so this is
+	@# relying on F* looking in its include path. sigh.
+	$(FSTAR) $(FF) \
+	  --codegen $(CODEGEN) \
+	  --extract_module $(MM)
 	@touch -c $@  ## SHOULD NOT BE NEEDED
 
 # --------------------------------------------------------------------
