@@ -2,7 +2,6 @@ export FSTAR_HOME=$(CURDIR)
 include .common.mk
 
 FSTAR_DEFAULT_GOAL ?= full
-
 .DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
 
 ### STAGES
@@ -168,18 +167,6 @@ package:
 	mkdir _build
 	+$(MAKE) install PREFIX=$(CURDIR)/_build/
 	tar czf fstar.tar.gz -C _build .
-
-# save:
-#         $(MAKE) -C src ocaml
-#         @.scripts/git-directory-untouched.sh stage0 || (echo "Stage 1 seems not clean, NOT SAVING"; false)
-#         rm -rf stage1/ocaml/fstar-lib
-#         cp -r  stage2/ocaml/fstar-lib stage1/ocaml/fstar-lib
-
-# re2:
-#         rm -f stage2/.depend
-#         git clean -dfx stage2/ocaml
-#         $(MAKE) 2
-
 
 watch:
 	while true; do \
