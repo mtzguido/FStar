@@ -2,7 +2,7 @@ include $(FSTAR_HOME)/.common.mk
 
 .DEFAULT_GOAL := verify-all
 HINTS_ENABLED?=--use_hints
-FSTAR_EXE=$(FSTAR_HOME)/bin/fstar.exe
+FSTAR_EXE=$(FSTAR_HOME)/stage2/full/bin/fstar.exe
 
 FSTAR=$(FSTAR_EXE) $(OTHERFLAGS) $(MAYBE_ADMIT) $(HINTS_ENABLED) $(WITH_CACHE_DIR)
 

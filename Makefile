@@ -4,7 +4,7 @@ include .common.mk
 .PHONY: all
 all: setlink-1
 
-FSTAR_DEFAULT_GOAL ?= 2
+FSTAR_DEFAULT_GOAL ?= full
 
 .DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
 
@@ -131,14 +131,21 @@ stage2: 2
 
 # Depends on some F* being there
 .PHONY: lib
-lib: | bin/fstar.exe
+lib: | $(FSTAR2_FULL_EXE)
 	+$(MAKE) -C ulib all
 
 .PHONY: lib-ocaml
 lib-ocaml: | lib
 	+$(Q)$(MAKE) -C ulib -f Makefile.extract
 	$(Q)dune build --root=ulib-ocaml
-	$(Q)dune install --root=ulib-ocaml --prefix=$(CURDIR)/build
+
+.PHONY: full
+full: lib-ocaml
+	$(Q)dune install --root=stage2/full --prefix=$(CURDIR)/out
+	$(Q)dune install --root=ulib-ocaml --prefix=$(CURDIR)/out
+	mkdir -p out/ulib
+	cp ulib/*.fst $(CURDIR)/out/ulib/
+	cp ulib/*.fsti $(CURDIR)/out/ulib/
 
 .PHONY: test
 test: tests examples check-stage3-diff
