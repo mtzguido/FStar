@@ -11,10 +11,10 @@ FSTAR0_EXE := $(realpath $(FSTAR_EXTERNAL_STAGE0))
 endif
 
 FSTAR0_EXE ?= stage0/bin/fstar.exe
-FSTAR1_BARE_EXE := stage1/bare/bin/fstar.exe
-FSTAR1_FULL_EXE := stage1/full/bin/fstar.exe
-FSTAR2_BARE_EXE := stage2/bare/bin/fstar.exe
-FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
+FSTAR1_BARE_EXE := stage1/inst/bare/bin/fstar.exe
+FSTAR1_FULL_EXE := stage1/inst/full/bin/fstar.exe
+FSTAR2_BARE_EXE := stage2/inst/bare/bin/fstar.exe
+FSTAR2_FULL_EXE := stage2/inst/full/bin/fstar.exe
 
 .PHONY: 0
 .PHONY: 1.bare 1.full 1.lib 1
