@@ -120,9 +120,10 @@ lib-ocaml: | lib
 	+$(Q)$(MAKE) -C ulib -f Makefile.extract
 	$(Q)dune build --root=ulib-ocaml
 
-.PHONY: full
-full: lib-ocaml
-	$(MAKE) PREFIX=$(CURDIR)/out install
+full0: lib-ocaml
+
+full: PREFIX:=$(CURDIR)/out
+full: install
 
 .PHONY: test
 test: tests examples check-stage3-diff
