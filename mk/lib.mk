@@ -36,34 +36,68 @@ endif
 
 FSTAR_OPTIONS += $(OTHERFLAGS)
 
-FSTAR_REALIZED_MODULES=All Buffer Bytes Char CommonST Constructive Dyn Float Ghost Heap Monotonic.Heap \
-	HyperStack.All HyperStack.ST HyperStack.IO Int16 Int32 Int64 Int8 IO \
-	List List.Tot.Base Mul Option Pervasives.Native ST Exn String \
-	UInt16 UInt32 UInt64 UInt8 \
-	Pointer.Derived1 Pointer.Derived2 \
-	Pointer.Derived3 \
-	BufferNG \
-	TaggedUnion \
-	Bytes Util \
-	Tactics \
-	Reflection \
-	InteractiveHelpers \
-	Class \
-	Range \
-	Vector.Base Vector.Properties Vector TSet
-	# prims is realized by default hence not included in this list
-
-NOEXTRACT_STEEL_MODULES = -FStar.MSTTotal -FStar.MST -FStar.NMSTTotal -FStar.NMST
-
-NOEXTRACT_MODULES:=$(addprefix -FStar., $(FSTAR_REALIZED_MODULES) Printf) \
-  -FStar.ModifiesGen \
-  -LowStar.Printf +FStar.List.Pure.Base +FStar.List.Tot.Properties +FStar.Int.Cast.Full $(NOEXTRACT_STEEL_MODULES)
-
+EXTRACT_NS :=
+EXTRACT_NS += -FStar.All
+EXTRACT_NS += -FStar.Buffer
+EXTRACT_NS += -FStar.Bytes
+EXTRACT_NS += -FStar.Char
+EXTRACT_NS += -FStar.CommonST
+EXTRACT_NS += -FStar.Constructive
+EXTRACT_NS += -FStar.Dyn
+EXTRACT_NS += -FStar.Float
+EXTRACT_NS += -FStar.Ghost
+EXTRACT_NS += -FStar.Heap
+EXTRACT_NS += -FStar.Monotonic.Heap
+EXTRACT_NS += -FStar.HyperStack.All
+EXTRACT_NS += -FStar.HyperStack.ST
+EXTRACT_NS += -FStar.HyperStack.IO
+EXTRACT_NS += -FStar.Int16
+EXTRACT_NS += -FStar.Int32
+EXTRACT_NS += -FStar.Int64
+EXTRACT_NS += -FStar.Int8
+EXTRACT_NS += -FStar.IO
+EXTRACT_NS += -FStar.List
+EXTRACT_NS += -FStar.List.Tot.Base
+EXTRACT_NS += -FStar.Mul
+EXTRACT_NS += -FStar.Option
+EXTRACT_NS += -FStar.Pervasives.Native
+EXTRACT_NS += -FStar.ST
+EXTRACT_NS += -FStar.Exn
+EXTRACT_NS += -FStar.String
+EXTRACT_NS += -FStar.UInt16
+EXTRACT_NS += -FStar.UInt32
+EXTRACT_NS += -FStar.UInt64
+EXTRACT_NS += -FStar.UInt8
+EXTRACT_NS += -FStar.Pointer.Derived1
+EXTRACT_NS += -FStar.Pointer.Derived2
+EXTRACT_NS += -FStar.Pointer.Derived3
+EXTRACT_NS += -FStar.BufferNG
+EXTRACT_NS += -FStar.TaggedUnion
+EXTRACT_NS += -FStar.Bytes
+EXTRACT_NS += -FStar.Util
+EXTRACT_NS += -FStar.Tactics
+EXTRACT_NS += -FStar.Reflection
+EXTRACT_NS += -FStar.InteractiveHelpers
+EXTRACT_NS += -FStar.Class
+EXTRACT_NS += -FStar.Range
+EXTRACT_NS += -FStar.Vector.Base
+EXTRACT_NS += -FStar.Vector.Properties
+EXTRACT_NS += -FStar.Vector
+EXTRACT_NS += -FStar.TSet
+EXTRACT_NS += -FStar.MSTTotal
+EXTRACT_NS += -FStar.MST
+EXTRACT_NS += -FStar.NMSTTotal
+EXTRACT_NS += -FStar.NMST
+EXTRACT_NS += -FStar.Printf
+EXTRACT_NS += -FStar.ModifiesGen
+EXTRACT_NS += -LowStar.Printf
+EXTRACT_NS += +FStar.List.Pure.Base
+EXTRACT_NS += +FStar.List.Tot.Properties
+EXTRACT_NS += +FStar.Int.Cast.Full
 
 FSTAR := $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 
-EXTRACT :=
-EXTRACT += --extract '* $(NOEXTRACT_MODULES)'
+EXTRACT := --extract '* $(EXTRACT_NS)'
 
 # We first lax type-check each file, producing a .checked.lax file
 # We touch the file, because if F* determined that the .checked.lax
