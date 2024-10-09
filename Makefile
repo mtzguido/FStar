@@ -148,6 +148,7 @@ do-install:
 	  PREFIX=$(CURDIR)/stage1/out \
 	  FSTARC=$(CURDIR)/stage1/full \
 	  FSTARLIB=$(CURDIR)/stage1/fstarlib
+	ln -Tsf stage1/out out
 
 2: 2.lib
 	$(MAKE) do-install \
