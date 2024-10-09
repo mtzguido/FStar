@@ -156,6 +156,10 @@ do-install:
 	  FSTARLIB=$(CURDIR)/stage2/fstarlib
 	ln -Tsf stage2/out out # stage2 is the final stage
 
+.PHONY: test1
+test1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
+test1: tests examples
+
 .PHONY: test
 test: FSTAR_EXE=$(CURDIR)/out2/bin/fstar.exe
 test: tests examples check-stage3-diff
