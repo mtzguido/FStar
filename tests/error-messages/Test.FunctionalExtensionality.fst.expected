@@ -4,7 +4,7 @@
   - Expected type Prims.nat ^-> Prims.int got type Prims.int ^-> Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also FStar.FunctionalExtensionality.fsti(102,60-102,77)
+  - See also /home/guido/r/fstar/staging/ulib/FStar.FunctionalExtensionality.fsti(102,60-102,77)
 
 >>]
 >> Got issues: [
@@ -21,7 +21,7 @@
   - Expected type _: Prims.int -> Prims.int got type Prims.nat ^-> Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also Prims.fst(680,18-680,24)
+  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
@@ -30,7 +30,7 @@
   - Expected type Prims.int ^-> Prims.int got type Prims.int ^-> Prims.nat
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also FStar.FunctionalExtensionality.fsti(102,60-102,77)
+  - See also /home/guido/r/fstar/staging/ulib/FStar.FunctionalExtensionality.fsti(102,60-102,77)
 
 >>]
 Verified module: Test.FunctionalExtensionality
