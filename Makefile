@@ -169,6 +169,11 @@ install: lib-ocaml
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
 	cp ulib/*.fsti $(PREFIX)/ulib/
+	cp ulib/fstar.include $(PREFIX)/ulib/
+	cp -r ulib/experimental $(PREFIX)/ulib/
+	cp -r ulib/legacy $(PREFIX)/ulib/
+	cp -r ulib/LowStar $(PREFIX)/ulib/
+	cp -r ulib/.cache $(PREFIX)/ulib/
 
 .PHONY: package
 package:

@@ -1,6 +1,4 @@
-# --------------------------------------------------------------------
-ifdef FSTAR_HOME
-FSTAR_HOME=$(realpath ..)
+FSTAR_HOME?=$(realpath ..)
 include $(FSTAR_HOME)/.common.mk
 FSTAR_ULIB=$(shell $(FSTAR_HOME)/out/bin/fstar.exe --locate_lib)
 include $(FSTAR_HOME)/gmake/z3.mk
