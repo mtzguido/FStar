@@ -1,35 +1,25 @@
-include $(FSTAR_HOME)/.common.mk
+include mk/common.mk
 
-FSTAR_HOME ?= ..
-export FSTAR_HOME # because of the recursive calls to `make`
-
-.SUFFIXES:
-MAKEFLAGS += --no-builtin-rules
-
-.PHONY: all
-all:
-	$(error src/fstar.mk: Need to specify a rule)
+$(call need, FSTAR_EXE, fstar.exe to be used)
+$(call need, CACHE_DIR, directory for checked files)
+$(call need, OUTPUT_DIR, directory for extracted OCaml files)
+$(call need, CODEGEN, backend (OCaml / Plugin))
+$(call need, SRC, source directory)
 
 .PHONY: clean
-clean: clean-ocaml
+clean:
+	rm -rf $(CACHE_DIR)
+	rm -rf $(OUTPUT_DIR)
 
 .PHONY: ocaml
 ocaml: all-ml
 
-# Unclear whether we even want defaults here.
-# FSTAR_EXE		?= $(FSTAR_HOME)/stage0/bin/fstar.exe
-# CACHE_DIR 		?= $(CACHE_DIR)/fstarc.checked
-# OUTPUT_DIR	  ?= $(CACHE_DIR)/fstarc.ml
-# CODEGEN       ?= OCaml
-# SRC           ?= .
-
 FSTAR_OPTIONS += $(OTHERFLAGS)
 FSTAR_OPTIONS += --lax
-# FSTAR_OPTIONS += --warn_error -271-241-319-274
 FSTAR_OPTIONS += --cache_dir "$(CACHE_DIR)"
 FSTAR_OPTIONS += --cache_checked_modules
 FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
-FSTAR_OPTIONS += --include $(SRC)
+FSTAR_OPTIONS += --include "$(SRC)"
 
 FSTAR = $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 

@@ -1,5 +1,5 @@
 export FSTAR_HOME=$(CURDIR)
-include .common.mk
+include mk/common.mk
 
 FSTAR_DEFAULT_GOAL ?= 2
 .DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)

@@ -77,3 +77,8 @@ maybe_cygwin_path=$(if $(findstring $(OS),Windows_NT),$(shell cygpath -m $(1)),$
 .PHONY: undef
 undef:
 	$(error "This makefile does not have a default goal")
+
+# Check that a variable is defined. If not, abort with an (optional) error message.
+need = \
+  $(if $(value $(strip $1)),, \
+    $(error Need a value $(strip $1)$(if $2, ("$(strip $2)"))))

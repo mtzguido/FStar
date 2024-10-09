@@ -1,4 +1,15 @@
-include $(FSTAR_HOME)/.common.mk
+include mk/common.mk
+
+$(call need, FSTAR_EXE, fstar.exe to be used)
+$(call need, CACHE_DIR, directory for checked files)
+$(call need, OUTPUT_DIR, directory for extracted OCaml files)
+$(call need, CODEGEN, backend (OCaml / Plugin))
+$(call need, SRC, source directory)
+
+.PHONY: clean
+clean:
+	rm -rf $(CACHE_DIR)
+	rm -rf $(OUTPUT_DIR)
 
 .PHONY: all
 all: verify ocaml
