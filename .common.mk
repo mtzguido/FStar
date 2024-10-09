@@ -31,6 +31,7 @@ ifneq ($(V),)
 else
 	MAKEFLAGS += -s
 endif
+MAKEFLAGS += --no-builtin-rules
 
 define NO_RUNLIM_ERR
 runlim not found:

@@ -104,6 +104,28 @@ check-stage3-diff: stage3-bare
 
 ### LIBRARY
 
+.PHONY: 1.lib
+1.lib: $(FSTAR1_FULL_EXE)
+	mkdir -p stage1/ulib.checked # stupid
+	mkdir -p stage1/ulib.ml # stupid
+	+$(MAKE) -f ulib/lib.mk all \
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.ml \
+	  CODEGEN=OCaml
+
+.PHONY: 2.lib
+2.lib: $(FSTAR2_FULL_EXE)
+	mkdir -p stage2/ulib.checked # stupid
+	mkdir -p stage2/ulib.ml # stupid
+	+$(MAKE) -f ulib/lib.mk all \
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.ml \
+	  CODEGEN=OCaml
+
 # Depends on some F* being there
 .PHONY: lib-verify
 lib-verify: $(FSTAR2_FULL_EXE)
