@@ -2,8 +2,7 @@
 (executable
   (name Main)
   (libraries
-    batteries
-    fstar.lib
+    fstar_lib
   )
   (preprocess (pps ppx_deriving_yojson))
   (flags (:standard -w -8-9-11-26-27-33-39))
