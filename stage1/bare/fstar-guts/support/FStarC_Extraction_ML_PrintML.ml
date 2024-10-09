@@ -93,7 +93,7 @@ let mk_top_mllb (e: mlexpr): mllb =
    print_typ=false }
 
 (* names of F* functions which need to be handled differently *)
-let fstar_compiler_effect_try_with_ident = path_to_ident (["FStar"; "Compiler"; "Effect"], "try_with")
+let fstar_compiler_effect_try_with_ident = path_to_ident (["FStarC"; "Compiler"; "Effect"], "try_with")
 let fstar_all_try_with_ident = path_to_ident (["FStar"; "All"], "try_with")
 
 (* For integer constants (not 0/1) in this range we will use Prims.of_int
