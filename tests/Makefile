@@ -2,6 +2,7 @@ FSTAR_HOME=..
 export OTHERFLAGS += --ext context_pruning
 include ../examples/Makefile.include
 
+ALL_TEST_DIRS += semiring
 ALL_TEST_DIRS += bug-reports
 ALL_TEST_DIRS += coercions
 ALL_TEST_DIRS += error-messages
@@ -13,7 +14,6 @@ ALL_TEST_DIRS += micro-benchmarks
 ALL_TEST_DIRS += prettyprinting
 ALL_TEST_DIRS += projectors
 ALL_TEST_DIRS += restricted_includes
-# ALL_TEST_DIRS += semiring
 ALL_TEST_DIRS += struct
 ALL_TEST_DIRS += tactics
 ALL_TEST_DIRS += typeclasses
