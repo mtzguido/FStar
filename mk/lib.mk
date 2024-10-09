@@ -80,7 +80,6 @@ EXTRACT_NS += -FStar.Tactics
 EXTRACT_NS += -FStar.Reflection
 EXTRACT_NS += -FStar.InteractiveHelpers
 EXTRACT_NS += -FStar.Class
-EXTRACT_NS += -FStar.Range
 EXTRACT_NS += -FStar.Vector.Base
 EXTRACT_NS += -FStar.Vector.Properties
 EXTRACT_NS += -FStar.Vector
@@ -92,6 +91,7 @@ EXTRACT_NS += -FStar.NMST
 EXTRACT_NS += -FStar.Printf
 EXTRACT_NS += -FStar.ModifiesGen
 EXTRACT_NS += -LowStar.Printf
+EXTRACT_NS += -FStar.Sealed
 EXTRACT_NS += +FStar.List.Pure.Base
 EXTRACT_NS += +FStar.List.Tot.Properties
 EXTRACT_NS += +FStar.Int.Cast.Full
@@ -134,7 +134,7 @@ FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
 ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
 
 $(CACHE_DIR)/.$(TAG)depend:
-	$(call msg, "DEPEND")
+	$(call msg, "DEPEND", $(SRC))
 	$(FSTAR) --dep full $(ROOTS) $(EXTRACT) $(DEPFLAGS) --output_deps_to $@
 	mkdir -p $(CACHE_DIR)
 

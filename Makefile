@@ -105,7 +105,7 @@ check-stage3-diff: stage3-bare
 
 .PHONY: 1.lib
 1.lib: $(FSTAR1_FULL_EXE)
-	$(call msg, "LIB", "STAGE1")
+	$(call msg, "EXTRACT", "STAGE1 LIB")
 	$(Q)mkdir -p stage1/ulib.checked # stupid
 	$(Q)mkdir -p stage1/ulib.ml # stupid
 	+$(MAKE) -f mk/lib.mk all \
@@ -120,7 +120,7 @@ check-stage3-diff: stage3-bare
 .PHONY: 1.pluglib
 1.pluglib: $(FSTAR1_FULL_EXE)
 	#NB: shares .depend and checked from 1.lib
-	$(call msg, "LIB", "STAGE1")
+	$(call msg, "EXTRACT", "STAGE1 PLUGLIB")
 	$(Q)mkdir -p stage1/ulib.checked # stupid
 	$(Q)mkdir -p stage1/ulib.pluginml # stupid
 	+$(MAKE) -f mk/lib.mk all \
@@ -130,7 +130,7 @@ check-stage3-diff: stage3-bare
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.pluginml \
 	  CODEGEN=Plugin \
 	  TAG=pluginlib \
-	  DEPFLAGS='--extract +FStar.Tactics.Effect'
+	  DEPFLAGS='--extract +FStar.Tactics,+FStar.Reflection,+FStar.Sealed'
 	+$(MAKE) -C stage1/ fstar-pluginlib
 
 .PHONY: 2.lib
