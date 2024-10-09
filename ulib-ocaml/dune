@@ -3,17 +3,9 @@
  (name fstar_lib)
  (public_name fstar_lib)
  (libraries
-    ; REVIEW, dynlink and menhir seem unneeded
     batteries
     zarith
     stdint
-    yojson
-    ppxlib
-    dynlink
-    menhirLib
-    pprint
-    process
-    sedlex
  )
  (modes native byte)
  ; ^ Note: we need to compile fstar-lib in bytecode since some
