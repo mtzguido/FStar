@@ -6,7 +6,7 @@ FSTAR_EXE=$(FSTAR_HOME)/bin/fstar.exe
 
 FSTAR=$(FSTAR_EXE) $(OTHERFLAGS) $(MAYBE_ADMIT) $(HINTS_ENABLED) $(WITH_CACHE_DIR)
 
-include gmake/Makefile.tmpl
+include ../gmake/Makefile.tmpl
 
 .PHONY: verify-all verify-core verify-extra
 
