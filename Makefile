@@ -125,6 +125,7 @@ check-stage3-diff: stage3-bare
 	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.ml \
 	  CODEGEN=OCaml
+	+$(MAKE) -C stage2/fstarlib fstarlib
 	
 .PHONY: do-install
 do-install:
@@ -153,6 +154,7 @@ do-install:
 	  PREFIX=$(CURDIR)/out2 \
 	  FSTARC=$(CURDIR)/stage2/full \
 	  FSTARLIB=$(CURDIR)/stage2/fstarlib
+	ln -sf out2 out # stage2 is the final stage
 
 .PHONY: test
 test: tests examples check-stage3-diff
