@@ -14,12 +14,14 @@ clean:
 .PHONY: ocaml
 ocaml: all-ml
 
-FSTAR_OPTIONS += $(OTHERFLAGS)
 FSTAR_OPTIONS += --lax
-FSTAR_OPTIONS += --cache_dir "$(CACHE_DIR)"
 FSTAR_OPTIONS += --cache_checked_modules
+FSTAR_OPTIONS += --cache_dir "$(CACHE_DIR)"
 FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
+
 FSTAR_OPTIONS += --include "$(SRC)"
+
+FSTAR_OPTIONS += $(OTHERFLAGS)
 
 FSTAR = $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 
