@@ -38,8 +38,15 @@ runlim not found:
 endef
 
 define msg =
-@printf "  %-8s  %s\n" $(1) $(2)
+@printf "  %-14s  %s\n" $(1) $(2)
 endef
+
+# Check that we are under FSTAR_HOME. Otherwise abort now.
+REL_CURDIR=$(shell realpath --relative-base=$(FSTAR_HOME) $(CURDIR))
+REL_CURDIR_0=$(shell echo $(REL_CURDIR) | head -c 1)
+ifeq ($(REL_CURDIR_0),/)
+  $(error "FSTAR_HOME points outside of this repo.")
+endif
 
 # Passing RESOURCEMONITOR=1 will create .runlim files through the source tree with
 # information about the time and space taken by each F* invocation.
@@ -61,3 +68,8 @@ maybe_cygwin_path=$(if $(findstring $(OS),Windows_NT),$(shell cygpath -m $(1)),$
 # Ensure that any failing rule will not create its target file.
 # In other words, make `make` less insane.
 .DELETE_ON_ERROR:
+
+.DEFAULT_GOAL:=undef
+.PHONY: undef
+undef:
+	$(error "This makefile does not have a default goal")

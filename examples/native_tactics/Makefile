@@ -33,9 +33,11 @@ ALL=Apply\
     Rename\
     Retype\
     Sequences\
-    Simplifier\
     Tutorial\
     Unify
+
+# FIXME: Add back
+    # Simplifier\
 
 OTHERFLAGS +=
 

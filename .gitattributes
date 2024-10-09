@@ -4,6 +4,7 @@
 *.fsti linguist-language=FStar
 *.fsti linguist-documentation=false
 /ocaml/*/generated/*.ml linguist-vendored
+/stage1/ocaml/*/generated/*.ml linguist-vendored
 
 # Line endings
 *.fs* eol=lf
@@ -26,12 +27,3 @@ karamel_ref eol=lf
 /ocaml/*/generated/*.ml linguist-generated=true
 *.hints -diff -merge
 *.hints linguist-generated=true
-
-# Checked modules
-*.checked binary
-*.checked linguist-generated=true
-*.checked.lax binary
-*.checked.lax linguist-generated=true
-
-# Batch files
-*.bat eol=crlf

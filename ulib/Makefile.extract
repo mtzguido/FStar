@@ -1,21 +1,47 @@
-.PHONY: indent extra
-
-FSTAR_HOME=..
-include ml/Makefile.realized
-
 include $(FSTAR_HOME)/.common.mk
-include gmake/z3.mk
-include gmake/fstar.mk
+.DEFAULT_GOAL := all-ml
+HINTS_ENABLED?=--use_hints
+FSTAR_EXE=$(FSTAR_HOME)/bin/fstar.exe
 
-DUNE_SNAPSHOT ?= $(call maybe_cygwin_path,$(realpath $(FSTAR_HOME)/ocaml))
-OUTPUT_DIRECTORY=$(FSTAR_HOME)/src/ocaml-output/fstarlib
+FSTAR=$(FSTAR_EXE) $(OTHERFLAGS) $(MAYBE_ADMIT) $(HINTS_ENABLED) $(WITH_CACHE_DIR)
 
+# You should include this Makefile in your Makefile to make sure you remain
+# future-proof w.r.t. realized modules!
+# GM: God no, removing this soon.
+
+FSTAR_REALIZED_MODULES := \
+  All Buffer Bytes Char CommonST Constructive Dyn Float Ghost Heap Monotonic.Heap \
+  HyperStack.All HyperStack.ST HyperStack.IO Int16 Int32 Int64 Int8 IO \
+  List List.Tot.Base Mul Option Pervasives.Native ST Exn String \
+  UInt16 UInt32 UInt64 UInt8 \
+  Pointer.Derived1 Pointer.Derived2 \
+  Pointer.Derived3 \
+  BufferNG \
+  TaggedUnion \
+  Bytes Util \
+  Range \
+  Tactics \
+  Reflection \
+  InteractiveHelpers \
+  Class \
+  Vector.Base Vector.Properties Vector TSet
+
+NOEXTRACT_STEEL_MODULES = -FStar.MSTTotal -FStar.MST -FStar.NMSTTotal -FStar.NMST
+
+NOEXTRACT_MODULES:=$(addprefix -FStar., $(FSTAR_REALIZED_MODULES) Printf) \
+  -FStar.ModifiesGen \
+  -LowStar.Printf +FStar.List.Pure.Base +FStar.List.Tot.Properties +FStar.Int.Cast.Full \
+  $(NOEXTRACT_STEEL_MODULES)
+
+OUTPUT_DIRECTORY=$(FSTAR_HOME)/ulib-ocaml/extracted
+
+# FIXME: add everything in the library automatically
 FSTAR_FILES:=
 FSTAR_FILES+=$(wildcard *.fst *.fsti)
 FSTAR_FILES+=$(wildcard experimental/*.fst experimental/*.fsti)
 FSTAR_FILES:=$(filter-out $(NOEXTRACT_FILES), $(FSTAR_FILES))
 
-CODEGEN = Plugin
+CODEGEN = OCaml
 MY_FSTAR=$(RUNLIM) $(FSTAR) $(SIL) $(OTHERFLAGS) --cache_checked_modules --odir $(OUTPUT_DIRECTORY) --cache_dir .cache --warn_error @241
 EXTRACT_MODULES=--extract '* $(NOEXTRACT_MODULES)'
 
@@ -39,32 +65,9 @@ $(DEPEND): $(DEPENDRSP)
 	$(Q)mkdir -p .cache
 	$(Q)$(MY_FSTAR) --dep full $(EXTRACT_MODULES)  @$(DEPENDRSP) --output_deps_to $@
 
-dep.graph: $(DEPENDRSP)
-	$(Q)$(MY_FSTAR) --dep graph $(EXTRACT_MODULES) @$(DEPENDRSP) --output_deps_to $@
-
-depgraph.pdf: dep.graph
-	$(Q)$(FSTAR_HOME)/.scripts/simpl_graph.py dep.graph > dep_simpl.graph
-	$(call msg, "DOT", $@)
-	$(Q)dot -Tpdf -o $@ dep_simpl.graph
-
-# make depgraph-FStar.Tactics.fst.pdf to get a dep graph of FStar.Tactics.fst downwards
-depgraph-%.pdf:
-	$(Q)$(MY_FSTAR) --dep graph $(EXTRACT_MODULES) $* --output_deps_to $@.graph
-	$(Q)$(FSTAR_HOME)/.scripts/simpl_graph.py $@.graph > $@.graph.simpl
-	$(call msg, "DOT", $@)
-	$(Q)dot -Tpdf -o $@ $@.graph.simpl
-
 depend.extract: $(DEPEND)
 
 include $(DEPEND)
 
-.PHONY: all-ml dune-snapshot intfiles
-
-# Prims is the only .fst (not fsti) with an Ocaml implementation
-# so we do not need to extract it.
-all-ml: $(filter-out %/prims.ml, $(ALL_ML_FILES))
-
-intfiles:
-	+$(MAKE) -C ml intfiles
-
-dune-snapshot: all-ml intfiles
+.PHONY: all-ml
+all-ml: $(ALL_ML_FILES)

@@ -1,6 +1,7 @@
 module Bug1966a
 
 open FStar.Tactics.V2
+open FStar.Tactics.MApply
 open FStar.Squash
 
 let conversion a (x y : a) (h:(x == y)) : Tot (equals x y) = Refl

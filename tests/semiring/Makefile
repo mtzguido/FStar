@@ -5,7 +5,7 @@ FSTAR=$(FSTAR_HOME)/bin/fstar.exe $(OTHERFLAGS)
 # We should make it so in the library and just remove this, along
 # with its hacks.
 
-OCAMLOPT=OCAMLPATH="$(FSTAR_HOME)/lib" ocamlfind opt
+OCAMLOPT=OCAMLPATH="$(FSTAR_HOME)/src/ocaml-output/fstarlib" ocamlfind opt
 
 .PHONY: %.native %.interpreted
 .PRECIOUS: %.fst.checked %.ml %.cmxs

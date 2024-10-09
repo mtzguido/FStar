@@ -13,6 +13,8 @@ ifndef HAVE_Z3_NIGHTLY_BIN
   endif
   $(info Obtaining Z3 nightly binary ...)
   Q=$(shell cd $(FSTAR_HOME) && python .scripts/z3_nightly.py $(C))
+  # ^This script does not even exist. This whole file should
+  # probably disappear.
   $(info $(Q))
   export Z3=$(abspath $(FSTAR_HOME)/$(lastword $(Q)))
   export HAVE_Z3_NIGHTLY_BIN=yes

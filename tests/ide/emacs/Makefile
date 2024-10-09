@@ -7,13 +7,13 @@ FSTAR:=${FSTAR_HOME}/bin/fstar.exe $(SMT) --ide --warn_error -282 --ext fstar:no
 # (otherwise the order of fields in JSON dictionaries might vary across runs)
 # We turn off the .checked file cache so we don't get any races in CI
 # because we don't track dependency information.
-%.out: %.in $(FSTAR_HOME)/bin/fstar.exe
+%.out: %.in
 	$(call msg, "OUT_IDE", $<)
 	$(Q)$(eval FST := $(firstword $(subst ., ,$<)))
 	$(Q)$(FSTAR) --cache_off "$(realpath ${FST}.fst)" < "$<" | $(JSON_CLEANUP) "$@"
 
 # The Harness.* tests for the push-partial-checked-file request require Harness.fst.checked
-Harness.%.out: Harness.%.in $(FSTAR_HOME)/bin/fstar.exe Harness.fst.checked
+Harness.%.out: Harness.%.in Harness.fst.checked
 	$(call msg, "OUT_IDE", $<)
 	$(Q)$(eval FST := $(firstword $(subst ., ,$<)))
 	$(Q)$(FSTAR) "$(realpath ${FST}.fst)" < "$<" | $(JSON_CLEANUP) "$@"

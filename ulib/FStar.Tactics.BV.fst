@@ -96,8 +96,8 @@ let arith_to_bv_tac () : Tac unit = focus (fun () ->
 too. This can be useful, if we have mixed expressions so I'll leave it
 as is for now *)
 let bv_tac () = focus (fun () ->
-  mapply (`eq_to_bv);
-  mapply (`trans);
+  mapply0 (`eq_to_bv);
+  mapply0 (`trans);
   arith_to_bv_tac ();
   arith_to_bv_tac ();
   set_options "--smtencoding.elim_box true";

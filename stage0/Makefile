@@ -1,0 +1,10 @@
+include $(FSTAR_HOME)/.common.mk
+
+.DEFAULT_GOAL := fstar
+
+.PHONY: fstar
+fstar:
+	@echo "  DUNE BUILD"
+	$(Q)dune build $(FSTAR_DUNE_BUILD_OPTIONS)
+	@echo "  DUNE INSTALL"
+	$(Q)dune install --prefix=.

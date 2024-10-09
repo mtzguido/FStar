@@ -1,3 +1,13 @@
+include $(FSTAR_HOME)/.common.mk
+
+.DEFAULT_GOAL := verify-all
+HINTS_ENABLED?=--use_hints
+FSTAR_EXE=$(FSTAR_HOME)/bin/fstar.exe
+
+FSTAR=$(FSTAR_EXE) $(OTHERFLAGS) $(MAYBE_ADMIT) $(HINTS_ENABLED) $(WITH_CACHE_DIR)
+
+include gmake/Makefile.tmpl
+
 .PHONY: verify-all verify-core verify-extra
 
 # List the files that should be verified by verify-extra and verify-all
@@ -35,10 +45,6 @@ WITH_CACHE_DIR=--cache_dir .cache --hint_dir .hints
 # 247 -> did not write checked file
 OTHERFLAGS+=--warn_error @271-330@247 --ext context_pruning
 
-include $(FSTAR_HOME)/.common.mk
-include gmake/z3.mk
-include gmake/fstar.mk
-include gmake/Makefile.tmpl
 # Default rule is verify-all, defined in gmake/Makefile.tmpl
 
 %.fst-in:

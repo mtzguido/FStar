@@ -1,6 +1,7 @@
 module Bug2229
 
 open FStar.Tactics.V2
+open FStar.Tactics.MApply
 
 (* A helper function to rewrite things *)
 let rw (t:term): Tac unit =

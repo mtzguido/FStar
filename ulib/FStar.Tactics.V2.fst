@@ -32,7 +32,7 @@ include FStar.Tactics.Util
 include FStar.Tactics.Print
 include FStar.Tactics.Visit
 include FStar.Tactics.NamedView
-include FStar.Tactics.MApply
+include FStar.Tactics.MApply0
 
 include FStar.Tactics.SMT (* Version agnostic *)
 include FStar.Reflection.TermEq.Simple

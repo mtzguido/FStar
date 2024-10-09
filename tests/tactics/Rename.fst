@@ -58,6 +58,7 @@ let constr (a b : prop) : Lemma (a ==> b ==> b /\ a) =
       by (let ha = implies_intro () in
           let hb = implies_intro () in
           split ();
+          let open FStar.Tactics.MApply in
           mapply hb;
           mapply ha;
           qed ())

@@ -35,8 +35,8 @@ val closure_reflexive: #a:Type u#a -> r:binrel u#a u#r a -> Lemma (reflexive (_c
 let closure_reflexive #a r =
   assert (forall x. _closure0 r x x) by
     (let x = forall_intro () in
-     mapply (`FStar.Squash.return_squash);
-     mapply (`Refl))
+     mapply0 (`FStar.Squash.return_squash);
+     mapply0 (`Refl))
 
 #push-options "--warn_error -271"
 val closure_transitive: #a:Type u#a -> r:binrel u#a u#r a -> Lemma (transitive (_closure0 r))
@@ -70,7 +70,7 @@ let closure_step #a r x y =
     (let xy = implies_intro () in
      let xy : squash (r x y) = unquote (binding_to_term xy) in
      squash_intro ();
-     mapply (`Step);
+     mapply0 (`Step);
      assumption())
 
 val closure_one_aux: #a:Type u#a -> r:binrel u#a u#r a -> x:a -> y:a
@@ -152,10 +152,10 @@ let stable_on_closure #a r p hr =
      let x : a = unquote (binding_to_term x) in
      let y : a = unquote (binding_to_term y) in
      let px = implies_intro () in
-     mapply (`squash_implies_to_arrow);
-     mapply (`FStar.Squash.return_squash);
+     mapply0 (`squash_implies_to_arrow);
+     mapply0 (`FStar.Squash.return_squash);
      apply (`squash_double_arrow);
-     mapply (`FStar.Squash.return_squash);
+     mapply0 (`FStar.Squash.return_squash);
      let xy = intro () in
      let xy : _closure r x y = unquote (binding_to_term xy) in
      exact (quote (_stable_on_closure r p hr x y xy (Squash.get_proof _))))

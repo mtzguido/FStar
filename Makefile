@@ -1,225 +1,213 @@
+export FSTAR_HOME=$(CURDIR)
 include .common.mk
 
 .PHONY: all
-all: build-and-verify-ulib
+all: setlink-1
 
-DUNE_SNAPSHOT ?= $(call maybe_cygwin_path,$(CURDIR)/ocaml)
+FSTAR_DEFAULT_GOAL ?= 2
 
-# The directory where we install files when doing "make install".
-# Overridden via the command-line by the OPAM invocation.
-PREFIX ?= /usr/local
+.DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
 
-# On Cygwin, the `--prefix` option to dune only
-# supports Windows paths.
-FSTAR_CURDIR=$(call maybe_cygwin_path,$(CURDIR))
+### STAGES
 
-FSTAR_BUILD_PROFILE ?= release
+.PHONY: stage0/bin/fstar.exe # PHONY since we cannot capture its dependencies here
+stage0/bin/fstar.exe:
+	$(call msg, "STAGE0")
+	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
+	$(MAKE) -C stage0
+	ln -sf ../$@ bin/fstar-stage0.exe
 
-.PHONY: fstar
-fstar:
-	$(Q)cp version.txt $(DUNE_SNAPSHOT)/
-	@# Call Dune to build the snapshot.
-	@echo "  DUNE BUILD"
-	$(Q)cd $(DUNE_SNAPSHOT) && dune build --profile=$(FSTAR_BUILD_PROFILE)
-	@echo "  DUNE INSTALL"
-	$(Q)cd $(DUNE_SNAPSHOT) && dune install --profile=$(FSTAR_BUILD_PROFILE) --prefix=$(FSTAR_CURDIR)
+.PHONY: setlink-0
+setlink-0: stage0/bin/fstar.exe
+	ln -sf fstar-stage0.exe bin/fstar.exe
 
-.PHONY: verify-ulib
-verify-ulib:
-	+$(Q)$(MAKE) -C ulib
+.PHONY: 0
+0: setlink-0
 
-.PHONY: build-and-verify-ulib
-build-and-verify-ulib: fstar
-	+$(Q)$(MAKE) verify-ulib
+ifneq ($(FSTAR_EXTERNAL_STAGE0),)
+FSTAR_STAGE0 := $(realpath $(FSTAR_EXTERNAL_STAGE0))
+_: $(shell ln -sf $(FSTAR_STAGE0) bin/fstar-stage0.exe)
+	# ^ Top-level effect, not good
+endif
 
-# Removes all generated files (including the whole generated snapshot,
-# and .checked files), except the object files, so that the snapshot
-# can be rebuilt with an existing fstar.exe
-.PHONY: clean-snapshot
-clean-snapshot: clean-intermediate
-	$(call msg, "CLEAN SNAPSHOT")
-	$(Q)cd $(DUNE_SNAPSHOT) && { dune clean || true ; }
-	$(Q)rm -rf $(DUNE_SNAPSHOT)/fstar-lib/generated/*
-	$(Q)rm -f src/ocaml-output/fstarc/*
-	$(Q)rm -f src/ocaml-output/fstarlib/*
+FSTAR_STAGE0 ?= stage0/bin/fstar.exe
 
-.PHONY: dune-snapshot
-dune-snapshot:
-	+$(Q)$(MAKE) -C src/ocaml-output dune-snapshot
+FSTAR1_BARE_EXE := stage1/bare/bin/fstar.exe
+FSTAR1_FULL_EXE := stage1/full/bin/fstar.exe
+FSTAR2_BARE_EXE := stage2/bare/bin/fstar.exe
+FSTAR2_FULL_EXE := stage2/full/bin/fstar.exe
 
-# This rule is not incremental, by design.
-.PHONY: full-bootstrap
-full-bootstrap:
-	+$(Q)$(MAKE) fstar
-	+$(Q)$(MAKE) clean-snapshot
-	+$(Q)$(MAKE) bootstrap
+.PHONY: $(FSTAR1_BARE_EXE)
+$(FSTAR1_BARE_EXE): | $(FSTAR_STAGE0)
+	$(call msg, "EXTRACT", "STAGE1 FSTARC")
+	$(MAKE) -f src/fstar.mk ocaml \
+		SRC=$(CURDIR)/src \
+		FSTAR_BOOT=$(FSTAR_STAGE0) \
+		CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
+		OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
+		CODEGEN=OCaml
+	$(MAKE) -C stage1 fstar-bare
+	ln -sf ../$@ bin/fstar-stage1-bare.exe
 
-.PHONY: bootstrap
-bootstrap:
-	+$(Q)$(MAKE) dune-snapshot
-	+$(Q)$(MAKE) fstar
+.PHONY: $(FSTAR1_FULL_EXE)
+$(FSTAR1_FULL_EXE): | $(FSTAR1_BARE_EXE)
+	$(call msg, "EXTRACT", "STAGE1 PLUGINS")
+	$(MAKE) -f src/plugins.mk ocaml \
+		SRC=$(CURDIR)/ulib \
+		FSTAR_BOOT=$(CURDIR)/$(FSTAR1_BARE_EXE) \
+		CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
+		OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
+		CODEGEN=Plugin
+	$(MAKE) -C stage1 fstar
+	ln -sf ../$@ bin/fstar-stage1.exe
 
-# This is a faster version of bootstrap, since it does not use dune
-# to install the binary and libraries, and instead just copies the binary
-# mannualy. HOWEVER, note that this means plugins will not work well,
-# since they are compiled against the objects in bin/, which will become
-# stale if this rule is used. Using bootstrap is usually safer.
-.PHONY: boot
-boot:
-	+$(Q)$(MAKE) dune-snapshot
-	$(Q)cp version.txt $(DUNE_SNAPSHOT)/
-	@# Call Dune to build the snapshot.
-	$(call msg, "DUNE BUILD")
-	$(Q)cd $(DUNE_SNAPSHOT) && dune build --profile release
-	$(call msg, "RAW INSTALL")
-	$(Q)install ocaml/_build/default/fstar/main.exe $(FSTAR_CURDIR)/bin/fstar.exe
+.PHONY: setlink-1
+setlink-1: $(FSTAR1_FULL_EXE)
+	ln -sf fstar-stage1.exe bin/fstar.exe
 
-.PHONY: install
-install:
-	+$(Q)$(MAKE) -C src/ocaml-output install
+.PHONY: 1
+1: setlink-1
 
-# The `uninstall` rule is only necessary for users who manually ran
-# `make install`. It is not needed if F* was installed with opam,
-# since `opam remove` can uninstall packages automatically with its
-# own way.
+.PHONY: $(FSTAR2_BARE_EXE)
+$(FSTAR2_BARE_EXE): | $(FSTAR1_FULL_EXE)
+	$(call msg, "EXTRACT", "STAGE2 FSTARC")
+	$(MAKE) -f src/fstar.mk ocaml \
+		SRC=$(CURDIR)/src \
+		FSTAR_BOOT=$(FSTAR1_FULL_EXE) \
+		CACHE_DIR=$(CURDIR)/stage2/fstarc.checked \
+		OUTPUT_DIR=$(CURDIR)/stage2/fstarc.ml \
+		CODEGEN=OCaml
+	$(MAKE) -C stage2 fstar-bare
+	ln -sf ../$@ bin/fstar-stage2-bare.exe
 
-.PHONY: uninstall
-uninstall:
-	rm -rf \
-	  $(PREFIX)/lib/fstar \
-	  $(PREFIX)/bin/fstar_tests.exe \
-	  $(PREFIX)/bin/fstar.exe \
-	  $(PREFIX)/share/fstar
+.PHONY: $(FSTAR2_FULL_EXE)
+$(FSTAR2_FULL_EXE): | $(FSTAR2_BARE_EXE)
+	$(call msg, "EXTRACT", "STAGE2 PLUGINS")
+	$(MAKE) -f src/plugins.mk ocaml \
+		SRC=$(CURDIR)/ulib \
+		FSTAR_BOOT=$(CURDIR)/$(FSTAR2_BARE_EXE) \
+		CACHE_DIR=$(CURDIR)/stage2/plugins.checked \
+		OUTPUT_DIR=$(CURDIR)/stage2/plugins.ml \
+		CODEGEN=Plugin
+	$(MAKE) -C stage2 fstar
+	ln -sf ../$@ bin/fstar-stage2.exe
 
-.PHONY: package
-package: all
-	+$(Q)$(MAKE) -C src/ocaml-output package
+.PHONY: setlink-2
+setlink-2: $(FSTAR2_FULL_EXE)
+	ln -sf fstar-stage2.exe bin/fstar.exe
 
-# Removes everything created by `make all`. MUST NOT be used when
-# bootstrapping.
-.PHONY: clean
-clean: clean-intermediate
-	$(call msg, "CLEAN")
-	$(Q)cd $(DUNE_SNAPSHOT) && { dune clean || true ; }
+.PHONY: 2
+2: setlink-2
 
-# Removes all .checked files and other intermediate files
-# Does not remove the object files from the dune snapshot.
-.PHONY: clean-intermediate
-clean-intermediate:
-	+$(Q)$(MAKE) -C ulib clean
-	+$(Q)$(MAKE) -C src clean
+# Stage 3 is different, we don't build it, we just check that the extracted
+# OCaml files coincide exactly with stage2.
 
-# Regenerate all hints for the standard library and regression test suite
-.PHONY: hints
-hints:
-	+$(Q)OTHERFLAGS="${OTHERFLAGS} --record_hints" $(MAKE) -C ulib/
-	+$(Q)OTHERFLAGS="${OTHERFLAGS} --record_hints" $(MAKE) ci-uregressions ci-ulib-extra
+.PHONY: stage3 # PHONY since we cannot capture its dependencies here
+stage3-bare: | $(FSTAR2_FULL_EXE)
+	$(call msg, "EXTRACT", "STAGE3 FSTARC")
+	$(MAKE) -f src/fstar.mk ocaml \
+		SRC=$(CURDIR)/src \
+		FSTAR_BOOT=$(CURDIR)/$(FSTAR2_FULL_EXE) \
+		CACHE_DIR=$(CURDIR)/stage3/fstarc.checked \
+		OUTPUT_DIR=$(CURDIR)/stage3/fstarc.ml \
+		CODEGEN=OCaml
 
-.PHONY: bench
-bench:
-	./bin/run_benchmark.sh
+check-stage3-diff: stage3-bare
+	$(call msg, "DIFF", "STAGE2 vs STAGE3")
+	@# No output expected the gitignore line
+	! diff -r stage2/fstarc.ml stage3/fstarc.ml
 
-# Regenerate and accept expected output tests. Should be manually
-# reviewed before checking in.
-.PHONY: output
-output:				\
-	output-error-messages	\
-	output-pretty-printing	\
-	output-ide-emacs	\
-	output-ide-lsp		\
-	output-bug-reports
+.PHONY: 3
+3: check-stage3-diff
 
-.PHONY: output-error-messages
-output-error-messages:
-	+$(Q)$(MAKE) -C tests/error-messages accept
+.PHONY: stage1
+stage1: 1
 
-.PHONY: output-pretty-printing
-output-pretty-printing:
-	+$(Q)$(MAKE) -C tests/prettyprinting accept
+.PHONY: stage2
+stage2: 2
 
-.PHONY: output-ide-emacs
-output-ide-emacs:
-	+$(Q)$(MAKE) -C tests/ide/emacs accept
 
-.PHONY: output-ide-lsp
-output-ide-lsp:
-	+$(Q)$(MAKE) -C tests/ide/lsp accept
+### LIBRARY
 
-.PHONY: output-bug-reports
-output-bug-reports:
-	+$(Q)$(MAKE) -C tests/bug-reports output-accept
+# Depends on some F* being there
+.PHONY: lib
+lib: | bin/fstar.exe
+	+$(MAKE) -C ulib all
 
-# This rule is meant to mimic what the docker based CI does, but it
-# is not perfect. In particular it will not look for a diff on the
-# snapshot, nor run the build-standalone script.
+.PHONY: lib-ocaml
+lib-ocaml: | lib
+	+$(Q)$(MAKE) -C ulib -f Makefile.extract
+	$(Q)dune build --root=ulib-ocaml
+	$(Q)dune install --root=ulib-ocaml --prefix=$(CURDIR)/build
+
+.PHONY: test
+test: tests examples check-stage3-diff
+
+.PHONY: tests
+tests: | lib
+	+$(MAKE) -C tests all
+
+.PHONY: examples
+examples: | lib
+	+$(MAKE) -C examples
+
 .PHONY: ci
 ci:
-	+$(Q)FSTAR_HOME=$(CURDIR) $(MAKE) ci-pre
-	+$(Q)FSTAR_HOME=$(CURDIR) $(MAKE) ci-post
+	+$(MAKE) 2
+	+$(MAKE) lib
+	+$(MAKE) test
 
-# This rule runs a CI job in a local container, exactly like is done for
-# CI.
-.PHONY: docker-ci
-docker-ci:
-	docker build -f .docker/standalone.Dockerfile \
-		--build-arg CI_THREADS=$(shell nproc) \
-		--build-arg FSTAR_CI_NO_GITDIFF=1 \
-		.
+.PHONY: save
+save:
+	if ! [ -f stage2/bin/fstar.exe ]; then echo "stage2 needs to be built first" >&2; false; fi
+	rm -rf stage0/
+	mkdir stage0
+	cp -r stage2/extracted       stage0
+	rm stage0/extracted/.gitignore # This directory is ignored in stage2, should not be in stage0
+	cp -r stage2/fstar           stage0
+	cp -r stage2/fstar-lib       stage0
+	cp -r stage2/fstar-tests     stage0
+	cp -r stage2/intfiles        stage0
+	cp -r stage2/Makefile        stage0
+	cp -r stage2/dune            stage0
+	cp -r stage2/dune-project    stage0
+	cp -r ulib                   stage0
+	cp -r version.txt            stage0
+	echo 'bin/' >> stage0/.gitignore
+	echo 'lib/' >> stage0/.gitignore
 
-.PHONY: ci-pre
-ci-pre: ci-rebootstrap
+INSTALL_EXEC := install
+install_dir = cd $(1) && find . -type f -exec $(INSTALL_EXEC) -m 644 -D {} $(PREFIX)/$(2)/{} \;
 
-.PHONY: ci-rebootstrap
-ci-rebootstrap:
-	+$(Q)$(MAKE) full-bootstrap FSTAR_BUILD_PROFILE=test
+.PHONY: install
+install: stage2
+	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
+	@# Install the binary and the binary library
+	cd stage2 && dune install --profile=release --prefix=$(PREFIX)
+	@# Then the standard library sources and checked files
+	+$(MAKE) -C $(FSTAR_HOME)/ulib install
 
-.PHONY: ci-ocaml-test
-ci-ocaml-test:
-	+$(Q)$(MAKE) -C src ocaml-unit-tests
+.PHONY: package
+package:
+	rm -rf _build
+	mkdir _build
+	+$(MAKE) install PREFIX=$(CURDIR)/_build/
+	tar czf fstar.tar.gz -C _build .
 
-.PHONY: ci-ulib-extra
-ci-ulib-extra:
-	+$(Q)$(MAKE) -C ulib extra
+# save:
+#         $(MAKE) -C src ocaml
+#         @.scripts/git-directory-untouched.sh stage0 || (echo "Stage 1 seems not clean, NOT SAVING"; false)
+#         rm -rf stage1/ocaml/fstar-lib
+#         cp -r  stage2/ocaml/fstar-lib stage1/ocaml/fstar-lib
 
-.PHONY: ci-ulib-in-fsharp
-ci-ulib-in-fsharp:
-	+$(Q)$(MAKE) -C ulib ulib-in-fsharp
+# re2:
+#         rm -f stage2/.depend
+#         git clean -dfx stage2/ocaml
+#         $(MAKE) 2
 
-.PHONY: ci-post
-ci-post:						\
-	ci-ulib-in-fsharp				\
-	ci-ocaml-test					\
-	ci-uregressions					\
-	$(if $(FSTAR_CI_TEST_KARAMEL),ci-karamel-test,)	\
-	ci-ulib-extra
 
-.PHONY: ci-uregressions
-ci-uregressions:
-	+$(Q)$(MAKE) -C src uregressions
-
-.PHONY: ci-karamel-test
-ci-karamel-test: ci-krmllib
-	+$(Q)$(MAKE) -C examples krml_tests
-
-# krmllib needs FStar.ModifiesGen already checked, so we add the dependency on
-# ulib-extra here. This is possibly spurious and fixable by tweaking krml's makefiles.
-.PHONY: ci-krmllib
-ci-krmllib: ci-ulib-extra
-	+$(Q)OTHERFLAGS="${OTHERFLAGS} --admit_smt_queries true" $(MAKE) -C $(KRML_HOME)/krmllib
-
-# Shortcuts:
-
-.PHONY: 1 2 3
-
-1: fstar
-
-# This is a hacky rule to bootstrap the compiler, and not
-# the library, more quickly.
-2:
-	+$(Q)$(MAKE) -C src ocaml
-	+$(Q)$(MAKE) -C src/ocaml-output overlay-snapshots
-	+$(Q)$(MAKE) fstar
-
-3:
-	+$(Q)$(MAKE) 1
-	+$(Q)$(MAKE) 2
+watch:
+	while true; do \
+		$(MAKE) ;\
+		inotifywait -qre close_write,moved_to .; \
+	done

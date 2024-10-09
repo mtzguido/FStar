@@ -94,16 +94,16 @@ let unfold_logxor64 (x y: U64.t) : Lemma
 /// Now, here's a tactic that will try to rewrite the goal
 /// using one of the above three lemmas or fail
 let unfold64 () : Tac unit =
-  or_else (fun () -> mapply (quote unfold_logand64))
-          (fun () -> or_else (fun () -> mapply (quote unfold_logor64))
-                             (fun () -> mapply (quote unfold_logxor64)))
+  or_else (fun () -> mapply0 (quote unfold_logand64))
+          (fun () -> or_else (fun () -> mapply0 (quote unfold_logor64))
+                             (fun () -> mapply0 (quote unfold_logxor64)))
 
 let aux () : Tac unit = or_else unfold64 (fun () -> raise SKIP)
 
 /// Finally, a tactic for bitwise operations on U64.t
 let bv64_tac () : Tac unit =
     //introduce a single `v e = v e'` at the top, if the goal is a U64.t equality
-    mapply (`v64_eq);
+    mapply0 (`v64_eq);
     norm [];
     //proceed top-down through the goal recursively rewriting to `uint_t 64` further
     // if unfold64 fails, then just skip rewriting this node.

@@ -1,0 +1,12 @@
+(include_subdirs unqualified)
+(library
+ (name fstar_plugins)
+ ; (public_name fstar.plugins)
+ (libraries
+   fstar-guts
+ )
+ (modes native)
+ (wrapped false)
+ (preprocess (pps ppx_deriving.show ppx_deriving_yojson sedlex.ppx))
+ ; ^ Needed for some of the base modules.
+)

@@ -101,3 +101,6 @@ nuget/
 
 # devcontainer temp files
 /.devcontainer_build.log
+
+
+stage3

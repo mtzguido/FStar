@@ -1,30 +1,13 @@
 {
-  "fstar_exe": "fstar.exe",
+  "fstar_exe": "../bin/fstar-stage0.exe",
   "options": [
     "--MLish",
     "--lax",
-    "--cache_dir",
-    ".cache.boot",
-    "--no_location_info",
+    "--cache_dir", "../stage1/fstarc.checked",
     "--warn_error",
     "-271-272-241-319-274"
   ],
   "include_dirs": [
-    "../ulib",
-    "basic",
-    "class",
-    "data",
-    "extraction",
-    "fstar",
-    "parser",
-    "prettyprint",
-    "reflection",
-    "smtencoding",
-    "syntax",
-    "syntax/print",
-    "tactics",
-    "tosyntax",
-    "typechecker",
-    "tests"
+    "."
   ]
 }

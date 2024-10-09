@@ -1,0 +1,9 @@
+(lang dune 3.8)
+(name fstar_lib)
+(generate_opam_files false)
+(using menhir 2.1)
+
+(package
+  (name fstar_lib)
+  (synopsis "An OCaml-built library for F* applications")
+)
