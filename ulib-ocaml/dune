@@ -3,6 +3,7 @@
  (name fstar_lib)
  (public_name fstar_lib)
  (libraries
+    ; REVIEW, dynlink and menhir seem unneeded
     batteries
     zarith
     stdint

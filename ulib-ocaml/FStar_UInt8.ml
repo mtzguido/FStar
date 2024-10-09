@@ -1,3 +1,6 @@
+(* GM: This file is manual due to the derivings,
+   and that sucks. *)
+
 type uint8 = int[@@deriving yojson,show]
 type byte = uint8[@@deriving yojson,show]
 type t = uint8[@@deriving yojson,show]
