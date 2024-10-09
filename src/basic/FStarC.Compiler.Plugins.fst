@@ -71,7 +71,7 @@ let load_plugins_dir dir =
 
 let compile_modules dir ms =
    let compile m =
-     let packages = [ "fstar.lib" ] in
+     let packages = [ "fstar_lib"; "fstar-guts" ] in
      let pkg pname = "-package " ^ pname in
      let args = ["ocamlopt"; "-shared"] (* FIXME shell injection *)
                 @ ["-I"; dir]
@@ -88,11 +88,14 @@ let compile_modules dir ms =
        | Some s -> s
        | None -> ""
      in
-     let env_setter = BU.format5 "env OCAMLPATH=\"%s/../lib/%s%s/%s%s\""
-       Options.fstar_bin_directory
+     let ocaml_lib_dir =
+       Util.get_exec_dir () ^ "/../lib" |> Util.normalize_file_path
+     in
+     let env_setter = BU.format3 "env OCAMLPATH=\"%s%s%s\""
+       ocaml_lib_dir
        ocamlpath_sep
-       Options.fstar_bin_directory
-       ocamlpath_sep
+      //  Options.fstar_bin_directory // needed?
+      //  ocamlpath_sep
        old_ocamlpath
      in
      let cmd = String.concat " " (env_setter :: "ocamlfind" :: args) in

@@ -134,6 +134,7 @@ do-install:
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
 	$(Q)dune install --root=$(FSTARC)   --prefix=$(shell realpath $(PREFIX))
+	$(Q)dune install --root=$(FSTARC)/../bare fstar-guts   --prefix=$(shell realpath $(PREFIX))
 	$(Q)dune install --root=$(FSTARLIB) --prefix=$(shell realpath $(PREFIX))
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
@@ -180,7 +181,8 @@ test2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
 test2: tests examples
 
 .PHONY: test
-test: test2 check-stage3-diff
+test: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
+test: tests examples
 
 .PHONY: tests
 tests:
