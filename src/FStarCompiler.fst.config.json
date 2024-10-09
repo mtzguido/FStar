@@ -1,5 +1,5 @@
 {
-  "fstar_exe": "../bin/fstar-stage0.exe",
+  "fstar_exe": "../stage0/bin/fstar.exe",
   "options": [
     "--MLish",
     "--lax",
