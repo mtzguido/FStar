@@ -1,7 +1,7 @@
 export FSTAR_HOME=$(CURDIR)
 include .common.mk
 
-FSTAR_DEFAULT_GOAL ?= full
+FSTAR_DEFAULT_GOAL ?= 2
 .DEFAULT_GOAL := $(FSTAR_DEFAULT_GOAL)
 
 ### STAGES
