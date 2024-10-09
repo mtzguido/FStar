@@ -647,7 +647,7 @@ let rec (doc_of_expr :
                                                                   = uu___6;_}::[])
                  when
                  (let uu___7 = FStar_Extraction_ML_Syntax.string_of_mlpath p in
-                  uu___7 = "FStar.Compiler.Effect.try_with") ||
+                  uu___7 = "FStarC.Compiler.Effect.try_with") ||
                    (let uu___7 =
                       FStar_Extraction_ML_Syntax.string_of_mlpath p in
                     uu___7 = "FStar.All.try_with")
