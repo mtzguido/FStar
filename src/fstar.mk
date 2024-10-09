@@ -17,21 +17,21 @@ clean: clean-ocaml
 ocaml: all-ml
 
 # Unclear whether we even want defaults here.
-# FSTAR_BOOT		?= $(FSTAR_HOME)/stage0/bin/fstar.exe
+# FSTAR_EXE		?= $(FSTAR_HOME)/stage0/bin/fstar.exe
 # CACHE_DIR 		?= $(CACHE_DIR)/fstarc.checked
 # OUTPUT_DIR	  ?= $(CACHE_DIR)/fstarc.ml
 # CODEGEN       ?= OCaml
 # SRC           ?= .
 
-FSTAR_BOOT_OPTIONS += $(OTHERFLAGS)
-FSTAR_BOOT_OPTIONS += --lax
-# FSTAR_BOOT_OPTIONS += --warn_error -271-241-319-274
-FSTAR_BOOT_OPTIONS += --cache_dir "$(CACHE_DIR)"
-FSTAR_BOOT_OPTIONS += --cache_checked_modules
-FSTAR_BOOT_OPTIONS += --odir "$(OUTPUT_DIR)"
-FSTAR_BOOT_OPTIONS += --include $(SRC)
+FSTAR_OPTIONS += $(OTHERFLAGS)
+FSTAR_OPTIONS += --lax
+# FSTAR_OPTIONS += --warn_error -271-241-319-274
+FSTAR_OPTIONS += --cache_dir "$(CACHE_DIR)"
+FSTAR_OPTIONS += --cache_checked_modules
+FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
+FSTAR_OPTIONS += --include $(SRC)
 
-FSTAR = $(RUNLIM) $(FSTAR_BOOT) $(SIL) $(FSTAR_BOOT_OPTIONS)
+FSTAR = $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 
 # FIXME: Maintaining this list sucks. Could **the module** itself specify whether it is
 # noextract? Actually, the F* compiler should already know which of its modules are

@@ -17,27 +17,27 @@ clean: clean-ocaml
 ocaml: all-ml
 
 # Unclear whether we even want defaults here.
-# FSTAR_BOOT		?= $(FSTAR_HOME)/stage1/bare/bin/fstar.exe
+# FSTAR_EXE		?= $(FSTAR_HOME)/stage1/bare/bin/fstar.exe
 # CACHE_DIR 		?= $(CACHE_DIR)/plugins.checked
 # OUTPUT_DIR	  ?= $(CACHE_DIR)/plugins.ml
 # CODEGEN       ?= Plugin
 # SRC           ?= .
 
-FSTAR_BOOT_OPTIONS += $(OTHERFLAGS)
-FSTAR_BOOT_OPTIONS += --lax
-# FSTAR_BOOT_OPTIONS += --warn_error -271-241-319-274
-FSTAR_BOOT_OPTIONS += --cache_dir "$(CACHE_DIR)"
-FSTAR_BOOT_OPTIONS += --cache_checked_modules
-FSTAR_BOOT_OPTIONS += --odir "$(OUTPUT_DIR)"
-FSTAR_BOOT_OPTIONS += --no_default_includes
-FSTAR_BOOT_OPTIONS += --include $(SRC)
+FSTAR_OPTIONS += $(OTHERFLAGS)
+FSTAR_OPTIONS += --lax
+# FSTAR_OPTIONS += --warn_error -271-241-319-274
+FSTAR_OPTIONS += --cache_dir "$(CACHE_DIR)"
+FSTAR_OPTIONS += --cache_checked_modules
+FSTAR_OPTIONS += --odir "$(OUTPUT_DIR)"
+FSTAR_OPTIONS += --no_default_includes
+FSTAR_OPTIONS += --include $(SRC)
 
 # FIXME: This should be somehow fixed better. We should distinguish the
 # namespaces of the 'old' fstarlib and the new one.
-# FSTAR_BOOT_OPTIONS += --no_default_includes
-# FSTAR_BOOT_OPTIONS += --include $(realpath $(FSTAR_HOME)/ulib/)
+# FSTAR_OPTIONS += --no_default_includes
+# FSTAR_OPTIONS += --include $(realpath $(FSTAR_HOME)/ulib/)
 
-FSTAR = $(RUNLIM) $(FSTAR_BOOT) $(SIL) $(FSTAR_BOOT_OPTIONS)
+FSTAR = $(FSTAR_EXE) $(SIL) $(FSTAR_OPTIONS)
 
 # FIXME: Maintaining this list sucks. Could **the module** itself specify whether it is
 # noextract?
