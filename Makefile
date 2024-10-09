@@ -38,44 +38,44 @@ $(FSTAR0_EXE):
 $(FSTAR1_BARE_EXE): $(FSTAR0_EXE)
 	$(call msg, "EXTRACT", "STAGE1 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
-		SRC=$(CURDIR)/src \
-		FSTAR_BOOT=$(FSTAR0_EXE) \
-		CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
-		OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
-		CODEGEN=OCaml
+	  SRC=$(CURDIR)/src \
+	  FSTAR_BOOT=$(FSTAR0_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
+	  CODEGEN=OCaml
 	$(MAKE) -C stage1 fstar-bare
 
 .PHONY: $(FSTAR1_FULL_EXE)
 $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE1 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
-		SRC=$(CURDIR)/ulib \
-		FSTAR_BOOT=$(CURDIR)/$(FSTAR1_BARE_EXE) \
-		CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
-		OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
-		CODEGEN=Plugin
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_BOOT=$(CURDIR)/$(FSTAR1_BARE_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
+	  CODEGEN=Plugin
 	$(MAKE) -C stage1 fstar
 
 .PHONY: $(FSTAR2_BARE_EXE)
 $(FSTAR2_BARE_EXE): $(FSTAR1_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE2 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
-		SRC=$(CURDIR)/src \
-		FSTAR_BOOT=$(FSTAR1_FULL_EXE) \
-		CACHE_DIR=$(CURDIR)/stage2/fstarc.checked \
-		OUTPUT_DIR=$(CURDIR)/stage2/fstarc.ml \
-		CODEGEN=OCaml
+	  SRC=$(CURDIR)/src \
+	  FSTAR_BOOT=$(FSTAR1_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage2/fstarc.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage2/fstarc.ml \
+	  CODEGEN=OCaml
 	$(MAKE) -C stage2 fstar-bare
 
 .PHONY: $(FSTAR2_FULL_EXE)
 $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 	$(call msg, "EXTRACT", "STAGE2 PLUGINS")
 	$(MAKE) -f src/plugins.mk ocaml \
-		SRC=$(CURDIR)/ulib \
-		FSTAR_BOOT=$(CURDIR)/$(FSTAR2_BARE_EXE) \
-		CACHE_DIR=$(CURDIR)/stage2/plugins.checked \
-		OUTPUT_DIR=$(CURDIR)/stage2/plugins.ml \
-		CODEGEN=Plugin
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_BOOT=$(CURDIR)/$(FSTAR2_BARE_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage2/plugins.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage2/plugins.ml \
+	  CODEGEN=Plugin
 	$(MAKE) -C stage2 fstar
 
 # Stage 3 is different, we don't build it, we just check that the
@@ -88,11 +88,11 @@ $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 stage3-bare: | $(FSTAR2_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE3 FSTARC")
 	$(MAKE) -f src/fstar.mk ocaml \
-		SRC=$(CURDIR)/src \
-		FSTAR_BOOT=$(CURDIR)/$(FSTAR2_FULL_EXE) \
-		CACHE_DIR=$(CURDIR)/stage3/fstarc.checked \
-		OUTPUT_DIR=$(CURDIR)/stage3/fstarc.ml \
-		CODEGEN=OCaml
+	  SRC=$(CURDIR)/src \
+	  FSTAR_BOOT=$(CURDIR)/$(FSTAR2_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage3/fstarc.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage3/fstarc.ml \
+	  CODEGEN=OCaml
 
 check-stage3-diff: stage3-bare
 	$(call msg, "DIFF", "STAGE2 vs STAGE3")
@@ -179,6 +179,6 @@ package:
 
 watch:
 	while true; do \
-		$(MAKE) ;\
-		inotifywait -qre close_write,moved_to .; \
+	  $(MAKE) ;\
+	  inotifywait -qre close_write,moved_to .; \
 	done
