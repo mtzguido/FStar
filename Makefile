@@ -35,13 +35,14 @@ FSTAR2_FULL_EXE := stage2/inst/full/bin/fstar.exe
 
 .PHONY: $(FSTAR1_BARE_EXE)
 $(FSTAR1_BARE_EXE): $(FSTAR0_EXE)
-	$(call msg, "EXTRACT", "STAGE1 FSTARC")
+	$(call msg, "EXTRACT", "STAGE1 FSTARC-BARE")
 	$(MAKE) -f mk/fstar.mk ocaml \
 	  SRC=$(CURDIR)/src \
 	  FSTAR_EXE=$(FSTAR0_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/fstarc.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/fstarc.ml \
 	  CODEGEN=OCaml
+	$(call msg, "BUILD", "STAGE1 FSTARC-BARE")
 	$(MAKE) -C stage1 fstar-bare
 
 .PHONY: $(FSTAR1_FULL_EXE)
@@ -53,6 +54,7 @@ $(FSTAR1_FULL_EXE): $(FSTAR1_BARE_EXE)
 	  CACHE_DIR=$(CURDIR)/stage1/plugins.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/plugins.ml \
 	  CODEGEN=PluginNoLib
+	$(call msg, "BUILD", "STAGE1 FSTARC")
 	$(MAKE) -C stage1 fstar
 
 .PHONY: $(FSTAR2_BARE_EXE)
@@ -64,6 +66,7 @@ $(FSTAR2_BARE_EXE): $(FSTAR1_FULL_EXE)
 	  CACHE_DIR=$(CURDIR)/stage2/fstarc.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/fstarc.ml \
 	  CODEGEN=OCaml
+	$(call msg, "BUILD", "STAGE2 FSTARC-BARE")
 	$(MAKE) -C stage2 fstar-bare
 
 .PHONY: $(FSTAR2_FULL_EXE)
@@ -74,7 +77,8 @@ $(FSTAR2_FULL_EXE): $(FSTAR2_BARE_EXE)
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_BARE_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/plugins.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/plugins.ml \
-	  CODEGEN=Plugin
+	  CODEGEN=PluginNoLib
+	$(call msg, "BUILD", "STAGE2 FSTARC")
 	$(MAKE) -C stage2 fstar
 
 # Stage 3 is different, we don't build it, we just check that the
@@ -106,8 +110,8 @@ check-stage3-diff: stage3-bare
 .PHONY: 1.lib
 1.lib: $(FSTAR1_FULL_EXE)
 	$(call msg, "EXTRACT", "STAGE1 LIB")
-	$(Q)mkdir -p stage1/ulib.checked # stupid
-	$(Q)mkdir -p stage1/ulib.ml # stupid
+	mkdir -p stage1/ulib.checked # stupid
+	mkdir -p stage1/ulib.ml # stupid
 	+$(MAKE) -f mk/lib.mk all \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
@@ -115,14 +119,15 @@ check-stage3-diff: stage3-bare
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.ml \
 	  CODEGEN=OCaml \
 	  TAG=lib
+	$(call msg, "BUILD", "STAGE1 LIB")
 	+$(MAKE) -C stage1/ fstarlib
 
 .PHONY: 1.pluglib
 1.pluglib: $(FSTAR1_FULL_EXE)
 	#NB: shares .depend and checked from 1.lib
 	$(call msg, "EXTRACT", "STAGE1 PLUGLIB")
-	$(Q)mkdir -p stage1/ulib.checked # stupid
-	$(Q)mkdir -p stage1/ulib.pluginml # stupid
+	mkdir -p stage1/ulib.checked # stupid
+	mkdir -p stage1/ulib.pluginml # stupid
 	+$(MAKE) -f mk/lib.mk all \
 	  SRC=$(CURDIR)/ulib \
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
@@ -131,6 +136,7 @@ check-stage3-diff: stage3-bare
 	  CODEGEN=Plugin \
 	  TAG=pluginlib \
 	  DEPFLAGS='--extract +FStar.Tactics,+FStar.Reflection,+FStar.Sealed'
+	$(call msg, "BUILD", "STAGE1 PLUGLIB")
 	+$(MAKE) -C stage1/ fstar-pluginlib
 
 .PHONY: 2.lib

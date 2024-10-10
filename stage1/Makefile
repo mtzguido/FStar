@@ -7,7 +7,6 @@ FSTAR_DUNE_BUILD_OPTIONS += --display=quiet
 fstar-bare: bare/bin/fstar.exe
 .PHONY: bare/bin/fstar.exe
 bare/bin/fstar.exe:
-	$(call msg, "BUILD", "FSTARC-BARE")
 	dune build $(FSTAR_DUNE_BUILD_OPTIONS) --root=bare
 	dune install --root=bare --prefix=$(CURDIR)/inst/bare
 
@@ -15,7 +14,6 @@ bare/bin/fstar.exe:
 fstar: full/bin/fstar.exe
 .PHONY: full/bin/fstar.exe
 full/bin/fstar.exe:
-	$(call msg, "BUILD", "FSTARC")
 	env OCAMLPATH="$(CURDIR)/inst/bare/lib" \
 	  dune build --root=full $(FSTAR_DUNE_BUILD_OPTIONS)
 	env OCAMLPATH="$(CURDIR)/inst/bare/lib" \
@@ -23,12 +21,10 @@ full/bin/fstar.exe:
 
 .PHONY: fstarlib
 fstarlib:
-	$(call msg, "BUILD", "LIB")
 	dune build   --root=fstarlib $(FSTAR_DUNE_BUILD_OPTIONS)
 	dune install --root=fstarlib --prefix=$(CURDIR)/inst/fstarlib
 
 .PHONY: fstar-pluginlib
 fstar-pluginlib:
-	$(call msg, "BUILD", "PLUGIN LIB")
 	env OCAMLPATH="$(CURDIR)/inst/fstarlib/lib:$(CURDIR)/inst/bare/lib" \
 	  dune build --root=fstar-pluginlib $(FSTAR_DUNE_BUILD_OPTIONS)
