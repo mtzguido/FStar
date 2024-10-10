@@ -27,6 +27,7 @@ module O   = FStarC.Options
 open FStarC.Class.Show
 
 let loaded : ref (list string) = BU.mk_ref []
+let loaded_plugin_lib : ref bool = BU.mk_ref false
 
 let pout  s   = if Debug.any () then BU.print_string s
 let pout1 s x = if Debug.any () then BU.print1 s x
@@ -56,22 +57,29 @@ let dynlink (fname:string) : unit =
   )
 
 let load_plugin tac =
+  if ! loaded_plugin_lib then ()
+  else (
+    pout "Loading fstar_plugin_lib before first plugin\n";
+    dynlink_loadfile (BU.get_exec_dir () ^ "/../lib/fstar_plugin_lib/fstar_plugin_lib.cmxs");
+    pout "Loaded fstar_plugin_lib OK\n";
+    loaded_plugin_lib := true
+  );
   dynlink tac
 
 let load_plugins tacs =
-    List.iter load_plugin tacs
+  List.iter load_plugin tacs
 
 let load_plugins_dir dir =
-    (* Dynlink all .cmxs files in the given directory *)
-    (* fixme: confusion between FStarC.Compiler.String and FStar.String *)
-    BU.readdir dir
-    |> List.filter (fun s -> String.length s >= 5 && FStar.String.sub s (String.length s - 5) 5 = ".cmxs")
-    |> List.map (fun s -> dir ^ "/" ^ s)
-    |> load_plugins
+  (* Dynlink all .cmxs files in the given directory *)
+  (* fixme: confusion between FStarC.Compiler.String and FStar.String *)
+  BU.readdir dir
+  |> List.filter (fun s -> String.length s >= 5 && FStar.String.sub s (String.length s - 5) 5 = ".cmxs")
+  |> List.map (fun s -> dir ^ "/" ^ s)
+  |> load_plugins
 
 let compile_modules dir ms =
    let compile m =
-     let packages = [ "fstar_lib"; "fstar-guts" ] in
+     let packages = [ "fstar_plugin_lib" ] in
      let pkg pname = "-package " ^ pname in
      let args = ["ocamlopt"; "-shared"] (* FIXME shell injection *)
                 @ ["-I"; dir]
