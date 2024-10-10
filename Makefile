@@ -213,7 +213,8 @@ fstar.tar.gz: 2.full 2.lib 2.plib
 	$(MAKE) do-install \
 	  PREFIX=$(CURDIR)/_build \
 	  FSTARC=$(CURDIR)/stage2/full \
-	  FSTARLIB=$(CURDIR)/stage2/fstarlib
+	  FSTARLIB=$(CURDIR)/stage2/fstarlib \
+	  FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
 	$(call msg, "ARCHIVE", $@)
 	tar czf $@ -C _build .
 	rm -rf _build
