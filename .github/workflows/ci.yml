@@ -1,4 +1,4 @@
-name: FStar build and test
+name: F* CI
 
 on:
   push:
@@ -12,8 +12,8 @@ defaults:
 jobs:
   build-fstar:
     # Build an F* binary package: a fully-bootstrapped stage 2 compiler,
-    # with its plugins, a fully checker library (i.e. with .checked) files
-    # and compiled versions of fstar_lib and fstar_plugin_lib.
+    # with its plugins, a fully checker library (i.e. with .checked)
+    # files and compiled versions of fstar_lib and fstar_plugin_lib.
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
@@ -86,8 +86,9 @@ jobs:
 
   test-stage1:
     # Run all tests over the stage 1 compiler. They should all pass,
-    # just like for stage2. The compiler used to build fstar.exe should
-    # not matter.
+    # just like for stage2. The compiler used to build fstar.exe itself
+    # should not matter.
+    needs: build-fstar
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
@@ -116,15 +117,15 @@ jobs:
         run: make -skj$(nproc) test
 
   test-external:
-    # Download the binary package into a fresh machine and
-    # test that it starts up. Note: this does not check out the repo,
-    # this is meant to mimic a normal user of the binary package.
+    # Download the binary package into a fresh machine (no container)
+    # and test that it starts up. Note: this does not check out the
+    # repo, this is meant to mimic a normal user of the binary package.
     needs: build-fstar
     runs-on: ubuntu-latest
     steps:
       # Note: this runs on a fresh machine, so we need to install z3,
-      # and ONLY that. This test is in part meant to check that fstar runs
-      # without all the fancy dependencies and/or OPAM.
+      # and ONLY that. This test is in part meant to check that fstar
+      # runs without all the fancy dependencies and/or OPAM.
       - name: Cleanup
         run: find . -delete
       - uses: pavpanchekha/setup-z3@master
