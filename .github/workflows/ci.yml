@@ -23,13 +23,10 @@ jobs:
         uses: actions/checkout@master
 
       - name: Build
-        run: make -skj$(nproc)
-
-      - name: Test
-        run: make -skj$(nproc) test
+        run: make -skj$(nproc) |& .scripts/format_for_github_actions.sh
 
       - name: Package
-        run: make -skj$(nproc) package
+        run: make -skj$(nproc) package |& .scripts/format_for_github_actions.sh
 
       - name: Upload package as build artifact
         uses: actions/upload-artifact@v4
@@ -37,6 +34,9 @@ jobs:
           path: fstar.tar.gz
           name: fstar.tar.gz
           retention-days: 3
+
+      - name: Test
+        run: make -skj$(nproc) test |& .scripts/format_for_github_actions.sh
 
   test-package:
     needs: build-fstar
