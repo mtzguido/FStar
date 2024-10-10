@@ -207,19 +207,30 @@ do-install:
 	mkdir -p $(PREFIX)/ulib/.cache
 	cp -r -t $(PREFIX)/ulib/.cache $(BROOT)/ulib.checked/*
 
-package: fstar.tar.gz
-.PHONY: fstar.tar.gz
-fstar.tar.gz: 2.full 2.lib 2.plib
-	rm -rf _build
-	mkdir _build
-	$(MAKE) do-install \
-	  PREFIX=$(CURDIR)/_build \
-	  FSTARC=$(CURDIR)/stage2/full \
-	  FSTARLIB=$(CURDIR)/stage2/fstarlib \
-	  FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
-	$(call msg, "ARCHIVE", $@)
-	tar czf $@ -C _build .
-	rm -rf _build
+.PHONY: archive
+archive:
+	rm -rf $(PREFIX)
+	mkdir $(PREFIX)
+	$(MAKE) do-install
+	$(call msg, "ARCHIVE", $(ARCHIVE))
+	tar czf $(ARCHIVE) -C $(PREFIX) .
+	rm -rf $(PREFIX)
+
+package-1: export PREFIX=$(CURDIR)/_build
+package-1: export BROOT=$(CURDIR)/stage1
+package-1: export ARCHIVE=fstar-$(shell cat version.txt)-stage1.tar.gz
+package-1: 1.full 1.lib 1.plib
+	$(MAKE) archive
+	ln -Tsrf $(ARCHIVE) fstar.tar.gz
+
+package-2: export PREFIX=$(CURDIR)/_build
+package-2: export BROOT=$(CURDIR)/stage2
+package-2: export ARCHIVE=fstar-$(shell cat version.txt).tar.gz
+package-2: 2.full 2.lib 2.plib
+	$(MAKE) archive
+	ln -Tsrf $(ARCHIVE) fstar.tar.gz
+
+package: package-2
 
 .PHONY: test1
 test1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
