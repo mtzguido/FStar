@@ -18,6 +18,8 @@ full/bin/fstar.exe:
 	  dune build --root=full $(FSTAR_DUNE_BUILD_OPTIONS)
 	env OCAMLPATH="$(CURDIR)/inst/bare/lib" \
 	  dune install --root=full --prefix=$(CURDIR)/inst/full
+	# Installed full compiler needs access to a ulib
+	ln -Tsrf ../ulib inst/full/ulib
 
 .PHONY: fstarlib
 fstarlib:
