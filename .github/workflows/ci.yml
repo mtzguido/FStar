@@ -25,8 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Build and package
-        run: make -skj$(nproc) package
+      - name: Build and package stage 2
+        run: make -skj$(nproc) package-2
 
       - name: Upload package as build artifact
         uses: actions/upload-artifact@v4
@@ -34,6 +34,21 @@ jobs:
           path: fstar.tar.gz
           name: fstar.tar.gz
           retention-days: 3
+
+      # FIXME: Ideally the test job for stage 2 could start at this moment.
+
+      - name: Build and package stage 1
+        run: make -skj$(nproc) package-1
+
+      - name: Upload package as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: fstar.tar.gz
+          name: fstar-stage1.tar.gz
+          retention-days: 3
+
+      - name: Check for a stage 3 diff
+        run: make -skj$(nproc) check-stage3-diff
 
   test:
     # Download the binary package from the previous job and run the tests
@@ -62,36 +77,12 @@ jobs:
       - name: Set up package locally
         run: |
           mkdir out
+          find
+          ls -lh
           tar xzf fstar.tar.gz -C out
 
       - name: Run tests
         run: make -skj$(nproc) test
-
-  test-external:
-    # Download the binary package into a fresh machine and
-    # test that it starts up. Note: this does not check out the repo,
-    # this is meant to mimic a normal user of the binary package.
-    needs: build-fstar
-    runs-on: ubuntu-latest
-    container: mtzguido/fstar-base-testing
-    steps:
-      - name: Cleanup
-        run: find . -delete
-      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
-      - uses: mtzguido/set-opam-env@master
-      # ^ z3 is installed in the OPAM switch. We should probably get it
-      # from elsewhere and *not* use this container so we separate the
-      # runtime requirements from build requirements.
-
-      - name: Get fstar package
-        uses: actions/download-artifact@v4
-        with:
-          name: fstar.tar.gz
-
-      - run: tar xzf fstar.tar.gz
-
-      - name: Smoke test
-        run: ./bin/fstar.exe ulib/Prims.fst -f
 
   test-stage1:
     # Run all tests over the stage 1 compiler. They should all pass,
@@ -108,7 +99,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Build stage 1
-        run: make -skj$(nproc) 1
+      - name: Get fstar package
+        uses: actions/download-artifact@v4
+        with:
+          path: fstar.tar.gz
+          name: fstar-stage1.tar.gz
+
+      - name: Set up package locally
+        run: |
+          mkdir out
+          find
+          ls -lh
+          tar xzf fstar.tar.gz -C out
+
       - name: Run tests
         run: make -skj$(nproc) test
+
+  test-external:
+    # Download the binary package into a fresh machine and
+    # test that it starts up. Note: this does not check out the repo,
+    # this is meant to mimic a normal user of the binary package.
+    needs: build-fstar
+    runs-on: ubuntu-latest
+    steps:
+      # Note: this runs on a fresh machine, so we need to install z3,
+      # and ONLY that. This test is in part meant to check that fstar runs
+      # without all the fancy dependencies and/or OPAM.
+      - name: Cleanup
+        run: find . -delete
+      - uses: pavpanchekha/setup-z3@master
+        with:
+          z3-version: 4.8.5
+
+      - name: Get fstar package
+        uses: actions/download-artifact@v4
+        with:
+          name: fstar.tar.gz
+
+      - run: tar xzf fstar.tar.gz
+
+      - name: Smoke test
+        run: ./bin/fstar.exe ulib/Prims.fst -f
