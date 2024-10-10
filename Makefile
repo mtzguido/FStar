@@ -205,7 +205,7 @@ do-install:
 	cp -r -t $(PREFIX)/ulib ulib/legacy
 	cp -r -t $(PREFIX)/ulib ulib/LowStar
 	mkdir -p $(PREFIX)/ulib/.cache
-	cp -r -t $(PREFIX)/ulib/.cache $(BROOT)/ulib.checked
+	cp -r -t $(PREFIX)/ulib/.cache $(BROOT)/ulib.checked/*
 
 package: fstar.tar.gz
 .PHONY: fstar.tar.gz
