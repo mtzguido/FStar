@@ -150,9 +150,9 @@ do-install:
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
-	$(Q)dune install --root=$(FSTARC)   --prefix=$(shell realpath $(PREFIX))
-	$(Q)dune install --root=$(FSTARC)/../bare fstar-guts   --prefix=$(shell realpath $(PREFIX))
-	$(Q)dune install --root=$(FSTARLIB) --prefix=$(shell realpath $(PREFIX))
+	$(Q)dune install --root=$(FSTARC)    --prefix=$(abspath $(PREFIX))
+	$(Q)dune install --root=$(FSTARLIB)  --prefix=$(abspath $(PREFIX))
+	$(Q)dune install --root=$(FSTARPLIB) --prefix=$(abspath $(PREFIX))
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
 	cp ulib/*.fsti $(PREFIX)/ulib/
@@ -162,19 +162,19 @@ do-install:
 	cp -r ulib/LowStar $(PREFIX)/ulib/
 	cp -r $(FSTARLIB)/../ulib.checked $(PREFIX)/ulib/.cache
 
-1: 1.lib
-	$(MAKE) do-install \
-	  PREFIX=$(CURDIR)/stage1/out \
-	  FSTARC=$(CURDIR)/stage1/full \
-	  FSTARLIB=$(CURDIR)/stage1/fstarlib
+1: PREFIX=$(CURDIR)/stage1/out
+1: FSTARC=$(CURDIR)/stage1/full
+1: FSTARLIB=$(CURDIR)/stage1/fstarlib
+1: FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
+1: do-install
 	ln -Tsf stage1/out out
 
-2: 2.lib
-	$(MAKE) do-install \
-	  PREFIX=$(CURDIR)/stage2/out \
-	  FSTARC=$(CURDIR)/stage2/full \
-	  FSTARLIB=$(CURDIR)/stage2/fstarlib
-	ln -Tsf stage2/out out # stage2 is the final stage
+2: PREFIX=$(CURDIR)/stage2/out
+2: FSTARC=$(CURDIR)/stage2/full
+2: FSTARLIB=$(CURDIR)/stage2/fstarlib
+2: FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
+2: do-install
+	ln -Tsf stage2/out out
 
 package: fstar.tar.gz
 .PHONY: fstar.tar.gz
