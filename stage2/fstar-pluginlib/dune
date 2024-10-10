@@ -6,7 +6,7 @@
     fstar-guts
  )
  (modes native)
- (wrapped false)
+ (wrapped true)
  (preprocess (pps ppx_deriving.show ppx_deriving_yojson))
 )
 
