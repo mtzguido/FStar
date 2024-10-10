@@ -35,10 +35,34 @@ jobs:
           name: fstar.tar.gz
           retention-days: 3
 
+  test:
+    needs: build-fstar
+    runs-on: ubuntu-latest
+    container: mtzguido/fstar-base-testing
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
+
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Download package
+        uses: actions/download-artifact@v4
+        with:
+          path: fstar.tar.gz
+          name: fstar.tar.gz
+
+      - name: Set up package locally
+        run:
+          mkdir out
+          tar xzf fstar.tar.gz -C out
+
       - name: Test
         run: make -skj$(nproc) test |& .scripts/format_for_github_actions.sh
 
-  test-package:
+  test-external:
     needs: build-fstar
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
