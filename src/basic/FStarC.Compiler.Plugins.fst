@@ -34,33 +34,34 @@ let pout1 s x = if Debug.any () then BU.print1 s x
 let perr  s   = if Debug.any () then BU.print_error s
 let perr1 s x = if Debug.any () then BU.print1_error s x
 
+let do_dynlink (fname:string) : unit =
+  try
+    dynlink_loadfile fname
+  with DynlinkError e ->
+    E.log_issue0 E.Error_PluginDynlink [
+      E.text (BU.format1 "Failed to load plugin file %s" fname);
+      Pprint.prefix 2 1 (E.text "Reason:") (E.text e);
+      E.text (BU.format1 "Remove the `--load` option or use `--warn_error -%s` to ignore and continue."
+                (show (E.errno E.Error_PluginDynlink)))
+    ];
+    (* If we weren't ignoring this error, just stop now *)
+    E.stop_if_err ()
+
 let dynlink (fname:string) : unit =
   if List.mem fname !loaded then (
     pout1 "Plugin %s already loaded, skipping\n" fname
   ) else (
     pout ("Attempting to load " ^ fname ^ "\n");
-    begin try
-      dynlink_loadfile fname
-    with DynlinkError e ->
-      E.log_issue0 E.Error_PluginDynlink [
-        E.text (BU.format1 "Failed to load plugin file %s" fname);
-        Pprint.prefix 2 1 (E.text "Reason:") (E.text e);
-        E.text (BU.format1 "Remove the `--load` option or use `--warn_error -%s` to ignore and continue."
-                  (show (E.errno E.Error_PluginDynlink)))
-      ];
-      (* If we weren't ignoring this error, just stop now *)
-      E.stop_if_err ()
-    end;
+    do_dynlink fname;
     loaded := fname :: !loaded;
     pout1 "Loaded %s\n" fname;
     ()
   )
 
 let load_plugin tac =
-  if ! loaded_plugin_lib then ()
-  else (
+  if not (!loaded_plugin_lib) then (
     pout "Loading fstar_plugin_lib before first plugin\n";
-    dynlink_loadfile (BU.get_exec_dir () ^ "/../lib/fstar_plugin_lib/fstar_plugin_lib.cmxs");
+    do_dynlink (BU.normalize_file_path <| BU.get_exec_dir () ^ "/../lib/fstar_plugin_lib/fstar_plugin_lib.cmxs");
     pout "Loaded fstar_plugin_lib OK\n";
     loaded_plugin_lib := true
   );
