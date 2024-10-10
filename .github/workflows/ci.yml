@@ -71,8 +71,8 @@ jobs:
       - name: Get fstar package
         uses: actions/download-artifact@v4
         with:
-          path: fstar.tar.gz
           name: fstar.tar.gz
+          path: .
 
       - name: Set up package locally
         run: |
@@ -103,8 +103,8 @@ jobs:
       - name: Get fstar package
         uses: actions/download-artifact@v4
         with:
-          path: fstar.tar.gz
           name: fstar-stage1.tar.gz
+          path: .
 
       - name: Set up package locally
         run: |
@@ -130,12 +130,13 @@ jobs:
         run: find . -delete
       - uses: pavpanchekha/setup-z3@master
         with:
-          z3-version: 4.8.5
+          version: 4.8.5
 
       - name: Get fstar package
         uses: actions/download-artifact@v4
         with:
           name: fstar.tar.gz
+          path: .
 
       - run: tar xzf fstar.tar.gz
 
