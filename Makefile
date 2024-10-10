@@ -122,8 +122,8 @@ check-stage3-diff: stage3-bare
 	$(call msg, "BUILD", "STAGE1 LIB")
 	+$(MAKE) -C stage1/ fstarlib
 
-.PHONY: 1.pluglib
-1.pluglib: $(FSTAR1_FULL_EXE)
+.PHONY: 1.plib
+1.plib: $(FSTAR1_FULL_EXE)
 	#NB: shares .depend and checked from 1.lib
 	$(call msg, "EXTRACT", "STAGE1 PLUGLIB")
 	mkdir -p stage1/ulib.checked # stupid
@@ -151,6 +151,23 @@ check-stage3-diff: stage3-bare
 	  CODEGEN=OCaml
 	+$(MAKE) -C stage2/fstarlib fstarlib
 	
+.PHONY: 2.plib
+2.plib: $(FSTAR2_FULL_EXE)
+	#NB: shares .depend and checked from 2.lib
+	$(call msg, "EXTRACT", "STAGE2 PLUGLIB")
+	mkdir -p stage2/ulib.checked # stupid
+	mkdir -p stage2/ulib.pluginml # stupid
+	+$(MAKE) -f mk/lib.mk all \
+	  SRC=$(CURDIR)/ulib \
+	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
+	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
+	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.pluginml \
+	  CODEGEN=Plugin \
+	  TAG=pluginlib \
+	  DEPFLAGS='--extract +FStar.Tactics,+FStar.Reflection,+FStar.Sealed'
+	$(call msg, "BUILD", "STAGE2 PLUGLIB")
+	+$(MAKE) -C stage2/ fstar-pluginlib
+
 .PHONY: do-install
 do-install:
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi

@@ -1,3 +1,4 @@
+open Fstar_guts
 open FStarC_Syntax_Syntax
 module R = FStarC_Compiler_Range
 

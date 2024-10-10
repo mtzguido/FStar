@@ -1,0 +1,9 @@
+(lang dune 3.8)
+(name fstar_plugin_lib)
+(generate_opam_files false)
+(using menhir 2.1)
+
+(package
+  (name fstar_plugin_lib)
+  (synopsis "An OCaml library for F* dynamic plugins.")
+)
