@@ -116,7 +116,7 @@ let mcache : smap cache_t = BU.smap_create 50
  *)
 let hash_dependences (deps:Dep.deps) (fn:string) :either string (list (string & string)) =
   let fn =
-    match FStarC.Options.find_file fn with
+    match FStarC.Find.find_file fn with
     | Some fn -> fn
     | _ -> fn
   in

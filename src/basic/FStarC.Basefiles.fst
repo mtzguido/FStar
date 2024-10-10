@@ -8,7 +8,7 @@ module BU = FStarC.Compiler.Util
 module E  = FStarC.Errors
 
 let must_find (fn:string) : string =
-  match Options.find_file fn with
+  match Find.find_file fn with
   | Some f -> f
   | None ->
     E.raise_error0 E.Fatal_ModuleNotFound [

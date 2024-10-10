@@ -297,7 +297,7 @@ let cache_file_name =
         else fn ^".checked"
       in
       let mname = fn |> module_name_of_file in
-      match Options.find_file (cache_fn |> Util.basename) with
+      match Find.find_file (cache_fn |> Util.basename) with
       | Some path ->
         let expected_cache_file = Options.prepend_cache_dir cache_fn in
         if Option.isSome (Options.dep()) //if we're in the dependence analysis
@@ -1459,7 +1459,7 @@ let collect (all_cmd_line_files: list file_name)
   in
   let all_cmd_line_files =
       all_cmd_line_files |> List.map (fun fn ->
-        match FStarC.Options.find_file fn with
+        match Find.find_file fn with
         | None ->
           raise_error0 Errors.Fatal_ModuleOrFileNotFound
             (Util.format1 "File %s could not be found" fn)
