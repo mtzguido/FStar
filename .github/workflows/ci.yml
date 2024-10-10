@@ -128,7 +128,7 @@ jobs:
       # runs without all the fancy dependencies and/or OPAM.
       - name: Cleanup
         run: find . -delete
-      - uses: pavpanchekha/setup-z3@master
+      - uses: mtzguido/setup-z3@master
         with:
           version: 4.8.5
 
