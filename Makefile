@@ -134,7 +134,7 @@ check-stage3-diff: stage3-bare
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage1/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage1/ulib.pluginml \
-	  CODEGEN=Plugin \
+	  CODEGEN=PluginNoLib \
 	  TAG=pluginlib \
 	  DEPFLAGS='--extract +FStar.Tactics,+FStar.Reflection,+FStar.Sealed'
 	$(call msg, "BUILD", "STAGE1 PLUGLIB")
@@ -167,7 +167,7 @@ check-stage3-diff: stage3-bare
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.pluginml \
-	  CODEGEN=Plugin \
+	  CODEGEN=PluginNoLib \
 	  TAG=pluginlib \
 	  DEPFLAGS='--extract +FStar.Tactics,+FStar.Reflection,+FStar.Sealed'
 	$(call msg, "BUILD", "STAGE2 PLUGLIB")
