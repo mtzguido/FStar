@@ -34,7 +34,7 @@
   - Expected type Prims.nat got type Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
+  - See also Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
@@ -50,7 +50,7 @@
   - Assertion failed
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(451,90-451,102)
+  - See also Prims.fst(451,90-451,102)
 
 >>]
 >> Got issues: [
@@ -58,7 +58,7 @@
   - Assertion failed
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(451,90-451,102)
+  - See also Prims.fst(451,90-451,102)
 
 >>]
 >> Got issues: [
@@ -67,7 +67,7 @@
   - Expected type Prims.nat got type Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
+  - See also Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
@@ -86,7 +86,7 @@
     got type Prims.unit
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/FStar.Classical.Sugar.fsti(66,22-66,41)
+  - See also FStar.Classical.Sugar.fsti(66,22-66,41)
 
 >>]
 >> Got issues: [
@@ -122,7 +122,7 @@
   - Expected type Prims.squash (p \/ q) got type Prims.unit
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/FStar.Classical.Sugar.fsti(88,21-88,31)
+  - See also FStar.Classical.Sugar.fsti(88,21-88,31)
 
 >>]
 * Warning 240 at TestErrorLocations.fst(46,4-46,9):

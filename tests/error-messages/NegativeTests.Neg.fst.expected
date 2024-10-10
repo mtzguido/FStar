@@ -4,7 +4,7 @@
   - Expected type Prims.nat got type Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
+  - See also Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
@@ -13,7 +13,7 @@
   - Expected type Prims.nat got type Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
+  - See also Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
@@ -53,7 +53,7 @@
     got type FStar.Pervasives.Native.option 'a
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/FStar.Pervasives.Native.fst(33,4-33,8)
+  - See also FStar.Pervasives.Native.fst(33,4-33,8)
 
 >>]
 >> Got issues: [
@@ -63,7 +63,7 @@
     got type FStar.Pervasives.result Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/FStar.Pervasives.fsti(519,4-519,5)
+  - See also FStar.Pervasives.fsti(519,4-519,5)
 
 >>]
 >> Got issues: [
@@ -72,7 +72,7 @@
   - Expected type Prims.nat got type Prims.int
   - The SMT solver could not prove the query. Use --query_stats for more
     details.
-  - See also /home/guido/r/fstar/staging/ulib/Prims.fst(680,18-680,24)
+  - See also Prims.fst(680,18-680,24)
 
 >>]
 >> Got issues: [
