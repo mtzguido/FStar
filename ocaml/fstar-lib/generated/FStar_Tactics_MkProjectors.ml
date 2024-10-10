@@ -157,49 +157,45 @@ let (mk_one_projector :
                                               (fun r ->
                                                  match r with
                                                  | (cons, arity)::[] ->
+                                                     let uu___5 =
+                                                       if i >= arity
+                                                       then
+                                                         Obj.magic
+                                                           (Obj.repr
+                                                              (FStar_Tactics_V2_Derived.fail
+                                                                 "proj: bad index in mk_one_projector"))
+                                                       else
+                                                         Obj.magic
+                                                           (Obj.repr
+                                                              (FStar_Tactics_Effect.lift_div_tac
+                                                                 (fun uu___7
+                                                                    -> ()))) in
                                                      Obj.magic
-                                                       (Obj.repr
-                                                          (let uu___5 =
-                                                             if i >= arity
-                                                             then
-                                                               Obj.magic
-                                                                 (FStar_Tactics_V2_Derived.fail
-                                                                    "proj: bad index in mk_one_projector")
-                                                             else
-                                                               Obj.magic
-                                                                 (FStar_Tactics_Effect.lift_div_tac
-                                                                    (
-                                                                    fun
-                                                                    uu___7 ->
-                                                                    ())) in
-                                                           FStar_Tactics_Effect.tac_bind
-                                                             (FStar_Sealed.seal
-                                                                (Obj.magic
-                                                                   (FStar_Range.mk_range
-                                                                    "FStar.Tactics.MkProjectors.fst"
-                                                                    (Prims.of_int (34))
-                                                                    (Prims.of_int (4))
-                                                                    (Prims.of_int (35))
-                                                                    (Prims.of_int (48)))))
-                                                             (FStar_Sealed.seal
-                                                                (Obj.magic
-                                                                   (FStar_Range.mk_range
-                                                                    "FStar.Tactics.MkProjectors.fst"
-                                                                    (Prims.of_int (35))
-                                                                    (Prims.of_int (49))
-                                                                    (Prims.of_int (46))
-                                                                    (Prims.of_int (15)))))
+                                                       (FStar_Tactics_Effect.tac_bind
+                                                          (FStar_Sealed.seal
                                                              (Obj.magic
-                                                                uu___5)
+                                                                (FStar_Range.mk_range
+                                                                   "FStar.Tactics.MkProjectors.fst"
+                                                                   (Prims.of_int (34))
+                                                                   (Prims.of_int (4))
+                                                                   (Prims.of_int (35))
+                                                                   (Prims.of_int (48)))))
+                                                          (FStar_Sealed.seal
+                                                             (Obj.magic
+                                                                (FStar_Range.mk_range
+                                                                   "FStar.Tactics.MkProjectors.fst"
+                                                                   (Prims.of_int (35))
+                                                                   (Prims.of_int (49))
+                                                                   (Prims.of_int (46))
+                                                                   (Prims.of_int (15)))))
+                                                          (Obj.magic uu___5)
+                                                          (fun uu___6 ->
                                                              (fun uu___6 ->
-                                                                (fun uu___6
-                                                                   ->
-                                                                   let uu___7
-                                                                    =
-                                                                    FStar_Tactics_V2_Builtins.intros
+                                                                let uu___7 =
+                                                                  FStar_Tactics_V2_Builtins.intros
                                                                     i in
-                                                                   Obj.magic
-                                                                    (FStar_Tactics_Effect.tac_bind
+                                                                Obj.magic
+                                                                  (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
                                                                     (Obj.magic
                                                                     (FStar_Range.mk_range
@@ -385,12 +381,11 @@ let (mk_one_projector :
                                                                     uu___11)))
                                                                     uu___10)))
                                                                     uu___8)))
-                                                                  uu___6)))
+                                                               uu___6))
                                                  | uu___5 ->
                                                      Obj.magic
-                                                       (Obj.repr
-                                                          (FStar_Tactics_V2_Derived.fail
-                                                             "proj: more than one case?")))
+                                                       (FStar_Tactics_V2_Derived.fail
+                                                          "proj: more than one case?"))
                                                 uu___5))) uu___4))) uu___3)))
                uu___1)
 let _ =
@@ -2050,46 +2045,47 @@ let (mk_projs :
                                                             FStar_Tactics_NamedView.ctors
                                                               = ctors;_}
                                                           ->
-                                                          Obj.magic
-                                                            (Obj.repr
-                                                               (let uu___7 =
-                                                                  if
-                                                                    (FStar_List_Tot_Base.length
-                                                                    ctors) <>
-                                                                    Prims.int_one
-                                                                  then
-                                                                    Obj.magic
-                                                                    (FStar_Tactics_V2_Derived.fail
-                                                                    "Expected an inductive with one constructor")
-                                                                  else
-                                                                    Obj.magic
-                                                                    (FStar_Tactics_Effect.lift_div_tac
+                                                          let uu___7 =
+                                                            if
+                                                              (FStar_List_Tot_Base.length
+                                                                 ctors)
+                                                                <>
+                                                                Prims.int_one
+                                                            then
+                                                              Obj.magic
+                                                                (Obj.repr
+                                                                   (FStar_Tactics_V2_Derived.fail
+                                                                    "Expected an inductive with one constructor"))
+                                                            else
+                                                              Obj.magic
+                                                                (Obj.repr
+                                                                   (FStar_Tactics_Effect.lift_div_tac
                                                                     (fun
                                                                     uu___9 ->
-                                                                    ())) in
-                                                                FStar_Tactics_Effect.tac_bind
-                                                                  (FStar_Sealed.seal
-                                                                    (Obj.magic
+                                                                    ()))) in
+                                                          Obj.magic
+                                                            (FStar_Tactics_Effect.tac_bind
+                                                               (FStar_Sealed.seal
+                                                                  (Obj.magic
                                                                     (FStar_Range.mk_range
                                                                     "FStar.Tactics.MkProjectors.fst"
                                                                     (Prims.of_int (210))
                                                                     (Prims.of_int (6))
                                                                     (Prims.of_int (211))
                                                                     (Prims.of_int (57)))))
-                                                                  (FStar_Sealed.seal
-                                                                    (Obj.magic
+                                                               (FStar_Sealed.seal
+                                                                  (Obj.magic
                                                                     (FStar_Range.mk_range
                                                                     "FStar.Tactics.MkProjectors.fst"
                                                                     (Prims.of_int (211))
                                                                     (Prims.of_int (58))
                                                                     (Prims.of_int (230))
                                                                     (Prims.of_int (11)))))
-                                                                  (Obj.magic
-                                                                    uu___7)
+                                                               (Obj.magic
+                                                                  uu___7)
+                                                               (fun uu___8 ->
                                                                   (fun uu___8
                                                                     ->
-                                                                    (fun
-                                                                    uu___8 ->
                                                                     let uu___9
                                                                     =
                                                                     let uu___10
@@ -2157,14 +2153,16 @@ let (mk_projs :
                                                                     indices
                                                                     then
                                                                     Obj.magic
+                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "Inductive indices nonempty?")
+                                                                    "Inductive indices nonempty?"))
                                                                     else
                                                                     Obj.magic
+                                                                    (Obj.repr
                                                                     (FStar_Tactics_Effect.lift_div_tac
                                                                     (fun
                                                                     uu___12
-                                                                    -> ())) in
+                                                                    -> ()))) in
                                                                     Obj.magic
                                                                     (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
@@ -2451,12 +2449,11 @@ let (mk_projs :
                                                                     uu___13)))
                                                                     uu___11)))
                                                                     uu___10)))
-                                                                    uu___8)))
+                                                                    uu___8))
                                                       | uu___7 ->
                                                           Obj.magic
-                                                            (Obj.repr
-                                                               (FStar_Tactics_V2_Derived.fail
-                                                                  "not an inductive")))
+                                                            (FStar_Tactics_V2_Derived.fail
+                                                               "not an inductive"))
                                                      uu___6)))) uu___4)))
                         uu___3))) uu___1)
 let _ =

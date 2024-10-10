@@ -61,8 +61,9 @@ let (string_of_pos : FStar_Compiler_Range_Type.pos -> Prims.string) =
     let uu___ =
       FStar_Compiler_Util.string_of_int pos.FStar_Compiler_Range_Type.line in
     let uu___1 =
-      FStar_Compiler_Util.string_of_int pos.FStar_Compiler_Range_Type.col in
-    FStar_Compiler_Util.format2 "%s,%s" uu___ uu___1
+      FStar_Compiler_Util.string_of_int
+        (Prims.int_one + pos.FStar_Compiler_Range_Type.col) in
+    FStar_Compiler_Util.format2 "%s.%s" uu___ uu___1
 let (string_of_file_name : Prims.string -> Prims.string) =
   fun f ->
     let uu___ = FStar_Options.ide () in
@@ -116,7 +117,7 @@ let (string_of_rng : FStar_Compiler_Range_Type.rng -> Prims.string) =
     let uu___ = string_of_file_name r.FStar_Compiler_Range_Type.file_name in
     let uu___1 = string_of_pos r.FStar_Compiler_Range_Type.start_pos in
     let uu___2 = string_of_pos r.FStar_Compiler_Range_Type.end_pos in
-    FStar_Compiler_Util.format3 "%s(%s-%s)" uu___ uu___1 uu___2
+    FStar_Compiler_Util.format3 "%s:%s-%s" uu___ uu___1 uu___2
 let (string_of_def_range : FStar_Compiler_Range_Type.range -> Prims.string) =
   fun r -> string_of_rng r.FStar_Compiler_Range_Type.def_range
 let (string_of_use_range : FStar_Compiler_Range_Type.range -> Prims.string) =

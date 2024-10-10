@@ -4152,7 +4152,13 @@ and (term_as_mlexpr' :
                                       -> [FStar_Extraction_ML_Syntax.Erased]
                                   | uu___5 -> [] in
                                 let meta1 =
-                                  if has_c_inline
+                                  let uu___5 =
+                                    has_c_inline ||
+                                      (let uu___6 =
+                                         FStar_Options_Ext.get
+                                           "extraction_inline_all" in
+                                       uu___6 <> "") in
+                                  if uu___5
                                   then FStar_Extraction_ML_Syntax.CInline ::
                                     meta
                                   else meta in

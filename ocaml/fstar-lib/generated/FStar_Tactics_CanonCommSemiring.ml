@@ -2338,12 +2338,10 @@ let canon_semiring_aux :
                                                             (FStar_Pervasives_Native.Some
                                                             t), t1, t2)
                                                            ->
-                                                           Obj.magic
-                                                             (Obj.repr
-                                                                (let uu___6 =
-                                                                   FStar_Tactics_V2_Derived.tcut
-                                                                    (FStar_Reflection_V2_Builtins.pack_ln
-                                                                    (FStar_Reflection_V2_Data.Tv_App
+                                                           let uu___6 =
+                                                             FStar_Tactics_V2_Derived.tcut
+                                                               (FStar_Reflection_V2_Builtins.pack_ln
+                                                                  (FStar_Reflection_V2_Data.Tv_App
                                                                     ((FStar_Reflection_V2_Builtins.pack_ln
                                                                     (FStar_Reflection_V2_Data.Tv_FVar
                                                                     (FStar_Reflection_V2_Builtins.pack_fv
@@ -2367,28 +2365,29 @@ let canon_semiring_aux :
                                                                     (t2,
                                                                     FStar_Reflection_V2_Data.Q_Explicit)))),
                                                                     FStar_Reflection_V2_Data.Q_Explicit)))) in
-                                                                 FStar_Tactics_Effect.tac_bind
-                                                                   (FStar_Sealed.seal
-                                                                    (Obj.magic
+                                                           Obj.magic
+                                                             (FStar_Tactics_Effect.tac_bind
+                                                                (FStar_Sealed.seal
+                                                                   (Obj.magic
                                                                     (FStar_Range.mk_range
                                                                     "FStar.Tactics.CanonCommSemiring.fst"
                                                                     (Prims.of_int (1649))
                                                                     (Prims.of_int (12))
                                                                     (Prims.of_int (1649))
                                                                     (Prims.of_int (56)))))
-                                                                   (FStar_Sealed.seal
-                                                                    (Obj.magic
+                                                                (FStar_Sealed.seal
+                                                                   (Obj.magic
                                                                     (FStar_Range.mk_range
                                                                     "FStar.Tactics.CanonCommSemiring.fst"
                                                                     (Prims.of_int (1652))
                                                                     (Prims.of_int (4))
                                                                     (Prims.of_int (1690))
                                                                     (Prims.of_int (7)))))
-                                                                   (Obj.magic
-                                                                    uu___6)
-                                                                   (fun
-                                                                    uu___7 ->
-                                                                    (fun b ->
+                                                                (Obj.magic
+                                                                   uu___6)
+                                                                (fun uu___7
+                                                                   ->
+                                                                   (fun b ->
                                                                     let uu___7
                                                                     =
                                                                     FStar_Tactics_V2_Derived.try_with
@@ -2470,14 +2469,13 @@ let canon_semiring_aux :
                                                                     | 
                                                                     (e1::e2::[],
                                                                     vm) ->
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (let uu___11
+                                                                    let uu___11
                                                                     =
                                                                     quote_vm
                                                                     ta quotea
                                                                     vm in
-                                                                    FStar_Tactics_Effect.tac_bind
+                                                                    Obj.magic
+                                                                    (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
                                                                     (Obj.magic
                                                                     (FStar_Range.mk_range
@@ -2787,22 +2785,20 @@ let canon_semiring_aux :
                                                                     uu___15)))
                                                                     uu___14)))
                                                                     uu___13)))
-                                                                    uu___12)))
+                                                                    uu___12))
                                                                     | 
                                                                     uu___11
                                                                     ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "Unexpected")))
+                                                                    "Unexpected"))
                                                                     uu___10)))
                                                                     uu___8)))
-                                                                    uu___7)))
+                                                                    uu___7))
                                                        | uu___6 ->
                                                            Obj.magic
-                                                             (Obj.repr
-                                                                (FStar_Tactics_V2_Derived.fail
-                                                                   "Goal should be an equality")))
+                                                             (FStar_Tactics_V2_Derived.fail
+                                                                "Goal should be an equality"))
                                                       uu___5))) uu___4)))
                                 uu___2))
 let canon_semiring : 'a . 'a cr -> (unit, unit) FStar_Tactics_Effect.tac_repr

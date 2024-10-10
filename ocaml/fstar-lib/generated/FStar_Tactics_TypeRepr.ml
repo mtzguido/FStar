@@ -112,43 +112,46 @@ let (get_inductive_typ :
                        match se with
                        | FStar_Pervasives_Native.None ->
                            Obj.magic
-                             (Obj.repr
-                                (FStar_Tactics_V2_Derived.fail
-                                   "ctors_of_typ: type not found"))
+                             (FStar_Tactics_V2_Derived.fail
+                                "ctors_of_typ: type not found")
                        | FStar_Pervasives_Native.Some se1 ->
+                           let uu___2 =
+                             FStar_Tactics_NamedView.inspect_sigelt se1 in
                            Obj.magic
-                             (Obj.repr
-                                (let uu___2 =
-                                   FStar_Tactics_NamedView.inspect_sigelt se1 in
-                                 FStar_Tactics_Effect.tac_bind
-                                   (FStar_Sealed.seal
-                                      (Obj.magic
-                                         (FStar_Range.mk_range
-                                            "FStar.Tactics.TypeRepr.fst"
-                                            (Prims.of_int (23))
-                                            (Prims.of_int (14))
-                                            (Prims.of_int (23))
-                                            (Prims.of_int (31)))))
-                                   (FStar_Sealed.seal
-                                      (Obj.magic
-                                         (FStar_Range.mk_range
-                                            "FStar.Tactics.TypeRepr.fst"
-                                            (Prims.of_int (24))
-                                            (Prims.of_int (4))
-                                            (Prims.of_int (27))
-                                            (Prims.of_int (48)))))
-                                   (Obj.magic uu___2)
+                             (FStar_Tactics_Effect.tac_bind
+                                (FStar_Sealed.seal
+                                   (Obj.magic
+                                      (FStar_Range.mk_range
+                                         "FStar.Tactics.TypeRepr.fst"
+                                         (Prims.of_int (23))
+                                         (Prims.of_int (14))
+                                         (Prims.of_int (23))
+                                         (Prims.of_int (31)))))
+                                (FStar_Sealed.seal
+                                   (Obj.magic
+                                      (FStar_Range.mk_range
+                                         "FStar.Tactics.TypeRepr.fst"
+                                         (Prims.of_int (24))
+                                         (Prims.of_int (4))
+                                         (Prims.of_int (27))
+                                         (Prims.of_int (48)))))
+                                (Obj.magic uu___2)
+                                (fun uu___3 ->
                                    (fun sev ->
                                       if
                                         FStar_Tactics_NamedView.uu___is_Sg_Inductive
                                           sev
                                       then
-                                        FStar_Tactics_Effect.lift_div_tac
-                                          (fun uu___3 -> sev)
+                                        Obj.magic
+                                          (Obj.repr
+                                             (FStar_Tactics_Effect.lift_div_tac
+                                                (fun uu___3 -> sev)))
                                       else
-                                        FStar_Tactics_V2_Derived.fail
-                                          "ctors_of_typ: not an inductive type"))))
-                      uu___2))) uu___1)
+                                        Obj.magic
+                                          (Obj.repr
+                                             (FStar_Tactics_V2_Derived.fail
+                                                "ctors_of_typ: not an inductive type")))
+                                     uu___3))) uu___2))) uu___1)
 let (alg_ctor :
   FStar_Reflection_Types.typ ->
     (FStar_Reflection_Types.typ, unit) FStar_Tactics_Effect.tac_repr)
@@ -770,8 +773,10 @@ let rec (get_apply_tuple :
                                                    (Prims.of_int (71)))))
                                           (Obj.magic uu___6)
                                           (fun uu___7 ->
-                                             FStar_Tactics_V2_Derived.fail
-                                               uu___7))))
+                                             (fun uu___7 ->
+                                                Obj.magic
+                                                  (FStar_Tactics_V2_Derived.fail
+                                                     uu___7)) uu___7))))
                            | (FStar_Tactics_NamedView.Tv_FVar fv, b1::b2::[])
                                ->
                                Obj.magic
@@ -1016,8 +1021,10 @@ let rec (get_apply_tuple :
                                                    (Prims.of_int (71)))))
                                           (Obj.magic uu___5)
                                           (fun uu___6 ->
-                                             FStar_Tactics_V2_Derived.fail
-                                               uu___6))))
+                                             (fun uu___6 ->
+                                                Obj.magic
+                                                  (FStar_Tactics_V2_Derived.fail
+                                                     uu___6)) uu___6))))
                            | (FStar_Tactics_NamedView.Tv_FVar fv, []) ->
                                Obj.magic
                                  (Obj.repr
@@ -1078,8 +1085,10 @@ let rec (get_apply_tuple :
                                                      (Prims.of_int (71)))))
                                             (Obj.magic uu___5)
                                             (fun uu___6 ->
-                                               FStar_Tactics_V2_Derived.fail
-                                                 uu___6))))
+                                               (fun uu___6 ->
+                                                  Obj.magic
+                                                    (FStar_Tactics_V2_Derived.fail
+                                                       uu___6)) uu___6))))
                            | uu___4 ->
                                Obj.magic
                                  (Obj.repr
@@ -1130,8 +1139,11 @@ let rec (get_apply_tuple :
                                                 (Prims.of_int (69)))))
                                        (Obj.magic uu___5)
                                        (fun uu___6 ->
-                                          FStar_Tactics_V2_Derived.fail
-                                            uu___6)))) uu___3))) uu___1)
+                                          (fun uu___6 ->
+                                             Obj.magic
+                                               (FStar_Tactics_V2_Derived.fail
+                                                  uu___6)) uu___6)))) uu___3)))
+           uu___1)
 let rec (generate_up_aux :
   FStar_Reflection_V2_Data.ctor Prims.list ->
     FStar_Tactics_NamedView.binding ->
@@ -1189,11 +1201,14 @@ let rec (generate_up_aux :
                         (Prims.of_int (2))
                     then
                       Obj.magic
-                        (FStar_Tactics_V2_Derived.fail
-                           "generate_up_aux: expected Inl/Inr???")
+                        (Obj.repr
+                           (FStar_Tactics_V2_Derived.fail
+                              "generate_up_aux: expected Inl/Inr???"))
                     else
                       Obj.magic
-                        (FStar_Tactics_Effect.lift_div_tac (fun uu___3 -> ())) in
+                        (Obj.repr
+                           (FStar_Tactics_Effect.lift_div_tac
+                              (fun uu___3 -> ()))) in
                   Obj.magic
                     (FStar_Tactics_Effect.tac_bind
                        (FStar_Sealed.seal

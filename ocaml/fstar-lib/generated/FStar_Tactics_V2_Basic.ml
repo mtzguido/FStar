@@ -9,6 +9,16 @@ let (dbg_ReflTc : Prims.bool FStar_Compiler_Effect.ref) =
   FStar_Compiler_Debug.get_toggle "ReflTc"
 let (dbg_TacVerbose : Prims.bool FStar_Compiler_Effect.ref) =
   FStar_Compiler_Debug.get_toggle "TacVerbose"
+let (fixup_range :
+  FStar_Compiler_Range_Type.range ->
+    FStar_Compiler_Range_Type.range FStar_Tactics_Monad.tac)
+  =
+  fun uu___ ->
+    (fun r ->
+       let uu___ = FStar_Errors.maybe_bound_range r in
+       Obj.magic
+         (FStar_Class_Monad.return FStar_Tactics_Monad.monad_tac ()
+            (Obj.magic uu___))) uu___
 let (compress :
   FStar_Syntax_Syntax.term ->
     FStar_Syntax_Syntax.term FStar_Tactics_Monad.tac)
