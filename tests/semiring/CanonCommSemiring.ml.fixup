@@ -2,6 +2,7 @@
 (* ^ Empty line above since extracted files may not have a newline at the end. *)
 (* This is needed since we have no automatic embeddings for Tac functions, but we
 should add them *)
+open Fstar_guts
 let _ =
   FStarC_Tactics_Native.register_tactic "CanonCommSemiring.canon_semiring_aux"
     (Prims.parse_int "11")

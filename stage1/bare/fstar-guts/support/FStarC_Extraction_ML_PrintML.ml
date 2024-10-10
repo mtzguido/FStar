@@ -512,7 +512,7 @@ let build_m path (md: (mlsig * mlmodule) option) : structure =
   | Some(s, m) ->
     let open_plugin_lib =
       if FStarC_Options.codegen () = Some FStarC_Options.Plugin
-      then [Str.open_ (Opn.mk ?override:(Some Fresh) (Mod.ident (mk_lident "Fstar_guts")))]
+      then [Str.open_ (Opn.mk ?override:(Some Fresh) (Mod.ident (mk_lident "Fstar_plugin_lib")))]
       else []
     in
     let open_prims =
