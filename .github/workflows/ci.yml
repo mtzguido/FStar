@@ -60,7 +60,7 @@ jobs:
           name: fstar.tar.gz
 
       - name: Set up package locally
-        run:
+        run: |
           mkdir out
           tar xzf fstar.tar.gz -C out
 
