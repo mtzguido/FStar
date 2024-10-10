@@ -1,4 +1,6 @@
 # This makefile is included from several other makefiles in the tree.
+#
+# (this comment is old)
 
 # It enables configurably 'silent' rules, that do not
 # print output unless V=1 is set. When writing a rule, you can do as

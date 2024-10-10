@@ -30,7 +30,7 @@ FSTAR2_FULL_EXE := stage2/inst/full/bin/fstar.exe
 # build by 'make 0'.
 0 $(FSTAR0_EXE):
 	$(call msg, "STAGE0")
-	$(Q)mkdir -p stage0/ulib/.cache # prevent warnings
+	mkdir -p stage0/ulib/.cache # prevent warnings
 	$(MAKE) -C stage0
 
 .PHONY: $(FSTAR1_BARE_EXE)
@@ -123,8 +123,9 @@ check-stage3-diff: stage3-bare
 	+$(MAKE) -C stage1/ fstarlib
 
 .PHONY: 1.plib
-1.plib: $(FSTAR1_FULL_EXE)
-	#NB: shares .depend and checked from 1.lib
+1.plib: $(FSTAR1_FULL_EXE) 1.lib
+	# NB: shares .depend and checked from 1.lib,
+	# hence the dependency, though it is not quite precise.
 	$(call msg, "EXTRACT", "STAGE1 PLUGLIB")
 	mkdir -p stage1/ulib.checked # stupid
 	mkdir -p stage1/ulib.pluginml # stupid
@@ -152,8 +153,9 @@ check-stage3-diff: stage3-bare
 	+$(MAKE) -C stage2/fstarlib fstarlib
 	
 .PHONY: 2.plib
-2.plib: $(FSTAR2_FULL_EXE)
-	#NB: shares .depend and checked from 2.lib
+2.plib: $(FSTAR2_FULL_EXE) 2.lib
+	# NB: shares .depend and checked from 1.lib,
+	# hence the dependency, though it is not quite precise.
 	$(call msg, "EXTRACT", "STAGE2 PLUGLIB")
 	mkdir -p stage2/ulib.checked # stupid
 	mkdir -p stage2/ulib.pluginml # stupid
@@ -168,14 +170,30 @@ check-stage3-diff: stage3-bare
 	$(call msg, "BUILD", "STAGE2 PLUGLIB")
 	+$(MAKE) -C stage2/ fstar-pluginlib
 
+1: PREFIX=$(CURDIR)/stage1/out
+1: FSTARC=$(CURDIR)/stage1/full
+1: FSTARLIB=$(CURDIR)/stage1/fstarlib
+1: FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
+1: DO_INSTALL_DEP=1.plib
+1: do-install
+	ln -Tsf stage1/out out
+
+2: PREFIX=$(CURDIR)/stage2/out
+2: FSTARC=$(CURDIR)/stage2/full
+2: FSTARLIB=$(CURDIR)/stage2/fstarlib
+2: FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
+2: DO_INSTALL_DEP=2.plib
+2: do-install
+	ln -Tsf stage2/out out
+
 .PHONY: do-install
-do-install: | 1.plib 2.plib
+do-install: $(DO_INSTALL_DEP) # pretty hacky!
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
-	$(Q)dune install --root=$(FSTARC)    --prefix=$(abspath $(PREFIX))
-	$(Q)dune install --root=$(FSTARLIB)  --prefix=$(abspath $(PREFIX))
-	$(Q)dune install --root=$(FSTARPLIB) --prefix=$(abspath $(PREFIX))
+	dune install --root=$(FSTARC)    --prefix=$(abspath $(PREFIX))
+	dune install --root=$(FSTARLIB)  --prefix=$(abspath $(PREFIX))
+	dune install --root=$(FSTARPLIB) --prefix=$(abspath $(PREFIX))
 	mkdir -p $(PREFIX)/ulib
 	cp ulib/*.fst $(PREFIX)/ulib/
 	cp ulib/*.fsti $(PREFIX)/ulib/
@@ -184,20 +202,6 @@ do-install: | 1.plib 2.plib
 	cp -r ulib/legacy $(PREFIX)/ulib/
 	cp -r ulib/LowStar $(PREFIX)/ulib/
 	cp -r $(FSTARLIB)/../ulib.checked $(PREFIX)/ulib/.cache
-
-1: PREFIX=$(CURDIR)/stage1/out
-1: FSTARC=$(CURDIR)/stage1/full
-1: FSTARLIB=$(CURDIR)/stage1/fstarlib
-1: FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
-1: 1.plib do-install
-	ln -Tsf stage1/out out
-
-2: PREFIX=$(CURDIR)/stage2/out
-2: FSTARC=$(CURDIR)/stage2/full
-2: FSTARLIB=$(CURDIR)/stage2/fstarlib
-2: FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
-2: 2.plib do-install
-	ln -Tsf stage2/out out
 
 package: fstar.tar.gz
 .PHONY: fstar.tar.gz
