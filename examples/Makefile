@@ -1,3 +1,6 @@
+FSTAR_HOME?=..
+include $(FSTAR_HOME)/mk/common.mk
+
 OTHERFLAGS+=--warn_error -321-274 --ext context_pruning
 all: prep verify special_cases
 

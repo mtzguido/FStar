@@ -230,8 +230,9 @@ test2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
 test2: tests examples
 
 .PHONY: test
-test: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
 test: tests examples
+
+tests examples: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
 
 .PHONY: tests
 tests:
