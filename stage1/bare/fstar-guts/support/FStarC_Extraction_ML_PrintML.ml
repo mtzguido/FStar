@@ -510,14 +510,15 @@ let build_module1 path (m1: mlmodule1): structure_item option =
 let build_m path (md: (mlsig * mlmodule) option) : structure =
   match md with
   | Some(s, m) ->
-     let open_prims =
-       let nm = if FStarC_Options.codegen () = Some FStarC_Options.Plugin
-                then "Fstar_guts.Prims"
-                else "Prims"
-       in
-       Str.open_ (Opn.mk ?override:(Some Fresh) (Mod.ident (mk_lident nm)))
-     in
-     open_prims::(map (build_module1 path) m |> flatmap opt_to_list)
+    let open_plugin_lib =
+      if FStarC_Options.codegen () = Some FStarC_Options.Plugin
+      then [Str.open_ (Opn.mk ?override:(Some Fresh) (Mod.ident (mk_lident "Fstar_guts")))]
+      else []
+    in
+    let open_prims =
+      [Str.open_ (Opn.mk ?override:(Some Fresh) (Mod.ident (mk_lident "Prims")))]
+    in
+    open_plugin_lib @ open_prims @ (map (build_module1 path) m |> flatmap opt_to_list)
   | None -> []
 
 let build_ast (out_dir: string option) (ext: string) (ml: mllib) =
