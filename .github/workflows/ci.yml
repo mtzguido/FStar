@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Build and package
-        run: make -skj$(nproc) package |& .scripts/format_for_github_actions.sh
+        run: make -skj$(nproc) package
 
       - name: Upload package as build artifact
         uses: actions/upload-artifact@v4
@@ -65,7 +65,7 @@ jobs:
           tar xzf fstar.tar.gz -C out
 
       - name: Run tests
-        run: make -skj$(nproc) test |& .scripts/format_for_github_actions.sh
+        run: make -skj$(nproc) test
 
   test-external:
     # Download the binary package into a fresh machine and
@@ -109,6 +109,6 @@ jobs:
         uses: actions/checkout@master
 
       - name: Build stage 1
-        run: make -skj$(nproc) 1 |& .scripts/format_for_github_actions.sh
+        run: make -skj$(nproc) 1
       - name: Run tests
-        run: make -skj$(nproc) test |& .scripts/format_for_github_actions.sh
+        run: make -skj$(nproc) test
