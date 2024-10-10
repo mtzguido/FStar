@@ -28,7 +28,7 @@ jobs:
       - name: Test
         run: make -skj$(nproc) test
 
-      - name: Build binary package
+      - name: Package
         run: make -skj$(nproc) package
 
       - name: Upload package as build artifact
