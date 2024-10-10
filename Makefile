@@ -142,6 +142,7 @@ check-stage3-diff: stage3-bare
 
 .PHONY: 2.lib
 2.lib: $(FSTAR2_FULL_EXE)
+	$(call msg, "EXTRACT", "STAGE2 LIB")
 	mkdir -p stage2/ulib.checked # stupid
 	mkdir -p stage2/ulib.ml # stupid
 	+$(MAKE) -f mk/lib.mk all \
@@ -149,12 +150,14 @@ check-stage3-diff: stage3-bare
 	  FSTAR_EXE=$(CURDIR)/$(FSTAR2_FULL_EXE) \
 	  CACHE_DIR=$(CURDIR)/stage2/ulib.checked \
 	  OUTPUT_DIR=$(CURDIR)/stage2/ulib.ml \
-	  CODEGEN=OCaml
-	+$(MAKE) -C stage2/fstarlib fstarlib
-	
+	  CODEGEN=OCaml \
+	  TAG=lib
+	$(call msg, "BUILD", "STAGE2 LIB")
+	+$(MAKE) -C stage2/ fstarlib
+
 .PHONY: 2.plib
 2.plib: $(FSTAR2_FULL_EXE) 2.lib
-	# NB: shares .depend and checked from 1.lib,
+	# NB: shares .depend and checked from 2.lib,
 	# hence the dependency, though it is not quite precise.
 	$(call msg, "EXTRACT", "STAGE2 PLUGLIB")
 	mkdir -p stage2/ulib.checked # stupid
