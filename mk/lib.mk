@@ -129,9 +129,10 @@ ROOTS :=
 ROOTS += $(shell find $(SRC) -name *.fst)
 ROOTS += $(shell find $(SRC) -name *.fsti)
 
-# Filter out legacy/
+# Filter out legacy/ and reclaimable/
 FILTER_OUT = $(foreach v,$(2),$(if $(findstring $(1),$(v)),,$(v)))
 ROOTS := $(call FILTER_OUT,legacy/,$(ROOTS))
+ROOTS := $(call FILTER_OUT,reclaimable/,$(ROOTS))
 
 $(CACHE_DIR)/.$(TAG)depend:
 	$(call msg, "DEPEND", $(SRC))
