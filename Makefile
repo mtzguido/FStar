@@ -232,18 +232,17 @@ package-2: 2.full 2.lib 2.plib
 
 package: package-2
 
-.PHONY: test1
-test1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
-test1: tests examples
+.PHONY: test-1
+test-1: FSTAR_EXE=$(CURDIR)/stage1/out/bin/fstar.exe
+test-1: tests examples
 
-.PHONY: test2
-test2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
-test2: tests examples
+.PHONY: test-2
+test-2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
+test-2: tests examples
 
 .PHONY: test
+test: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
 test: tests examples
-
-tests examples: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
 
 .PHONY: tests
 tests:
@@ -252,12 +251,6 @@ tests:
 .PHONY: examples
 examples:
 	+$(MAKE) -C examples all FSTAR_EXE=$(FSTAR_EXE)
-
-.PHONY: ci
-ci:
-	+$(MAKE) 2
-	+$(MAKE) lib
-	+$(MAKE) test
 
 .PHONY: save
 save:
