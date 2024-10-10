@@ -174,17 +174,13 @@ check-stage3-diff: stage3-bare
 	+$(MAKE) -C stage2/ fstar-pluginlib
 
 1: export PREFIX=$(CURDIR)/stage1/out
-1: export FSTARC=$(CURDIR)/stage1/full
-1: export FSTARLIB=$(CURDIR)/stage1/fstarlib
-1: export FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
+1: export BROOT=$(CURDIR)/stage1
 1: 1.full 1.lib 1.plib
 	$(MAKE) do-install
 	ln -Tsf stage1/out out
 
 2: export PREFIX=$(CURDIR)/stage2/out
-2: export FSTARC=$(CURDIR)/stage2/full
-2: export FSTARLIB=$(CURDIR)/stage2/fstarlib
-2: export FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
+2: export BROOT=$(CURDIR)/stage2
 2: 2.full 2.lib 2.plib
 	$(MAKE) do-install
 	ln -Tsf stage2/out out
@@ -192,12 +188,14 @@ check-stage3-diff: stage3-bare
 .PHONY: do-install
 do-install:
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
+	if [ -z "$(BROOT)" ]; then echo "BROOT not set" >&2; false; fi
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
 	# Install fstar.exe, application library, and plugin library
-	dune install --root=$(FSTARC)    --prefix=$(abspath $(PREFIX))
-	dune install --root=$(FSTARLIB)  --prefix=$(abspath $(PREFIX))
-	dune install --root=$(FSTARPLIB) --prefix=$(abspath $(PREFIX))
+	dune install --prefix=$(abspath $(PREFIX)) --root=$(BROOT)/full
+	dune install --prefix=$(abspath $(PREFIX)) --root=$(BROOT)/fstarlib
+	dune install --prefix=$(abspath $(PREFIX)) --root=$(BROOT)/bare fstar-guts
+	dune install --prefix=$(abspath $(PREFIX)) --root=$(BROOT)/fstar-pluginlib
 	# Install library with its checked files.
 	mkdir -p $(PREFIX)/ulib
 	cp -t $(PREFIX)/ulib ulib/*.fst
@@ -206,7 +204,8 @@ do-install:
 	cp -r -t $(PREFIX)/ulib ulib/experimental
 	cp -r -t $(PREFIX)/ulib ulib/legacy
 	cp -r -t $(PREFIX)/ulib ulib/LowStar
-	cp -r -t $(PREFIX)/ulib $(FSTARLIB)/../ulib.checked
+	mkdir -p $(PREFIX)/ulib/.cache
+	cp -r -t $(PREFIX)/ulib/.cache $(BROOT)/ulib.checked
 
 package: fstar.tar.gz
 .PHONY: fstar.tar.gz
