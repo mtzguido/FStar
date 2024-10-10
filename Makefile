@@ -170,42 +170,44 @@ check-stage3-diff: stage3-bare
 	$(call msg, "BUILD", "STAGE2 PLUGLIB")
 	+$(MAKE) -C stage2/ fstar-pluginlib
 
-1: PREFIX=$(CURDIR)/stage1/out
-1: FSTARC=$(CURDIR)/stage1/full
-1: FSTARLIB=$(CURDIR)/stage1/fstarlib
-1: FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
-1: DO_INSTALL_DEP=1.plib
-1: do-install
+1: export PREFIX=$(CURDIR)/stage1/out
+1: export FSTARC=$(CURDIR)/stage1/full
+1: export FSTARLIB=$(CURDIR)/stage1/fstarlib
+1: export FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
+1: 1.full 1.lib 1.plib
+	$(MAKE) do-install
 	ln -Tsf stage1/out out
 
-2: PREFIX=$(CURDIR)/stage2/out
-2: FSTARC=$(CURDIR)/stage2/full
-2: FSTARLIB=$(CURDIR)/stage2/fstarlib
-2: FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
-2: DO_INSTALL_DEP=2.plib
-2: do-install
+2: export PREFIX=$(CURDIR)/stage2/out
+2: export FSTARC=$(CURDIR)/stage2/full
+2: export FSTARLIB=$(CURDIR)/stage2/fstarlib
+2: export FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
+2: 2.full 2.lib 2.plib
+	$(MAKE) do-install
 	ln -Tsf stage2/out out
 
 .PHONY: do-install
-do-install: $(DO_INSTALL_DEP) # pretty hacky!
+do-install:
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
+	# Install fstar.exe, application library, and plugin library
 	dune install --root=$(FSTARC)    --prefix=$(abspath $(PREFIX))
 	dune install --root=$(FSTARLIB)  --prefix=$(abspath $(PREFIX))
 	dune install --root=$(FSTARPLIB) --prefix=$(abspath $(PREFIX))
+	# Install library with its checked files.
 	mkdir -p $(PREFIX)/ulib
-	cp ulib/*.fst $(PREFIX)/ulib/
-	cp ulib/*.fsti $(PREFIX)/ulib/
-	cp ulib/fstar.include $(PREFIX)/ulib/
-	cp -r ulib/experimental $(PREFIX)/ulib/
-	cp -r ulib/legacy $(PREFIX)/ulib/
-	cp -r ulib/LowStar $(PREFIX)/ulib/
-	cp -r $(FSTARLIB)/../ulib.checked $(PREFIX)/ulib/.cache
+	cp -t $(PREFIX)/ulib ulib/*.fst
+	cp -t $(PREFIX)/ulib ulib/*.fsti
+	cp -t $(PREFIX)/ulib ulib/fstar.include
+	cp -r -t $(PREFIX)/ulib ulib/experimental
+	cp -r -t $(PREFIX)/ulib ulib/legacy
+	cp -r -t $(PREFIX)/ulib ulib/LowStar
+	cp -r -t $(PREFIX)/ulib $(FSTARLIB)/../ulib.checked
 
 package: fstar.tar.gz
 .PHONY: fstar.tar.gz
-fstar.tar.gz: 2.lib
+fstar.tar.gz: 2.full 2.lib 2.plib
 	rm -rf _build
 	mkdir _build
 	$(MAKE) do-install \
