@@ -11,6 +11,9 @@ defaults:
 
 jobs:
   build-fstar:
+    # Build an F* binary package: a fully-bootstrapped stage 2 compiler,
+    # with its plugins, a fully checker library (i.e. with .checked) files
+    # and compiled versions of fstar_lib and fstar_plugin_lib.
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
     steps:
@@ -22,10 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Build
-        run: make -skj$(nproc) |& .scripts/format_for_github_actions.sh
-
-      - name: Package
+      - name: Build and package
         run: make -skj$(nproc) package |& .scripts/format_for_github_actions.sh
 
       - name: Upload package as build artifact
@@ -36,6 +36,11 @@ jobs:
           retention-days: 3
 
   test:
+    # Download the binary package from the previous job and run the tests
+    # in the repo. This makes sure that the tests do not depend on some
+    # random internal state of the repo, but only on out/.
+    #
+    # We could be paranoid and rm -rf ulib too, it should not make a difference.
     needs: build-fstar
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
@@ -48,7 +53,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: Download package
+      - name: Get fstar package
         uses: actions/download-artifact@v4
         with:
           path: fstar.tar.gz
@@ -59,10 +64,13 @@ jobs:
           mkdir out
           tar xzf fstar.tar.gz -C out
 
-      - name: Test
+      - name: Run tests
         run: make -skj$(nproc) test |& .scripts/format_for_github_actions.sh
 
   test-external:
+    # Download the binary package into a fresh machine and
+    # test that it starts up. Note: this does not check out the repo,
+    # this is meant to mimic a normal user of the binary package.
     needs: build-fstar
     runs-on: ubuntu-latest
     container: mtzguido/fstar-base-testing
