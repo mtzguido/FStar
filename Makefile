@@ -169,7 +169,7 @@ check-stage3-diff: stage3-bare
 	+$(MAKE) -C stage2/ fstar-pluginlib
 
 .PHONY: do-install
-do-install:
+do-install: | 1.plib 2.plib
 	if [ -z "$(PREFIX)" ]; then echo "PREFIX not set" >&2; false; fi
 	$(call msg, "INSTALL", $(PREFIX))
 	mkdir -p $(PREFIX)
@@ -189,14 +189,14 @@ do-install:
 1: FSTARC=$(CURDIR)/stage1/full
 1: FSTARLIB=$(CURDIR)/stage1/fstarlib
 1: FSTARPLIB=$(CURDIR)/stage1/fstar-pluginlib
-1: do-install
+1: 1.plib do-install
 	ln -Tsf stage1/out out
 
 2: PREFIX=$(CURDIR)/stage2/out
 2: FSTARC=$(CURDIR)/stage2/full
 2: FSTARLIB=$(CURDIR)/stage2/fstarlib
 2: FSTARPLIB=$(CURDIR)/stage2/fstar-pluginlib
-2: do-install
+2: 2.plib do-install
 	ln -Tsf stage2/out out
 
 package: fstar.tar.gz
