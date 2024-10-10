@@ -241,14 +241,15 @@ test-2: FSTAR_EXE=$(CURDIR)/stage2/out/bin/fstar.exe
 test-2: tests examples
 
 .PHONY: test
-test: FSTAR_EXE=$(CURDIR)/out/bin/fstar.exe
 test: tests examples
 
 .PHONY: tests
+tests: FSTAR_EXE?=$(CURDIR)/out/bin/fstar.exe
 tests:
 	+$(MAKE) -C tests all FSTAR_EXE=$(FSTAR_EXE)
 
 .PHONY: examples
+examples: FSTAR_EXE?=$(CURDIR)/out/bin/fstar.exe
 examples:
 	+$(MAKE) -C examples all FSTAR_EXE=$(FSTAR_EXE)
 
