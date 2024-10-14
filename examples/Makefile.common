@@ -1,22 +1,10 @@
-ifdef FSTAR_HOME
-  FSTAR_ULIB=$(shell if test -d $(FSTAR_HOME)/ulib ; then echo $(FSTAR_HOME)/ulib ; else echo $(FSTAR_HOME)/lib/fstar ; fi)
-else
-  # FSTAR_HOME not defined, assume fstar.exe installed through opam
-  # or binary package, and reachable from PATH
-  FSTAR_ULIB=$(dir $(shell which fstar.exe))/../lib/fstar
-endif
-include $(FSTAR_ULIB)/gmake/z3.mk
-include $(FSTAR_ULIB)/gmake/fstar.mk
+## FIXME: this thing should either be internal
+## or external, we cannot serve both.
 
-#for getting macros for OCaml commands to compile extracted code
-include $(FSTAR_ULIB)/ml/Makefile.include
+FSTAR_HOME ?= ..
 
-ifdef FSTAR_HOME
-  -include $(FSTAR_HOME)/.common.mk
-  FSTAR=$(FSTAR_HOME)/bin/fstar.exe
-else
-  FSTAR=fstar.exe
-endif
+include $(FSTAR_HOME)/mk/common.mk
+include $(FSTAR_HOME)/gmake/fstar.mk
 
 #################################################################################
 # Customize these variables for your project
@@ -53,7 +41,7 @@ MAYBE_HINTS = $(if $(HINTS),--use_hints)
 # YOU SHOULDN'T NEED TO TOUCH THE REST
 ################################################################################
 
-VERBOSE_FSTAR=$(BENCHMARK_PRE) $(FSTAR)                     \
+VERBOSE_FSTAR=$(BENCHMARK_PRE) $(FSTAR_EXE)                     \
 		  --cache_checked_modules                   \
 		  --odir $(OUTPUT_DIRECTORY)                \
 		  --cache_dir $(CACHE_DIR)                  \

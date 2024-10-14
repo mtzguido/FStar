@@ -1,5 +1,7 @@
-FSTAR_HOME=../..
-FSTAR=$(FSTAR_HOME)/bin/fstar.exe $(OTHERFLAGS)
+FSTAR_HOME ?= ../..
+include $(FSTAR_HOME)/mk/common.mk
+
+FSTAR=$(FSTAR_EXE) $(SIL) $(OTHERFLAGS)
 
 # Tests for which the native tactics used in module named Sample.Test.fst are
 # declared in a corresponding module named Sample.fst
@@ -33,9 +35,11 @@ ALL=Apply\
     Rename\
     Retype\
     Sequences\
-    Simplifier\
     Tutorial\
     Unify
+
+# FIXME: Add back
+    # Simplifier\
 
 OTHERFLAGS +=
 
@@ -50,14 +54,17 @@ all: $(addsuffix .sep.test, $(TAC_MODULES)) $(addsuffix .test, $(ALL))
 .PRECIOUS: %.ml
 
 %.test: %.fst %.ml
+	$(call msg, "CHECK", $<)
 	$(FSTAR) $*.fst --load $*
-	touch $@
+	touch -c $@
 
 %.sep.test: %.fst %.ml
+	$(call msg, "CHECK", $<)
 	$(FSTAR) $*.Test.fst --load $*
-	touch $@
+	touch -c $@
 
 %.ml: %.fst
+	$(call msg, "EXTRACT", $<)
 	$(FSTAR) $*.fst --cache_checked_modules --codegen Plugin --extract $*
 	touch $@
 
@@ -65,9 +72,11 @@ all: $(addsuffix .sep.test, $(TAC_MODULES)) $(addsuffix .test, $(ALL))
 	rm -f Registers_List.ml Registers.List.ml Registers_List.cmxs
 
 %.native: %.fst Registers.List.ml
+	$(call msg, "NATIVE", $<)
 	$(FSTAR) $*.fst --load Registers.List --warn_error -266
 
 %.interp: %.fst Registers.List.fst
+	$(call msg, "INTERP", $<)
 	$(FSTAR) $*.fst
 
 

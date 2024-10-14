@@ -1,7 +1,7 @@
 (executable
  (name hello)
  (public_name hello.exe)
- (libraries fstar.lib)
+ (libraries fstar_lib)
  (modes native)
 )
 (env

@@ -1,23 +1,12 @@
-FSTAR_FILES = $(wildcard *.fst)
+FSTAR_ROOT ?= ../..
+include $(FSTAR_ROOT)/mk/test.mk
 
-all: verify-all
-
-include ../Makefile.common
-
-verify-all: $(CACHE_DIR) $(addsuffix .checked, $(addprefix $(CACHE_DIR)/, $(FSTAR_FILES)))
+all: verify-all $(OUTPUT_DIR)/test.exe
 
 EXTRACT = RBTreeIntrinsic
 
-OCAML_DEFAULT_FLAGS += -I $(OUTPUT_DIRECTORY) -w -31
+OCAML_DEFAULT_FLAGS += -I $(OUTPUT_DIR) -w -31
 
-$(OUTPUT_DIRECTORY)/test.exe: $(OUTPUT_DIRECTORY)/$(EXTRACT).ml | $(OUTPUT_DIRECTORY)
+$(OUTPUT_DIR)/test.exe: $(OUTPUT_DIR)/$(EXTRACT).ml | $(OUTPUT_DIR)
 	@echo 'let _ = test()' >> $^
-	$(OCAMLC) -o $(OUTPUT_DIRECTORY)/test.exe $^
-
-test: $(OUTPUT_DIRECTORY)/test.exe
-	$(OUTPUT_DIRECTORY)/test.exe
-
-clean:
-	rm -rf $(OUTPUT_DIRECTORY) $(CACHE_DIR) .depend
-
-.PHONY: depend verify-all test clean
+	$(OCAMLOPT) -package fstar_lib -linkpkg -o $(OUTPUT_DIR)/test.exe $^

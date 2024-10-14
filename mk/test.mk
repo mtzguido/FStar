@@ -5,7 +5,7 @@ include $(FSTAR_ROOT)/mk/common.mk
 .DEFAULT_GOAL := all
 
 # Set a default FSTAR_EXE for most clients.
-FSTAR_EXE ?= $(FSTAR_ROOT)/bin/fstar.exe
+FSTAR_EXE ?= $(FSTAR_ROOT)/out/bin/fstar.exe
 
 OCAMLOPT := $(FSTAR_EXE) --ocamlenv ocamlfind opt
 

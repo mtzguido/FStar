@@ -7,8 +7,9 @@
 #   endif
 # endif
 
-FSTAR_OCAML := $(shell $(FSTAR_HOME)/bin/fstar.exe --locate_ocaml)
+FSTAR_OCAML := $(shell $(FSTAR_EXE) --locate_ocaml)
 OCAMLPATH := $(FSTAR_OCAML):$(OCAMLPATH)
+
 # with dune
 Main.exe: $(wildcard *.ml)
 	OCAMLPATH="$(OCAMLPATH)" dune build

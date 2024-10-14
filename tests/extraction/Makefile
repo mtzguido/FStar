@@ -6,7 +6,7 @@ all: inline_let all_cmi Eta_expand.test Div.test ExtractAs.test
 
 %.exe: %.fst
 	$(FSTAR) --codegen OCaml $<
-	$(OCAMLOPT) -package fstar.lib -linkpkg $(OUTPUT_DIR)/$(patsubst %.fst,%.ml,$<) -o $@
+	$(OCAMLOPT) -package fstar_lib -linkpkg $(OUTPUT_DIR)/$(patsubst %.fst,%.ml,$<) -o $@
 
 %.test: %.exe
 	$(call msg,RUN,$<)

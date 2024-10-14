@@ -14,7 +14,7 @@ accept: $(patsubst %.fst,%.run-accept,$(FSTAR_FILES))
 	$(eval B := $(patsubst %.exe,%,$@))
 	$(Q)$(FSTAR) --odir out --codegen OCaml --extract '${B}' '${B}.fst'
 	$(Q)/bin/echo -e '\n\nlet _ = main ()\n' >> out/${B}.ml
-	$(Q)$(OCAMLOPT) -package fstar.lib -linkpkg out/${B}.ml -o $@
+	$(Q)$(OCAMLOPT) -package fstar_lib -linkpkg out/${B}.ml -o $@
 
 %.out: %.exe
 	$(call msg, "OUTPUT", $(notdir $@))
