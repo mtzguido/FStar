@@ -46,8 +46,8 @@ let exec_in_ocamlenv #a (cmd : string) (args : list string) : a =
   Util.execvp cmd (cmd :: args);
   failwith "execvp failed"
 
-let app_lib = "fstar_lib"
-let plugin_lib = "fstar_plugin_lib"
+let app_lib = "fstar.lib"
+let plugin_lib = "fstar.pluginlib"
 
 (* OCaml Warning 8: this pattern-matching is not exhaustive.
 This is usually benign as we check for exhaustivenss via SMT. *)
