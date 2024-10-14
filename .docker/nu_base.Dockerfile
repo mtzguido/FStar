@@ -1,6 +1,7 @@
 # For check-world workflow, should be coallesced to the other base.
 # This could definitely use a big cleanup too.
-FROM ubuntu:23.10
+# 22.04 is LTS
+FROM ubuntu:22.04
 
 RUN apt-get update
 
