@@ -1,6 +1,3 @@
-# Include this makefile for unit tests. It mostly has all you need.
-# This is NOT meant for external consumption. Do not point to this.
-
 ifeq ($(FSTAR_ROOT),)
   $(error FSTAR_ROOT is not set. Please set it to the root of your F* repository)
 endif

@@ -1,0 +1,13 @@
+(lang dune 3.8)
+(name fstar)
+(generate_opam_files false)
+(using menhir 2.1)
+
+(package
+  (name fstarc-bare)
+  (synopsis "The F* compiler")
+)
+(package
+  (name fstar-guts)
+  (synopsis "Internal guts of the F* compiler, for plugins")
+)

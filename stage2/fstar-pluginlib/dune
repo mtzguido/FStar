@@ -1,0 +1,17 @@
+(include_subdirs unqualified)
+(library
+  (name fstar_plugin_lib)
+  (public_name fstar_plugin_lib)
+  (libraries
+    fstar-guts
+  )
+  (modes native)
+  (wrapped true)
+  (preprocess (pps ppx_deriving.show ppx_deriving_yojson))
+)
+
+(env
+  (_
+    (bin_annot false)
+    (flags (:standard -w -A)))
+)

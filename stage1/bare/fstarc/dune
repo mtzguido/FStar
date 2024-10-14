@@ -1,0 +1,12 @@
+(include_subdirs unqualified)
+(executable
+ (package fstarc-bare)
+ (name main)
+ (public_name fstar-bare.exe)
+ (libraries
+   fstar_guts
+   memtrace
+ )
+ (link_flags "-linkall")
+ (modes (native exe))
+)
