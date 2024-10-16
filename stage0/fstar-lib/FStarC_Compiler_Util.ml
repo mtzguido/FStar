@@ -16,7 +16,7 @@ let return_all x = x
 
 type time_ns = int64
 let now_ns () = Mtime_clock.now_ns()
-let time_diff_ns t1 t2 =
+let time_diff_ns t1 t2 = 
   Z.of_int (Int64.to_int (Int64.sub t2 t1))
 let time_diff_ms t1 t2 = Z.div (time_diff_ns t1 t2) (Z.of_int 1000000)
 let record_time_ns f =
@@ -824,8 +824,7 @@ let string_to_ascii_bytes (s:string) : char array =
   BatArray.of_list (BatString.explode s)
 let ascii_bytes_to_string (b:char array) : string =
   BatString.implode (BatArray.to_list b)
-
-let mk_ref a = ref a
+let mk_ref a = FStar_ST.alloc a
 
 let write_file (fn:string) s =
   let fh = open_file_for_writing fn in
@@ -918,8 +917,8 @@ let for_range lo hi f =
   done
 
 
-let incr r = r := Z.(!r + one)
-let decr r = r := Z.(!r - one)
+let incr r = FStar_ST.(Z.(write r (read r + one)))
+let decr r = FStar_ST.(Z.(write r (read r - one)))
 let geq (i:int) (j:int) = i >= j
 
 let exec_name = Sys.executable_name
@@ -1120,12 +1119,11 @@ let return_execution_time f =
 
 (* Outside of this file the reference to FStar_Util.ref must use the following combinators *)
 (* Export it at the end of the file so that we don't break other internal uses of ref *)
-(* type 'a ref = 'a ref *)
-
-let read r = !r
-let write r v = r := v
-let (!) = read
-let (:=) = write
+type 'a ref = 'a FStar_Monotonic_Heap.ref
+let read = FStar_ST.read
+let write = FStar_ST.write
+let (!) = FStar_ST.read
+let (:=) = FStar_ST.write
 
 let marshal (x:'a) : string = Marshal.to_string x []
 let unmarshal (x:string) : 'a = Marshal.from_string x 0
