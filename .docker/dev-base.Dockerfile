@@ -48,4 +48,7 @@ RUN sudo ln -s $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
 
 RUN rm fstar.opam # move up
 
-RUN sudo apt install rustc # move up
+# install rust (move up and remove rustv)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN sudo apt-get update && sudo apt-get install --yes --no-install-recommends llvm-dev libclang-dev clang libgmp-dev pkg-config
+RUN . "$HOME/.cargo/env" && rustup component add rustfmt && cargo install bindgen-cli
