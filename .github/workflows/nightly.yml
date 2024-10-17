@@ -12,7 +12,7 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: mtzguido/fstar-base-testing
+    container: mtzguido/dev-base
     # ^ We use the container here to be more robust, hopefully. Also not using
     # self-hosted runner to get a clean VM, that is hopefully always available too.
     steps:
