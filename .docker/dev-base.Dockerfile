@@ -47,3 +47,5 @@ RUN wget -nv https://download.visualstudio.microsoft.com/download/pr/cd0d0a4d-2a
 RUN sudo ln -s $DOTNET_ROOT/dotnet /usr/local/bin/dotnet
 
 RUN rm fstar.opam # move up
+
+RUN sudo apt install rustc # move up
