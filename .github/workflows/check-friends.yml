@@ -171,8 +171,8 @@ jobs:
           # Pulse needs an FSTAR_HOME too
           echo "FSTAR_HOME=$(pwd)/FStar" >> $GITHUB_ENV
 
-      - name: Build
-        run: make -C pulse -skj$(nproc)
+      - name: Build (after setting up cargo env)
+        run: . $HOME/.cargo/env && make -C pulse -skj$(nproc)
 
       - uses: mtzguido/gci-upload@master
         with:
