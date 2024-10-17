@@ -1,4 +1,4 @@
-name: Check world (build F* and all projects)
+name: Check F* friends
 
 ## THIS WORFLOW IS ONLY MEANT TO BE CALLED
 ## And needs a previous job to create an fstar-ci.tar.gz artifact
