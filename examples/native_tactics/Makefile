@@ -5,7 +5,7 @@
 # 'include test.mk'.
 
 FSTAR_HOME=../..
-FSTAR=$(FSTAR_HOME)/bin/fstar.exe $(OTHERFLAGS)
+FSTAR=$(FSTAR_HOME)/out/bin/fstar.exe $(OTHERFLAGS)
 
 # Tests for which the native tactics used in module named Sample.Test.fst are
 # declared in a corresponding module named Sample.fst
