@@ -1,0 +1,20 @@
+name: Check for stale hints
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          L=$(.scripts/remove_stale_hints.sh list)
+          echo "$L"
+          if [ "$L" != "" ]; then
+            echo "There are stale hints:"
+            echo "$L"
+            false
+          fi
