@@ -204,9 +204,11 @@ $(FSTAR2_FULL_EXE): $(FSTAR2_FULL_EXE).src _force
 
 stage3-bare: $(FSTAR2_FULL_EXE) _force
 	$(call bold_msg, "EXTRACT", "STAGE 3 FSTARC")
+	# NOTE: see the explanation for FSTAR_LIB near top of file.
 	env \
 	  SRC=src/ \
 	  FSTAR_EXE=$(FSTAR2_FULL_EXE) \
+	  FSTAR_LIB=$(abspath ulib) \
 	  CACHE_DIR=stage3/fstarc.checked/ \
 	  OUTPUT_DIR=stage3/fstarc.ml/ \
 	  CODEGEN=OCaml \
