@@ -1349,9 +1349,11 @@ let (arith_to_bv_tac : unit -> (unit, unit) FStar_Tactics_Effect.tac_repr) =
                                                          (Prims.of_int (65)))))
                                                 (Obj.magic uu___7)
                                                 (fun uu___8 ->
-                                                   FStar_Tactics_V2_Derived.fail
-                                                     uu___8))) uu___6)))
-                           uu___5))) uu___3))
+                                                   (fun uu___8 ->
+                                                      Obj.magic
+                                                        (FStar_Tactics_V2_Derived.fail
+                                                           uu___8)) uu___8)))
+                                      uu___6))) uu___5))) uu___3))
 let _ =
   FStarC_Tactics_Native.register_tactic "FStar.Tactics.BV.arith_to_bv_tac"
     (Prims.of_int (2))

@@ -16,6 +16,14 @@ let with_error_bound :
         (FStar_Pervasives_Native.Some r);
       (let res = f () in
        FStarC_Compiler_Effect.op_Colon_Equals error_range_bound old; res)
+let (maybe_bound_range :
+  FStarC_Compiler_Range_Type.range -> FStarC_Compiler_Range_Type.range) =
+  fun r ->
+    let uu___ = FStarC_Compiler_Effect.op_Bang error_range_bound in
+    match uu___ with
+    | FStar_Pervasives_Native.Some r' ->
+        FStarC_Compiler_Range_Ops.bound_range r r'
+    | FStar_Pervasives_Native.None -> r
 exception Invalid_warn_error_setting of Prims.string 
 let (uu___is_Invalid_warn_error_setting : Prims.exn -> Prims.bool) =
   fun projectee ->
@@ -525,18 +533,13 @@ let (dummy_ide_rng : FStarC_Compiler_Range_Type.rng) =
   let uu___ = FStarC_Compiler_Range_Type.mk_pos Prims.int_one Prims.int_zero in
   let uu___1 = FStarC_Compiler_Range_Type.mk_pos Prims.int_one Prims.int_zero in
   FStarC_Compiler_Range_Type.mk_rng "<input>" uu___ uu___1
-let (maybe_bound_rng :
-  FStarC_Compiler_Range_Type.range -> FStarC_Compiler_Range_Type.range) =
-  fun r ->
-    let uu___ = FStarC_Compiler_Effect.op_Bang error_range_bound in
-    match uu___ with
-    | FStar_Pervasives_Native.Some r' ->
-        FStarC_Compiler_Range_Ops.bound_range r r'
-    | FStar_Pervasives_Native.None -> r
-let (fixup_issue_range : issue -> issue) =
-  fun i ->
-    let rng =
-      match i.issue_range with
+let (fixup_issue_range :
+  FStarC_Compiler_Range_Type.range FStar_Pervasives_Native.option ->
+    FStarC_Compiler_Range_Type.range FStar_Pervasives_Native.option)
+  =
+  fun rng ->
+    let rng1 =
+      match rng with
       | FStar_Pervasives_Native.None ->
           FStarC_Compiler_Effect.op_Bang fallback_range
       | FStar_Pervasives_Native.Some range ->
@@ -559,14 +562,7 @@ let (fixup_issue_range : issue -> issue) =
                else use_rng) in
           let uu___ = FStarC_Compiler_Range_Type.set_use_range range use_rng' in
           FStar_Pervasives_Native.Some uu___ in
-    let uu___ = FStarC_Compiler_Util.map_opt rng maybe_bound_rng in
-    {
-      issue_msg = (i.issue_msg);
-      issue_level = (i.issue_level);
-      issue_range = uu___;
-      issue_number = (i.issue_number);
-      issue_ctx = (i.issue_ctx)
-    }
+    FStarC_Compiler_Util.map_opt rng1 maybe_bound_range
 let (mk_default_handler : Prims.bool -> error_handler) =
   fun print ->
     let issues = FStarC_Compiler_Util.mk_ref [] in
@@ -646,9 +642,8 @@ let (get_err_count : unit -> Prims.int) =
 let (wrapped_eh_add_one : error_handler -> issue -> unit) =
   fun h ->
     fun issue1 ->
-      let issue2 = fixup_issue_range issue1 in
-      h.eh_add_one issue2;
-      if issue2.issue_level <> EInfo
+      h.eh_add_one issue1;
+      if issue1.issue_level <> EInfo
       then
         ((let uu___2 =
             let uu___3 =
@@ -872,24 +867,25 @@ let (log_issue_ctx :
         match uu___ with
         | (e, msg) ->
             let msg1 = maybe_add_backtrace msg in
+            let r1 = fixup_issue_range (FStar_Pervasives_Native.Some r) in
             let uu___1 = lookup e in
             (match uu___1 with
              | (uu___2, FStarC_Errors_Codes.CAlwaysError, errno1) ->
                  add_one
-                   (mk_issue EError (FStar_Pervasives_Native.Some r) msg1
+                   (mk_issue EError r1 msg1
                       (FStar_Pervasives_Native.Some errno1) ctx)
              | (uu___2, FStarC_Errors_Codes.CError, errno1) ->
                  add_one
-                   (mk_issue EError (FStar_Pervasives_Native.Some r) msg1
+                   (mk_issue EError r1 msg1
                       (FStar_Pervasives_Native.Some errno1) ctx)
              | (uu___2, FStarC_Errors_Codes.CWarning, errno1) ->
                  add_one
-                   (mk_issue EWarning (FStar_Pervasives_Native.Some r) msg1
+                   (mk_issue EWarning r1 msg1
                       (FStar_Pervasives_Native.Some errno1) ctx)
              | (uu___2, FStarC_Errors_Codes.CSilent, uu___3) -> ()
              | (uu___2, FStarC_Errors_Codes.CFatal, errno1) ->
                  let i =
-                   mk_issue EError (FStar_Pervasives_Native.Some r) msg1
+                   mk_issue EError r1 msg1
                      (FStar_Pervasives_Native.Some errno1) ctx in
                  let uu___3 = FStarC_Options.ide () in
                  if uu___3
@@ -913,12 +909,12 @@ let info :
         fun uu___2 ->
           fun msg ->
             let rng = FStarC_Class_HasRange.pos uu___ r in
+            let rng1 = fixup_issue_range (FStar_Pervasives_Native.Some rng) in
             let msg1 = FStarC_Errors_Msg.to_doc_list uu___2 msg in
             let msg2 = maybe_add_backtrace msg1 in
             let ctx = get_ctx () in
             add_one
-              (mk_issue EInfo (FStar_Pervasives_Native.Some rng) msg2
-                 FStar_Pervasives_Native.None ctx)
+              (mk_issue EInfo rng1 msg2 FStar_Pervasives_Native.None ctx)
 let diag :
   'posut .
     'posut FStarC_Class_HasRange.hasRange ->
@@ -946,14 +942,18 @@ let raise_error :
           fun uu___2 ->
             fun msg ->
               let rng = FStarC_Class_HasRange.pos uu___ r in
-              let msg1 = FStarC_Errors_Msg.to_doc_list uu___2 msg in
               let uu___3 =
-                let uu___4 =
-                  let uu___5 = maybe_add_backtrace msg1 in
-                  let uu___6 = error_context.get () in
-                  (e, uu___5, rng, uu___6) in
-                Error uu___4 in
-              FStarC_Compiler_Effect.raise uu___3
+                fixup_issue_range (FStar_Pervasives_Native.Some rng) in
+              match uu___3 with
+              | FStar_Pervasives_Native.Some rng1 ->
+                  let msg1 = FStarC_Errors_Msg.to_doc_list uu___2 msg in
+                  let uu___4 =
+                    let uu___5 =
+                      let uu___6 = maybe_add_backtrace msg1 in
+                      let uu___7 = error_context.get () in
+                      (e, uu___6, rng1, uu___7) in
+                    Error uu___5 in
+                  FStarC_Compiler_Effect.raise uu___4
 let log_issue :
   'posut .
     'posut FStarC_Class_HasRange.hasRange ->
@@ -1011,9 +1011,9 @@ let (issue_of_exn : Prims.exn -> issue FStar_Pervasives_Native.option) =
     match e with
     | Error (e1, msg, r, ctx) ->
         let errno1 = let uu___ = lookup e1 in error_number uu___ in
+        let r1 = fixup_issue_range (FStar_Pervasives_Native.Some r) in
         FStar_Pervasives_Native.Some
-          (mk_issue EError (FStar_Pervasives_Native.Some r) msg
-             (FStar_Pervasives_Native.Some errno1) ctx)
+          (mk_issue EError r1 msg (FStar_Pervasives_Native.Some errno1) ctx)
     | uu___ -> FStar_Pervasives_Native.None
 let (err_exn : Prims.exn -> unit) =
   fun exn ->

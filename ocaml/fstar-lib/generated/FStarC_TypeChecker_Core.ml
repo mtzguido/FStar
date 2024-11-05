@@ -957,12 +957,22 @@ let (check_bqual :
          FStar_Pervasives_Native.Some (FStarC_Syntax_Syntax.Equality)) ->
           (fun uu___ -> Success ((), FStar_Pervasives_Native.None))
       | (FStar_Pervasives_Native.Some (FStarC_Syntax_Syntax.Meta t1),
-         FStar_Pervasives_Native.Some (FStarC_Syntax_Syntax.Meta t2)) ->
-          let uu___ = equal_term t1 t2 in
-          if uu___
-          then (fun uu___1 -> Success ((), FStar_Pervasives_Native.None))
-          else fail "Binder qualifier mismatch"
-      | uu___ -> fail "Binder qualifier mismatch"
+         FStar_Pervasives_Native.Some (FStarC_Syntax_Syntax.Meta t2)) when
+          equal_term t1 t2 ->
+          (fun uu___ -> Success ((), FStar_Pervasives_Native.None))
+      | uu___ ->
+          let uu___1 =
+            let uu___2 =
+              FStarC_Class_Show.show
+                (FStarC_Class_Show.show_option
+                   FStarC_Syntax_Print.showable_bqual) b0 in
+            let uu___3 =
+              FStarC_Class_Show.show
+                (FStarC_Class_Show.show_option
+                   FStarC_Syntax_Print.showable_bqual) b1 in
+            FStarC_Compiler_Util.format2
+              "Binder qualifier mismatch, %s vs %s" uu___2 uu___3 in
+          fail uu___1
 let (check_aqual :
   FStarC_Syntax_Syntax.aqual -> FStarC_Syntax_Syntax.aqual -> unit result) =
   fun a0 ->

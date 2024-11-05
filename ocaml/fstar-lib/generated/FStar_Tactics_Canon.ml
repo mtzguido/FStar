@@ -1407,9 +1407,11 @@ let (canon_point_entry : unit -> (unit, unit) FStar_Tactics_Effect.tac_repr)
                                                     (Prims.of_int (48)))))
                                            (Obj.magic uu___7)
                                            (fun uu___8 ->
-                                              FStar_Tactics_V2_Derived.fail
-                                                uu___8))) uu___5))) uu___4)))
-           uu___2)
+                                              (fun uu___8 ->
+                                                 Obj.magic
+                                                   (FStar_Tactics_V2_Derived.fail
+                                                      uu___8)) uu___8)))
+                                 uu___5))) uu___4))) uu___2)
 let (canon : unit -> (unit, unit) FStar_Tactics_Effect.tac_repr) =
   fun uu___ -> FStar_Tactics_V2_Derived.pointwise canon_point_entry
 let _ =

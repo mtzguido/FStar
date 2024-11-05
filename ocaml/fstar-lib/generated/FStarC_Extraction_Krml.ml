@@ -2033,10 +2033,15 @@ and (translate_expr' : env -> FStarC_Extraction_ML_Syntax.mlexpr -> expr) =
               FStarC_Extraction_ML_Syntax.print_typ = print;_}::[]),
            continuation)
           ->
+          let meta = translate_flags flags in
+          let meta1 =
+            let uu___1 =
+              let uu___2 = FStarC_Options_Ext.get "krml_inline_all" in
+              uu___2 <> "" in
+            if uu___1 then CInline :: meta else meta in
           let binder1 =
             let uu___1 = translate_type env1 typ1 in
-            let uu___2 = translate_flags flags in
-            { name = name1; typ = uu___1; mut = false; meta = uu___2 } in
+            { name = name1; typ = uu___1; mut = false; meta = meta1 } in
           let body1 = translate_expr env1 body in
           let env2 = extend env1 name1 in
           let continuation1 = translate_expr env2 continuation in
@@ -3570,9 +3575,13 @@ let (translate_type_decl' :
             if assumed
             then
               (let name3 = FStarC_Extraction_ML_Syntax.string_of_mlpath name2 in
-               FStarC_Compiler_Util.print1_warning
-                 "Not extracting type definition %s to KaRaMeL (assumed type)\n"
-                 name3;
+               (let uu___3 = FStarC_Compiler_Debug.any () in
+                if uu___3
+                then
+                  FStarC_Compiler_Util.print1_warning
+                    "Not extracting type definition %s to KaRaMeL (assumed type)\n"
+                    name3
+                else ());
                FStar_Pervasives_Native.None)
             else
               (let uu___3 =
@@ -3720,11 +3729,15 @@ let (translate_let' :
                 DExternal uu___4 in
               FStar_Pervasives_Native.Some uu___3
             else
-              ((let uu___5 =
-                  FStarC_Extraction_ML_Syntax.string_of_mlpath name2 in
-                FStarC_Compiler_Util.print1_warning
-                  "Not extracting %s to KaRaMeL (polymorphic assumes are not supported)\n"
-                  uu___5);
+              ((let uu___5 = FStarC_Compiler_Debug.any () in
+                if uu___5
+                then
+                  let uu___6 =
+                    FStarC_Extraction_ML_Syntax.string_of_mlpath name2 in
+                  FStarC_Compiler_Util.print1_warning
+                    "Not extracting %s to KaRaMeL (polymorphic assumes are not supported)\n"
+                    uu___6
+                else ());
                FStar_Pervasives_Native.None)
         | { FStarC_Extraction_ML_Syntax.mllb_name = name1;
             FStarC_Extraction_ML_Syntax.mllb_tysc =
@@ -3765,15 +3778,17 @@ let (translate_let' :
                    (FStarC_Compiler_List.length args) t0 in
                match uu___6 with
                | (i, eff, t) ->
-                   (if i > Prims.int_zero
-                    then
-                      (let msg =
+                   ((let uu___8 =
+                       (i > Prims.int_zero) && (FStarC_Compiler_Debug.any ()) in
+                     if uu___8
+                     then
+                       let msg =
                          "function type annotation has less arrows than the number of arguments; please mark the return type abbreviation as inline_for_extraction" in
-                       let uu___8 =
+                       let uu___9 =
                          FStarC_Extraction_ML_Syntax.string_of_mlpath name2 in
                        FStarC_Compiler_Util.print2_warning
-                         "Not extracting %s to KaRaMeL (%s)\n" uu___8 msg)
-                    else ();
+                         "Not extracting %s to KaRaMeL (%s)\n" uu___9 msg
+                     else ());
                     (let t1 = translate_type env3 t in
                      let binders = translate_binders env3 args in
                      let env4 = add_binders env3 args in
@@ -3948,9 +3963,13 @@ let (translate_decl :
       | FStarC_Extraction_ML_Syntax.MLM_Top uu___ ->
           failwith "todo: translate_decl [MLM_Top]"
       | FStarC_Extraction_ML_Syntax.MLM_Exn (m, uu___) ->
-          (FStarC_Compiler_Util.print1_warning
-             "Not extracting exception %s to KaRaMeL (exceptions unsupported)\n"
-             m;
+          ((let uu___2 = FStarC_Compiler_Debug.any () in
+            if uu___2
+            then
+              FStarC_Compiler_Util.print1_warning
+                "Not extracting exception %s to KaRaMeL (exceptions unsupported)\n"
+                m
+            else ());
            [])
 let (translate_module :
   FStarC_Extraction_ML_UEnv.uenv ->

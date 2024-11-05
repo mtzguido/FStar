@@ -833,30 +833,24 @@ let (trywith :
                                                          Obj.magic
                                                            (FStar_Tactics_V2_Derived.seq
                                                               (fun uu___7 ->
-                                                                 (fun uu___7
-                                                                    ->
-                                                                    if
-                                                                    (Prims.uu___is_Cons
+                                                                 if
+                                                                   (Prims.uu___is_Cons
                                                                     unresolved_args)
                                                                     &&
                                                                     (FStar_Pervasives_Native.uu___is_None
                                                                     g.fundeps)
-                                                                    then
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (FStar_Tactics_V2_Derived.fail
-                                                                    "Will not continue as there are unresolved args (and no fundeps)"))
-                                                                    else
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (if
+                                                                 then
+                                                                   FStar_Tactics_V2_Derived.fail
+                                                                    "Will not continue as there are unresolved args (and no fundeps)"
+                                                                 else
+                                                                   if
                                                                     (Prims.uu___is_Cons
                                                                     unresolved_args)
                                                                     &&
                                                                     (FStar_Pervasives_Native.uu___is_Some
                                                                     g.fundeps)
-                                                                    then
-                                                                    let uu___9
+                                                                   then
+                                                                    (let uu___9
                                                                     =
                                                                     Obj.magic
                                                                     (FStar_Tactics_Effect.lift_div_tac
@@ -979,21 +973,18 @@ let (trywith :
                                                                     all_good
                                                                     then
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.apply
-                                                                    t))
+                                                                    t)
                                                                     else
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "fundeps")))
+                                                                    "fundeps"))
                                                                     uu___14)))
                                                                     uu___12)))
-                                                                    uu___10)
-                                                                    else
+                                                                    uu___10))
+                                                                   else
                                                                     FStar_Tactics_V2_Derived.apply_noinst
-                                                                    t)))
-                                                                   uu___7)
+                                                                    t)
                                                               (fun uu___7 ->
                                                                  let uu___8 =
                                                                    debug
@@ -4011,19 +4002,17 @@ let (mk_class :
                                                                     FStar_Pervasives_Native.None
                                                                     ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "mk_class: proj not found?"))
+                                                                    "mk_class: proj not found?")
                                                                     | 
                                                                     FStar_Pervasives_Native.Some
                                                                     se1 ->
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (let uu___54
+                                                                    let uu___54
                                                                     =
                                                                     FStar_Tactics_NamedView.inspect_sigelt
                                                                     se1 in
-                                                                    FStar_Tactics_Effect.tac_bind
+                                                                    Obj.magic
+                                                                    (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
                                                                     (Obj.magic
                                                                     (FStar_Range.mk_range
@@ -4059,18 +4048,16 @@ let (mk_class :
                                                                     = lbs;_}
                                                                     ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_SyntaxHelpers.lookup_lb
                                                                     lbs
-                                                                    proj_name))
+                                                                    proj_name)
                                                                     | 
                                                                     uu___56
                                                                     ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "mk_class: proj not Sg_Let?")))
-                                                                    uu___55))))
+                                                                    "mk_class: proj not Sg_Let?"))
+                                                                    uu___55)))
                                                                     uu___53) in
                                                                     Obj.magic
                                                                     (FStar_Tactics_Effect.tac_bind
@@ -4246,15 +4233,12 @@ let (mk_class :
                                                                     | 
                                                                     [] ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "mk_class: impossible, no binders"))
+                                                                    "mk_class: impossible, no binders")
                                                                     | 
                                                                     b1::bs'
                                                                     ->
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (let uu___59
+                                                                    let uu___59
                                                                     =
                                                                     Obj.magic
                                                                     (FStar_Tactics_Effect.lift_div_tac
@@ -4263,7 +4247,8 @@ let (mk_class :
                                                                     ->
                                                                     binder_set_meta
                                                                     b1 tcr)) in
-                                                                    FStar_Tactics_Effect.tac_bind
+                                                                    Obj.magic
+                                                                    (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
                                                                     (Obj.magic
                                                                     (FStar_Range.mk_range
@@ -4294,7 +4279,7 @@ let (mk_class :
                                                                     (b11 ::
                                                                     bs'))
                                                                     cod2))
-                                                                    uu___60)))))
+                                                                    uu___60))))
                                                                     uu___58)))
                                                                     uu___56) in
                                                                     Obj.magic
@@ -4405,15 +4390,12 @@ let (mk_class :
                                                                     | 
                                                                     [] ->
                                                                     Obj.magic
-                                                                    (Obj.repr
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "mk_class: impossible, no binders"))
+                                                                    "mk_class: impossible, no binders")
                                                                     | 
                                                                     b1::bs'
                                                                     ->
-                                                                    Obj.magic
-                                                                    (Obj.repr
-                                                                    (let uu___60
+                                                                    let uu___60
                                                                     =
                                                                     Obj.magic
                                                                     (FStar_Tactics_Effect.lift_div_tac
@@ -4422,7 +4404,8 @@ let (mk_class :
                                                                     ->
                                                                     binder_set_meta
                                                                     b1 tcr)) in
-                                                                    FStar_Tactics_Effect.tac_bind
+                                                                    Obj.magic
+                                                                    (FStar_Tactics_Effect.tac_bind
                                                                     (FStar_Sealed.seal
                                                                     (Obj.magic
                                                                     (FStar_Range.mk_range
@@ -4453,7 +4436,7 @@ let (mk_class :
                                                                     (b11 ::
                                                                     bs'))
                                                                     body))
-                                                                    uu___61)))))
+                                                                    uu___61))))
                                                                     uu___59)))
                                                                     uu___57) in
                                                                     Obj.magic

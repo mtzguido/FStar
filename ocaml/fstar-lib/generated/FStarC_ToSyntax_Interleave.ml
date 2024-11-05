@@ -95,21 +95,27 @@ let rec (prefix_with_iface_decls :
   fun iface ->
     fun impl ->
       let qualify_karamel_private impl1 =
-        let karamel_private =
-          FStarC_Parser_AST.mk_term
-            (FStarC_Parser_AST.Const
-               (FStarC_Const.Const_string
-                  ("KrmlPrivate", (impl1.FStarC_Parser_AST.drange))))
-            impl1.FStarC_Parser_AST.drange FStarC_Parser_AST.Expr in
-        {
-          FStarC_Parser_AST.d = (impl1.FStarC_Parser_AST.d);
-          FStarC_Parser_AST.drange = (impl1.FStarC_Parser_AST.drange);
-          FStarC_Parser_AST.quals = (impl1.FStarC_Parser_AST.quals);
-          FStarC_Parser_AST.attrs = (karamel_private ::
-            (impl1.FStarC_Parser_AST.attrs));
-          FStarC_Parser_AST.interleaved =
-            (impl1.FStarC_Parser_AST.interleaved)
-        } in
+        let uu___ =
+          let uu___1 = FStarC_Options_Ext.get "no_krml_private" in
+          uu___1 <> "" in
+        if uu___
+        then impl1
+        else
+          (let karamel_private =
+             FStarC_Parser_AST.mk_term
+               (FStarC_Parser_AST.Const
+                  (FStarC_Const.Const_string
+                     ("KrmlPrivate", (impl1.FStarC_Parser_AST.drange))))
+               impl1.FStarC_Parser_AST.drange FStarC_Parser_AST.Expr in
+           {
+             FStarC_Parser_AST.d = (impl1.FStarC_Parser_AST.d);
+             FStarC_Parser_AST.drange = (impl1.FStarC_Parser_AST.drange);
+             FStarC_Parser_AST.quals = (impl1.FStarC_Parser_AST.quals);
+             FStarC_Parser_AST.attrs = (karamel_private ::
+               (impl1.FStarC_Parser_AST.attrs));
+             FStarC_Parser_AST.interleaved =
+               (impl1.FStarC_Parser_AST.interleaved)
+           }) in
       match iface with
       | [] ->
           let uu___ = let uu___1 = qualify_karamel_private impl in [uu___1] in

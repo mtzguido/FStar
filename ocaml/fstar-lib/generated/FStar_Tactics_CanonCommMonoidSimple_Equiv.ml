@@ -1183,79 +1183,72 @@ let (canon_monoid :
                                     | (sq, rel_xy) ->
                                         (match rel_xy with
                                          | (rel_xy1, uu___5)::[] ->
+                                             let uu___6 =
+                                               FStar_Tactics_V2_SyntaxHelpers.collect_app
+                                                 rel_xy1 in
                                              Obj.magic
-                                               (Obj.repr
-                                                  (let uu___6 =
-                                                     FStar_Tactics_V2_SyntaxHelpers.collect_app
-                                                       rel_xy1 in
-                                                   FStar_Tactics_Effect.tac_bind
-                                                     (FStar_Sealed.seal
-                                                        (Obj.magic
-                                                           (FStar_Range.mk_range
-                                                              "FStar.Tactics.CanonCommMonoidSimple.Equiv.fst"
-                                                              (Prims.of_int (381))
-                                                              (Prims.of_int (21))
-                                                              (Prims.of_int (381))
-                                                              (Prims.of_int (39)))))
-                                                     (FStar_Sealed.seal
-                                                        (Obj.magic
-                                                           (FStar_Range.mk_range
-                                                              "FStar.Tactics.CanonCommMonoidSimple.Equiv.fst"
-                                                              (Prims.of_int (380))
-                                                              (Prims.of_int (21))
-                                                              (Prims.of_int (391))
-                                                              (Prims.of_int (6)))))
-                                                     (Obj.magic uu___6)
+                                               (FStar_Tactics_Effect.tac_bind
+                                                  (FStar_Sealed.seal
+                                                     (Obj.magic
+                                                        (FStar_Range.mk_range
+                                                           "FStar.Tactics.CanonCommMonoidSimple.Equiv.fst"
+                                                           (Prims.of_int (381))
+                                                           (Prims.of_int (21))
+                                                           (Prims.of_int (381))
+                                                           (Prims.of_int (39)))))
+                                                  (FStar_Sealed.seal
+                                                     (Obj.magic
+                                                        (FStar_Range.mk_range
+                                                           "FStar.Tactics.CanonCommMonoidSimple.Equiv.fst"
+                                                           (Prims.of_int (380))
+                                                           (Prims.of_int (21))
+                                                           (Prims.of_int (391))
+                                                           (Prims.of_int (6)))))
+                                                  (Obj.magic uu___6)
+                                                  (fun uu___7 ->
                                                      (fun uu___7 ->
-                                                        (fun uu___7 ->
-                                                           match uu___7 with
-                                                           | (rel, xy) ->
-                                                               if
-                                                                 (FStar_List_Tot_Base.length
-                                                                    xy)
-                                                                   >=
-                                                                   (Prims.of_int (2))
-                                                               then
-                                                                 Obj.magic
-                                                                   (Obj.repr
-                                                                    (match 
-                                                                    ((FStar_List_Tot_Base.index
+                                                        match uu___7 with
+                                                        | (rel, xy) ->
+                                                            if
+                                                              (FStar_List_Tot_Base.length
+                                                                 xy)
+                                                                >=
+                                                                (Prims.of_int (2))
+                                                            then
+                                                              (match 
+                                                                 ((FStar_List_Tot_Base.index
                                                                     xy
                                                                     ((FStar_List_Tot_Base.length
                                                                     xy) -
                                                                     (Prims.of_int (2)))),
-                                                                    (FStar_List_Tot_Base.index
+                                                                   (FStar_List_Tot_Base.index
                                                                     xy
                                                                     ((FStar_List_Tot_Base.length
                                                                     xy) -
                                                                     Prims.int_one)))
-                                                                    with
-                                                                    | 
-                                                                    ((lhs,
-                                                                    FStarC_Reflection_V2_Data.Q_Explicit),
-                                                                    (rhs,
-                                                                    FStarC_Reflection_V2_Data.Q_Explicit))
-                                                                    ->
-                                                                    Obj.repr
+                                                               with
+                                                               | ((lhs,
+                                                                   FStarC_Reflection_V2_Data.Q_Explicit),
+                                                                  (rhs,
+                                                                   FStarC_Reflection_V2_Data.Q_Explicit))
+                                                                   ->
+                                                                   Obj.magic
                                                                     (canon_lhs_rhs
                                                                     eq m lhs
                                                                     rhs)
-                                                                    | 
-                                                                    uu___8 ->
-                                                                    Obj.repr
+                                                               | uu___8 ->
+                                                                   Obj.magic
                                                                     (FStar_Tactics_V2_Derived.fail
-                                                                    "Goal should have been an application of a binary relation to 2 explicit arguments")))
-                                                               else
-                                                                 Obj.magic
-                                                                   (Obj.repr
-                                                                    (FStar_Tactics_V2_Derived.fail
-                                                                    "Goal should have been an application of a binary relation to n implicit and 2 explicit arguments")))
-                                                          uu___7)))
+                                                                    "Goal should have been an application of a binary relation to 2 explicit arguments"))
+                                                            else
+                                                              Obj.magic
+                                                                (FStar_Tactics_V2_Derived.fail
+                                                                   "Goal should have been an application of a binary relation to n implicit and 2 explicit arguments"))
+                                                       uu___7))
                                          | uu___5 ->
                                              Obj.magic
-                                               (Obj.repr
-                                                  (FStar_Tactics_V2_Derived.fail
-                                                     "Goal should be squash applied to a binary relation"))))
+                                               (FStar_Tactics_V2_Derived.fail
+                                                  "Goal should be squash applied to a binary relation")))
                                    uu___4))) uu___3))) uu___1)
 let _ =
   FStarC_Tactics_Native.register_tactic
