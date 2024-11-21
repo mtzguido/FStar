@@ -1,8 +1,8 @@
 name: Rebuild base image
 on:
-  schedule:
-    # 2AM UTC
-    - cron: '0 2 * * *'
+  # schedule:
+  #   # 2AM UTC
+  #   - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       force:

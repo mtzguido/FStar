@@ -1,0 +1,42 @@
+name: F* CI (new)
+on:
+  # push:
+  #   branches-ignore:
+  #     - _**
+  # pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-fstar:
+    runs-on: [self-hosted, linux]
+    container: mtzguido/fstar-base-testing
+    steps:
+      - name: Cleanup
+        run: find . -delete
+      - run: echo "HOME=/home/opam" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
+
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          path: FStar/
+
+      - name: Checkout karamel
+        uses: actions/checkout@master
+        with:
+          path: karamel/
+          repository: FStarLang/karamel
+
+      - run: |
+          echo KRML_HOME=$(pwd)/karamel >>$GITHUB_ENV
+          echo FSTAR_CI_TEST_KARAMEL=1  >>$GITHUB_ENV
+
+      - name: Build
+        run: make -Otarget -C FStar -skj$(nproc) ci
+
+      - name: Check for snapshot diff
+        run: cd FStar && ./.scripts/check-snapshot-diff.sh
