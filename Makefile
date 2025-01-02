@@ -4,6 +4,9 @@ export FSTAR_ROOT=$(CURDIR)
 include mk/common.mk
 undefine FSTAR_EXE # just in case
 
+# NOTE: If you are changing any of install rules, run a macos build too.
+# The behavior of cp, find, etc, can differ in subtle ways from that of GNU tools.
+
 FSTAR_VERSION ?= $(shell cat version.txt)
 
 FSTAR_DEFAULT_GOAL ?= build
@@ -267,7 +270,8 @@ stage2: $(INSTALLED_FSTAR2_FULL_EXE)
 do-install: _force
 	$(call bold_msg, "INSTALL", $(PREFIX))
 	# Install fstar.exe, application library, and plugin library
-	cp -r $(BROOT)/out -T $(PREFIX)
+	mkdir -p $(PREFIX) # Needed for macOS apparently
+	cp -r $(BROOT)/out $(PREFIX)
 
 install: 2
 install: BROOT=stage2

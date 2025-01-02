@@ -1,0 +1,52 @@
+name: Build F* (Linux)
+
+# This builds F* for Linux for a binary package release.
+# See build.yml for the build used in normal CI runs.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    # We prefer slightly older Ubuntu so we get binaries that work on
+    # all more recent versions.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          path: FStar
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.2
+
+      - name: Prepare
+        run: |
+          ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
+          echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+          opam install --deps-only FStar/fstar.opam
+
+      # Note *g*make below!
+      - name: Produce all artifacts
+        working-directory: FStar
+        run: |
+          eval $(opam env) 
+          make -skj$(nproc) package FSTAR_VERSION=Linux-x86_64
+          make -skj$(nproc) package-src FSTAR_VERSION=Linux-x86_64
+          mv fstar--src.tar.gz fstar-src.tar.gz # fixup name...
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: FStar/fstar-Linux-x86_64.tar.gz
+          name: fstar-Linux-x86_64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          path: FStar/fstar-src.tar.gz
+          name: fstar-src.tar.gz
