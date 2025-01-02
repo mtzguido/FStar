@@ -8,9 +8,7 @@ jobs:
   build-linux:
     # This job also builds an (architecture-indepenendent) source package
     # artifact.
-    name: build-linux
     uses: ./.github/workflows/build-linux.yml
 
   build-macos:
-    name: build-macos
     uses: ./.github/workflows/build-macos.yml
