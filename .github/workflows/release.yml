@@ -1,72 +1,45 @@
-name: FStar Binary Release
+name: Create F* release and publish
 
 on:
   workflow_dispatch:
 
 jobs:
+  # Bump version number beforehand? I don't think the action can push
+  # that to master (easily). Just remember to do so manually.
 
-  build-linux:
+  build-all:
+    uses: ./.github/workflows/build-all.yml
 
-    runs-on: [self-hosted, linux, X64]
-
+  publish:
+    runs-on: ubuntu-latest
+    needs: build-all
     steps:
-    - name: Check out repo        
-      uses: actions/checkout@v4
-    - name: Package and release FStar
-      run: |
-          ci_docker_image_tag=fstar-release:local-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT
-          ci_docker_builder=builder_fstar-release_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}
-          docker buildx create --name $ci_docker_builder --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=500000000
-          docker buildx build --builder $ci_docker_builder --pull --load --secret id=DZOMO_GITHUB_TOKEN -t $ci_docker_image_tag -f .docker/release.Dockerfile .
-      env:
-          DZOMO_GITHUB_TOKEN: ${{ secrets.DZOMO_GITHUB_TOKEN }}
-    - name: Remove the builder if created
-      if: ${{ always() }}
-      run: |
-        docker buildx rm -f $ci_docker_builder || true
+      - uses: actions/download-artifact@v4
+        with:
+          name: fstar-Linux-x86_64.tar.gz
+      - uses: actions/download-artifact@v4
+        with:
+          name: fstar-src.tar.gz
+      - uses: actions/download-artifact@v4
+        with:
+          name: fstar-Darwin-x86_64.tar.gz
 
-  build-macos:
+      - uses: actions/checkout@v4
+        with:
+          path: FStar
+      - name: Rename packages to have version number
+        run: |
+          V="v$(cat FStar/version.txt)"
+          for file in fstar-*.tar.gz; do
+            mv "$file" "${file/fstar-/fstar-$V-}"
+          done
 
-    needs: build-linux
-
-    runs-on: macos-latest
-
-    steps:
-    - name: Checkout FStar
-      uses: actions/checkout@v4
-      with:
-        path: FStar
-    - name: Checkout everest
-      uses: actions/checkout@v4
-      with:
-        repository: project-everest/everest
-        path: FStar/.github/everest
-    - name: Install .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '6.0.x'
-    - name: Setup dependencies
-      run: ./FStar/.github/setup-macos.sh
-    - name: Package and release FStar
-      run: |
-        source FStar/.github/env.sh
-        CI_THREADS=24 FSTAR_SKIP_PACKAGE_TEST=1 FStar/.scripts/release.sh
-      env:
-        GH_TOKEN: ${{ secrets.DZOMO_GITHUB_TOKEN }}
-
-  build-windows:
-
-    needs: build-linux
-
-    runs-on: [self-hosted, Windows, X64, opam-2-3]
-
-    steps:
-    - name: Check out repo        
-      uses: actions/checkout@v4
-      
-    - name: Package and release FStar
-      shell: C:\cygwin64\bin\bash.exe --login '{0}'
-      run: |
-        eval $(opam env) && CC=x86_64-w64-mingw32-gcc.exe FSTAR_COMMIT=$GITHUB_SHA CI_THREADS=24 $GITHUB_WORKSPACE/.scripts/release.sh && echo "There is a CR at the end of this line"
-      env:
-        GH_TOKEN: ${{ secrets.DZOMO_GITHUB_TOKEN }}
+      - name: Publish release
+        run: |
+          V=$(cat FStar/version.txt)
+          git tag -a "v$V" -m "F* version $V"
+          git push origin "v$V"
+          gh release create --prerelease \
+            --generate-notes \
+            -t "F* v$V" \
+            "v$V" fstar-*.tar.gz
