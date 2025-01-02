@@ -1,5 +1,3 @@
-name: Build F* (Linux)
-
 # This builds F* for Linux for a binary package release.
 # See build.yml for the build used in normal CI runs.
 

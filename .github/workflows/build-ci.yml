@@ -1,5 +1,3 @@
-name: Build F* (ci)
-
 # This builds F* for Linux for the purposes of CI. It runs on a
 # recent Ubuntu-based container and also generates a source package
 # and a repo snapshot. For the purposes of binary releases, see
