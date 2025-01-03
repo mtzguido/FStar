@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-VERSION=$(head -n 1 version.txt)
+if [[ -z "$FSTAR_VERSION" ]]; then
+  FSTAR_VERSION=$(head -n 1 version.txt)~dev
+fi
+
 if [ "$OS" = "Windows_NT" ]
 then
    if [ "$PROCESSOR_ARCHITECTURE" = "AMD64" ]
@@ -20,7 +23,7 @@ fi
 COMMITDATE=$(git log --pretty=format:%ci -n 1 2>/dev/null || echo unset)
 
 echo "let dummy () = ();;"
-echo "FStarC_Options._version := \"$VERSION\";;"
+echo "FStarC_Options._version := \"$FSTAR_VERSION\";;"
 echo "FStarC_Options._platform := \"$PLATFORM\";;"
 echo "FStarC_Options._compiler := \"$COMPILER\";;"
 # We deliberately use commitdate instead of date, so that rebuilds are no-ops
