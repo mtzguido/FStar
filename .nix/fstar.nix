@@ -47,6 +47,7 @@ buildDunePackage {
   '';
 
   src = lib.sourceByRegex ./.. [
+    ".scripts/get_fstar_z3.sh"
     "Makefile"
     "src.*"
     "mk.*"
