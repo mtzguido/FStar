@@ -15,7 +15,23 @@ jobs:
   # Bump version number beforehand? I don't think the action can push
   # that to master (easily). Just remember to do so manually.
 
+  # At least check for it, so we don't run this whole thing and fail
+  # for an existing tag.
+  pre:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch --tags
+          V="v$(cat version.txt)"
+          if git tag -l "$V" | grep -q .; then
+            echo "::error::Version $V already exists." >&2
+            echo "::error::Bump the version number in version.txt before running this workflow." >&2
+            false
+          fi
+
   build-all:
+    needs: pre
     uses: ./.github/workflows/build-all.yml
 
   publish:
