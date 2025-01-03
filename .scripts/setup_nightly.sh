@@ -17,7 +17,14 @@ FILE="$(basename "$URL")"
 
 # Get artifact
 wget "$URL" -O "$FILE"
-tar xzf "$FILE"
+
+# Warn if too old (over 48 hours)
+S_NOW=$(date +%s)
+S_FILE=$(stat "$FILE" -c '%Y')
+if [[ $((S_NOW - S_FILE)) -gt $((48 * 6 * 6)) ]]; then
+	echo "Warning: downloaded package seems old" >&2
+	echo "Modification date: $(stat "$FILE" -c '%y')" >&2
+fi
 
 # Untar
 rm -rf out
