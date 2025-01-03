@@ -86,9 +86,11 @@ jobs:
           # ^ See note in test-local.
         os:
           # - ubuntu-20.04
-          - ubuntu-22.04
+          # - ubuntu-22.04
           - ubuntu-24.04
-          - ubuntu-latest
+          # - ubuntu-latest
+          # FIXME: the container builds with a recent glibc, use an older
+          # base system to get a more portable executable.
     runs-on: ${{ matrix.os }}
     steps:
       - uses: cda-tum/setup-z3@main
