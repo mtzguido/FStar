@@ -51,11 +51,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           V=$(cat version.txt)
-          # --target makes sure that if master advanced while
-          # we were running, the release is still created
-          # at commit where this workflow started.
+          # --target with a specific ShA makes sure that if
+          # master advanced while we were running, the release
+          # is still created at the commit where this workflow started.
           gh release create --prerelease \
             --generate-notes \
-            --target ${{ github.ref }} \
+            --target ${{ github.sha }} \
             -t "F* v$V" \
             "v$V" ../artifacts/fstar-*
