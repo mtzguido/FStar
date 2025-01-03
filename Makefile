@@ -284,14 +284,15 @@ do-src-install: _force
 
 __do-archive: _force
 	rm -rf $(PREFIX)
-	$(MAKE) do-install
+	# add an 'fstar' top-level directory to the archive
+	$(MAKE) do-install PREFIX=$(PREFIX)/fstar
 	$(call bold_msg, "ARCHIVE", $(ARCHIVE))
 	tar czf $(ARCHIVE) -h -C $(PREFIX) .
 	rm -rf $(PREFIX)
 
 __do-src-archive: _force
 	rm -rf $(PREFIX)
-	$(MAKE) do-src-install
+	$(MAKE) do-src-install PREFIX=$(PREFIX)/fstar
 	$(call bold_msg, "SRC ARCHIVE", $(ARCHIVE))
 	tar czf $(ARCHIVE) -h -C $(PREFIX) .
 	rm -rf $(PREFIX)
@@ -302,14 +303,14 @@ FSTAR_TAG ?= -v$(shell cat version.txt)
 
 package-1: $(INSTALLED_FSTAR1_FULL_EXE) _force
 	env \
-	  PREFIX=_pak1/ \
+	  PREFIX=_pak1 \
 	  BROOT=stage1/ \
 	  ARCHIVE=fstar$(FSTAR_TAG)-stage1.tar.gz \
 	  $(MAKE) __do-archive
 
 package-2: $(INSTALLED_FSTAR2_FULL_EXE) _force
 	env \
-	  PREFIX=_pak2/ \
+	  PREFIX=_pak2 \
 	  BROOT=stage2/ \
 	  ARCHIVE=fstar$(FSTAR_TAG).tar.gz \
 	  $(MAKE) __do-archive
