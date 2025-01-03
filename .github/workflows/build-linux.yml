@@ -34,6 +34,7 @@ jobs:
       - name: Build packages
         working-directory: FStar
         run: |
+          echo "TESTING: ${{github.workflow_ref}}"
           eval $(opam env)
           make -skj$(nproc) package     FSTAR_TAG=-Linux-x86_64
           make -skj$(nproc) package-src FSTAR_TAG=
