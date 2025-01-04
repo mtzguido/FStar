@@ -29,10 +29,11 @@ jobs:
           ocaml-compiler: 4.14.2
 
       - name: Prepare
+        shell: powershell # ?
         run: |
           ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
           echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
-          opam install --deps-only FStar\\fstar.opam
+          opam install --deps-only FStar\fstar.opam
 
       - name: Set version
         run: |
