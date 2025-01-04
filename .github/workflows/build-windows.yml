@@ -7,6 +7,12 @@ on:
   workflow_dispatch:
   push:
 
+defaults:
+  run:
+    shell:
+      bash
+      # ^ avoid powershell!
+
 jobs:
   build-windows:
     # NOTE! Unlike our other builds, this requires a self-hosted
@@ -26,24 +32,24 @@ jobs:
         run: |
           ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
           echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
-          opam install --deps-only FStar\fstar.opam
+          opam install --deps-only FStar/fstar.opam
 
       - name: Set version
         run: |
           # Setting FSTAR_VERSION for nightly and release builds. If unset,
           # we use $(version.txt)~dev. Setting it avoids the ~dev.
-          if ( "${{github.workflow_ref}}" -match "nightly.yml") {
+          if [[ "${{github.workflow_ref}}" =~ "nightly.yml" ]]; then
             echo FSTAR_VERSION="nightly-$(date -I)" >> $GITHUB_ENV
-          } elseif ( "${{github.workflow_ref}}" -match "release.yml") {
-            echo FSTAR_VERSION="$(cat FStar\version.txt)" >> $GITHUB_ENV
-          }
+          elif [[ "${{github.workflow_ref}}" =~ "release.yml" ]]; then
+            echo FSTAR_VERSION="$(cat FStar/version.txt)" >> $GITHUB_ENV
+          fi
+
 
       - name: Build packages
         working-directory: FStar
         run: |
-          # The crazy equivalent of eval $(opam env) for Powershell:
-          ( & opam env) -split '\r?\n' | ForEach-Object { Invoke-Expression $_ }
-          make -sk -j $env:NUMBER_OF_PROCESSORS package     FSTAR_TAG=-Windows_NT-x86_64
+          eval $(opam env)
+          make -skj$(nproc) package FSTAR_TAG=-Windows_NT-x86_64
 
       - uses: actions/upload-artifact@v4
         with:
