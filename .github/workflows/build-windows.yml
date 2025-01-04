@@ -1,12 +1,17 @@
-name: Build F* (macos)
+name: Build F* (Windows)
+
+# Build F* on Windows
 
 on:
-  workflow_dispatch:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  build-windows:
+    # NOTE! Unlike our other builds, this requires a self-hosted
+    # runner (for now?)
+    runs-on: windows-latest # [self-hosted, Windows, X64, opam-2-3]
+
     steps:
       - uses: actions/checkout@master
         with:
@@ -18,11 +23,10 @@ jobs:
 
       - name: Prepare
         run: |
-          brew install opam bash gnu-getopt coreutils gnu-sed make
           ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
           echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
           opam install --deps-only FStar/fstar.opam
-
+      
       - name: Set version
         run: |
           # Setting FSTAR_VERSION for nightly and release builds. If unset,
@@ -33,14 +37,14 @@ jobs:
             echo FSTAR_VERSION="$(cat FStar/version.txt)" >> $GITHUB_ENV
           fi
 
-      # Note *g*make below!
-      - name: Build package
+      - name: Build packages
         working-directory: FStar
         run: |
           eval $(opam env)
-          gmake -skj$(nproc) package FSTAR_TAG=-Darwin-x86_64
+          make -skj$(nproc) package     FSTAR_TAG=-Windows_NT-x86_64
+          make -skj$(nproc) package-src FSTAR_TAG=
 
       - uses: actions/upload-artifact@v4
         with:
-          path: FStar/fstar-Darwin-x86_64.tar.gz
-          name: fstar-Darwin-x86_64.tar.gz
+          path: FStar/fstar-Windows_NT-x86_64.tar.gz
+          name: fstar-Windows_NT-x86_64.tar.gz
