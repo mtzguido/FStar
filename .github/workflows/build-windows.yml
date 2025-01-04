@@ -5,6 +5,7 @@ name: Build F* (Windows)
 on:
   workflow_call:
   workflow_dispatch:
+  push:
 
 jobs:
   build-windows:
@@ -25,8 +26,8 @@ jobs:
         run: |
           ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
           echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
-          opam install --deps-only FStar/fstar.opam
-      
+          opam install --deps-only FStar\fstar.opam
+
       - name: Set version
         run: |
           # Setting FSTAR_VERSION for nightly and release builds. If unset,
@@ -34,7 +35,7 @@ jobs:
           if [[ "${{github.workflow_ref}}" =~ "nightly.yml" ]]; then
             echo FSTAR_VERSION="nightly-$(date -I)" >> $GITHUB_ENV
           elif [[ "${{github.workflow_ref}}" =~ "release.yml" ]]; then
-            echo FSTAR_VERSION="$(cat FStar/version.txt)" >> $GITHUB_ENV
+            echo FSTAR_VERSION="$(cat FStar\version.txt)" >> $GITHUB_ENV
           fi
 
       - name: Build packages
@@ -46,5 +47,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          path: FStar/fstar-Windows_NT-x86_64.tar.gz
+          path: FStar\fstar-Windows_NT-x86_64.tar.gz
           name: fstar-Windows_NT-x86_64.tar.gz
