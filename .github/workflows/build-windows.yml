@@ -44,7 +44,6 @@ jobs:
           # The crazy equivalent of eval $(opam env) for Powershell:
           ( & opam env) -split '\r?\n' | ForEach-Object { Invoke-Expression $_ }
           make -sk -j $env:NUMBER_OF_PROCESSORS package     FSTAR_TAG=-Windows_NT-x86_64
-          make -sk -j $env:NUMBER_OF_PROCESSORS package-src FSTAR_TAG=
 
       - uses: actions/upload-artifact@v4
         with:
