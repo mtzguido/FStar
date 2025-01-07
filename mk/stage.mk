@@ -45,5 +45,11 @@ install: fstarc-bare fstarc-full libapp libplugin
 	mkdir -p out/lib/fstar/ulib/.checked
 	cp -p ulib.checked/* out/lib/fstar/ulib/.checked/
 	echo '.checked' >> out/lib/fstar/ulib/fstar.include
+	@# Install checked files for FStarC
+	mkdir -p out/lib/fstar/fstarc/
+	mkdir -p out/lib/fstar/fstarc/.checked
+	cp -r $(FSTAR_ROOT)/src/* out/lib/fstar/fstarc/
+	cp -r fstarc.checked/* out/lib/fstar/fstarc/.checked/
+	echo '.checked' >> out/lib/fstar/fstarc/fstar.include
 	@# Install get_fstar_z3 script
 	cp ../.scripts/get_fstar_z3.sh $(CURDIR)/out/bin
