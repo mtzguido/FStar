@@ -12,7 +12,7 @@ case "$arch" in
   arm64) arch=aarch64 ;;
 esac
 
-URL="https://github.com/FStarLang/FStar/releases/download/nightly/fstar-$kernel-$arch.tar.gz"
+URL="https://github.com/FStarLang/FStar-nightly/releases/download/latest/fstar-$kernel-$arch.tar.gz"
 FILE="$(basename "$URL")"
 
 # Get artifact

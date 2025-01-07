@@ -28,7 +28,13 @@ jobs:
       - name: Publish artifacts in nightly tag
         run: |
           # try to create the release, then upload
-          gh release create -R ${{ github.repository }} nightly || true
-          gh release upload --clobber -R ${{ github.repository }} nightly artifacts/fstar-*
+          REPO="${{github.repository}}-nightly" # We push nightly builds to a different repo
+          TAG=nightly-$(date -I)
+          git tag $TAG ${{github.sha}}
+          git push https://github.com/$REPO.git $TAG
+          gh release create -R "$REPO" \
+            --generate-notes \
+            --target ${{github.sha}} \
+            $TAG artifacts/fstar-*
         env:
           GH_TOKEN: ${{ github.token }}
