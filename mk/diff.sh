@@ -20,12 +20,12 @@ if $DIFF "$ACTUAL" "$EXPECTED" ; then
 else
   # We're gonna fail, maybe emit a github message
   if [ -v GITHUB_ENV ]; then
-    DIFFTEXT=$($DIFF "$ACTUAL" "$EXPECTED" | tr '\n' '%0A')
+    DIFFTEXT=$($DIFF "$ACTUAL" "$EXPECTED" | sed 's/$/%0A/' | tr -d '\n')
     ACTUAL=$(realpath "$ACTUAL")
     ACTUAL="${ACTUAL#$FSTAR_ROOT}"
     EXPECTED=$(realpath "$EXPECTED")
     EXPECTED="${EXPECTED#$FSTAR_ROOT}"
-    echo "::error::Diff failed for files $ACTUAL and $EXPECTED:$DIFFTEXT"
+    echo "::error::Diff failed for files $ACTUAL and $EXPECTED:%0A%0A$DIFFTEXT"
   else
     echo "error: Diff failed for files $ACTUAL and $EXPECTED" >&2
     # echo "$DIFFTEXT"

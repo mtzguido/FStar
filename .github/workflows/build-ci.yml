@@ -21,12 +21,12 @@ jobs:
     # We do not package a stage 1 compiler.
     # runs-on: [self-hosted, linux, X64] # self-hosted so we use fast runners
     runs-on: ubuntu-latest
-    container: mtzguido/dev-base
+    # container: mtzguido/dev-base
     steps:
-      - name: Cleanup
-        run: sudo find . -delete
-      - run: echo "HOME=/home/user" >> $GITHUB_ENV
-      - uses: mtzguido/set-opam-env@master
+      # - name: Cleanup
+      #   run: sudo find . -delete
+      # - run: echo "HOME=/home/user" >> $GITHUB_ENV
+      # - uses: mtzguido/set-opam-env@master
 
       - uses: actions/checkout@master
         with:
@@ -37,7 +37,7 @@ jobs:
           # Note: we don't package Z3 for the CI artifact as the images
           # already have the relevant Z3.
           FSTAR_ROOT=$(pwd) ./mk/diff.sh flake.nix fstar.opam
-          make -skj$(nproc) package package-src FSTAR_TAG= FSTAR_PACKAGE_Z3=false
+          # make -skj$(nproc) package package-src FSTAR_TAG= FSTAR_PACKAGE_Z3=false
         working-directory: FStar
 
       # Upload the archives.
