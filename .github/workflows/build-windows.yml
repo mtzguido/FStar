@@ -1,0 +1,148 @@
+name: Build F* (Windows)
+
+# Build F* on Windows
+
+on:
+  workflow_call:
+  push:
+  schedule:
+    - cron: '*/5 * * * *'
+
+defaults:
+  run:
+    shell:
+      bash
+
+jobs:
+  build-src:
+    uses: ./.github/workflows/build-src.yml
+
+  build-windows:
+    needs: build-src
+    runs-on: windows-latest
+    steps:
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+      - uses: cygwin/cygwin-install-action@master
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-src
+
+      # Print out some debug info
+      - name: dbg
+        continue-on-error: true
+        run: |
+          echo 'uname -a'
+          uname -a
+          echo 'uname -s'
+          uname -s
+          echo 'uname -m'
+          uname -m
+          echo env
+          env
+          echo OS=$OS
+          which make
+          make --version
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+
+      - uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.2
+
+      # - run: echo "CYGWIN=" >>$GITHUB_ENV
+      # - name: Prepare
+      #   shell: powershell # somehow in bash we fail to build ocamlfind?
+      #   run: |
+      #     ./FStar/.scripts/get_fstar_z3.sh $HOME/bin
+      #     echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+      #     opam install --deps-only FStar\fstar.opam
+      # - run: echo "CYGWIN=" >>$GITHUB_ENV
+
+      # - name: Set version
+      #   run: |
+      #     # Setting FSTAR_VERSION for nightly and release builds. If unset,
+      #     # we use $(version.txt)~dev. Setting it avoids the ~dev.
+      #     if [[ "${{github.workflow_ref}}" =~ "nightly.yml" ]]; then
+      #       echo FSTAR_VERSION="nightly-$(date -I)" >> $GITHUB_ENV
+      #     elif [[ "${{github.workflow_ref}}" =~ "release.yml" ]]; then
+      #       echo FSTAR_VERSION="$(cat FStar/version.txt)" >> $GITHUB_ENV
+      #     fi
+
+      # - run: echo "CYGWIN=" >>$GITHUB_ENV
+      # - name: Build packages
+      #   working-directory: FStar
+      #   run: |
+      #     eval $(opam env)
+      #     KERNEL=Windows_NT
+      #     # $(uname -s)
+      #     # ^ uname-s prints something like CYGWIN_NT-10.0-26100 or MINGW64_NT-10.0-20348
+      #     ARCH=$(uname -m)
+      #     export FSTAR_TAG=-$KERNEL-$ARCH
+      #     make -kj$(nproc) 0 V=1
+      #     echo -------------------------------------------------
+      #     ./stage0/bin/fstar.exe --version
+      #     ./stage0/bin/fstar.exe --locate
+      #     ./stage0/bin/fstar.exe --locate_lib
+      #     ./stage0/bin/fstar.exe --locate_ocaml
+      #     ./stage0/bin/fstar.exe --include src --debug yes || true
+      #     echo -------------------------------------------------
+      #     make -kj$(nproc) package V=1
+
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     path: FStar\fstar-Windows_NT-x86_64.tar.gz
+      #     name: fstar-Windows_NT-x86_64.tar.gz
+
+      - run: tar xzf fstar-src.tar.gz
+      - run: opam install . --deps-only --with-test
+        working-directory: fstar
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+
+      - name: test mk-package quick
+        run: |
+          .scripts/mk-package.sh ulib/ lib
+        working-directory: fstar
+      - uses: actions/upload-artifact@v4
+        if: ${{ always () }}
+        with:
+          name: lib-package-test
+          path: fstar/lib.zip
+
+      # Note: we admit queries here, like the OPAM build does.
+      - run: eval $(opam env) && make V=1 -kj$(nproc) ADMIT=1
+        working-directory: fstar
+      - run: echo "CYGWIN=" >>$GITHUB_ENV
+
+      - name: install z3?
+        run: |
+          mkdir -p bin
+          ./fstar/get_fstar_z3.sh bin
+          echo "$(realpath bin)" >>$GITHUB_PATH
+
+      - name: Smoke test
+        continue-on-error: true
+        run: |
+          ./out/bin/fstar.exe out/lib/fstar/ulib/Prims.fst -f
+          echo -e "module A\nopen FStar.Mul\nlet _ = assert (forall x. 1 + x*x > 0)" > A.fst
+          ./out/bin/fstar.exe A.fst
+        working-directory: fstar
+
+      - run: |
+          eval $(opam env)
+          KERNEL=Windows_NT
+          # $(uname -s)
+          # ^ uname-s prints something like CYGWIN_NT-10.0-26100 or MINGW64_NT-10.0-20348
+          ARCH=$(uname -m)
+          export FSTAR_TAG=-$KERNEL-$ARCH
+          make package
+        working-directory: fstar
+
+      - run: find . -name '*.zip'
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always () }}
+        with:
+          name: package-win
+          path: fstar/fstar-*.zip
