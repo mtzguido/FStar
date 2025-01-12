@@ -5,8 +5,8 @@ name: Build F* (Windows)
 on:
   workflow_call:
   push:
-  schedule:
-    - cron: '*/5 * * * *'
+  # schedule:
+  #   - cron: '*/5 * * * *'
 
 defaults:
   run:
