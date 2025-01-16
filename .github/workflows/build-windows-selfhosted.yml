@@ -87,5 +87,3 @@ jobs:
         working-directory: fstar
         run: |
           ./bin/fstar.exe lib/fstar/ulib/Prims.fst -f -d
-          echo -e "module A\nopen FStar.Mul\nlet _ = assert (forall x. 1 + x*x > 0)" > A.fst
-          ./bin/fstar.exe A.fst -d

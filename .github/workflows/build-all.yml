@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Disable when Windows is reenabled.
+  # Windows build call this as a substep
   build-src:
     uses: ./.github/workflows/build-src.yml
 
@@ -15,5 +15,5 @@ jobs:
   build-macos:
     uses: ./.github/workflows/build-macos.yml
 
-  # build-windows:
-  #   uses: ./.github/workflows/build-windows.yml
+  build-windows:
+    uses: ./.github/workflows/build-windows-selfhosted.yml
