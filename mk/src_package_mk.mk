@@ -106,8 +106,8 @@ trim: .force
 
 clean: trim
 	rm -rf $(CURDIR)/out
-	rm -r ulib.checked
-	rm -r fstarc.checked
+	rm -rf ulib.checked
+	rm -rf fstarc.checked
 
 all: install_lib install_fstarc
 
