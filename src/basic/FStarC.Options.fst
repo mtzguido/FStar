@@ -299,6 +299,7 @@ let defaults =
       ("smtencoding.valid_intro"      , Bool true);
       ("smtencoding.valid_elim"       , Bool false);
       ("split_queries"                , String "on_failure");
+      ("stats"                        , Bool false);
       ("tactics_failhard"             , Bool false);
       ("tactics_info"                 , Bool false);
       ("tactic_raw_binders"           , Bool false);
@@ -558,6 +559,7 @@ let get_smtencoding_l_arith_repr()      = lookup_opt "smtencoding.l_arith_repr" 
 let get_smtencoding_valid_intro ()      = lookup_opt "smtencoding.valid_intro"  as_bool
 let get_smtencoding_valid_elim  ()      = lookup_opt "smtencoding.valid_elim"   as_bool
 let get_split_queries           ()      = lookup_opt "split_queries"            as_string
+let get_stats                   ()      = lookup_opt "stats"                    as_bool
 let get_tactic_raw_binders      ()      = lookup_opt "tactic_raw_binders"       as_bool
 let get_tactics_failhard        ()      = lookup_opt "tactics_failhard"         as_bool
 let get_tactics_info            ()      = lookup_opt "tactics_info"             as_bool
@@ -1415,6 +1417,11 @@ let rec specs_with_types warn_unsafe : list (char & string & opt_type & Pprint.d
     ]);
 
   ( noshort,
+    "stats",
+    Const (Bool true),
+    text "Print some statistics on the time spent in each phase of the compiler");
+
+  ( noshort,
     "tactic_raw_binders",
     Const (Bool true),
     text "Do not use the lexical scope of tactics to improve binder names");
@@ -2164,6 +2171,7 @@ let parse_split_queries (s:string) : option split_queries_t =
   | _ -> None
 
 let split_queries                () = get_split_queries () |> parse_split_queries |> Util.must
+let stats                        () = get_stats ()
 let tactic_raw_binders           () = get_tactic_raw_binders          ()
 let tactics_failhard             () = get_tactics_failhard            ()
 let tactics_info                 () = get_tactics_info                ()
