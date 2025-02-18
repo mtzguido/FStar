@@ -414,6 +414,10 @@ let handle_error e =
     end;
     report_errors []
 
+let print_stats () =
+  if Options.Ext.enabled "stats" then
+    print1_error "Stats:\n%s\n" (Stats.print_all ())
+
 let main () =
   try
     Hooks.setup_hooks ();
@@ -422,8 +426,10 @@ let main () =
     then Util.print2_error "TOTAL TIME %s ms: %s\n"
               (FStarC.Util.string_of_int time)
               (String.concat " " (FStarC.Getopt.cmdline()));
+    print_stats();
     exit 0
   with
   | e ->
     handle_error e;
+    print_stats();
     exit 1
