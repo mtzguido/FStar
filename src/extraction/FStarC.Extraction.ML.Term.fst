@@ -303,6 +303,17 @@ let is_type env t =
                                 (tag_of t)
                                 (show t)
                                 );
+    let t = N.normalize 
+    [Env.AllowUnboundUniverses;
+     Env.EraseUniverses;
+     Env.Inlining;
+     Env.Eager_unfolding;
+     Env.Exclude Env.Zeta;
+     Env.Primops;
+     Env.Unascribe;
+     Env.HNF;
+     Env.UnfoldUntil S.delta_constant;
+     Env.ForExtraction] (tcenv_of_uenv env) t in
     let b = is_type_aux env t in
     debug env (fun _ ->
         if b
