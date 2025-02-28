@@ -1907,7 +1907,7 @@ Errors.with_ctx (BU.format1 "While checking layered effect definition `%s`" (str
       U.has_attribute ed.eff_attrs PC.primitive_extraction_attr in
     let is_reifiable = List.contains Reifiable quals in
 
-    if has_primitive_extraction && is_reifiable
+    if false && has_primitive_extraction && is_reifiable
     then raise_error ed.mname Errors.Fatal_UnexpectedEffect
                       (BU.format1 "Effect %s is declared to be both primitive extraction and reifiable"
                         (show ed.mname)) 

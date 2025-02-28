@@ -111,6 +111,10 @@ let err_cannot_extract_effect (l:lident) (r:Range.range) (reason:string) (ctxt:s
        (string_of_lid l) reason ctxt
   ]
 
+let get_extraction_mode env (m:Ident.lident) =
+  let norm_m = Env.norm_eff_name env m in
+  (Env.get_effect_decl env norm_m).extraction_mode
+
 (***********************************************************************)
 (* Translating an effect lid to an e_tag = {E_PURE, E_ERASABLE, E_IMPURE} *)
 (***********************************************************************)
@@ -139,7 +143,10 @@ let effect_as_etag =
          match ed_opt with
          | Some (ed, qualifiers) ->
            if TcEnv.is_reifiable_effect (tcenv_of_uenv g) ed.mname
-           then E_PURE
+           then
+             if get_extraction_mode (tcenv_of_uenv g) ed.mname = S.Extract_reify
+             then E_PURE
+             else E_IMPURE
            else E_IMPURE
          | None -> E_IMPURE
 
