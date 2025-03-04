@@ -29,6 +29,10 @@ open FStarC.Class.Show
 module E = FStarC.Errors
 module UF = FStarC.Syntax.Unionfind
 
+let print_stats () =
+  if Options.Ext.enabled "stats" then
+    print1_error "Stats:\n%s\n" (Stats.print_all ())
+
 (* These modules only mentioned to put them in the dep graph
 and hence compile and link them in. They do not export anything,
 instead they register primitive steps in the normalizer during
@@ -65,6 +69,7 @@ let report_errors fmods =
   let nerrs = FStarC.Errors.get_err_count() in
   if nerrs > 0 then begin
     finished_message fmods nerrs;
+    print_stats ();
     exit 1
   end
 
@@ -125,6 +130,7 @@ let set_error_trap () =
     Errors.diag Range.dummyRange [
       text "GOT SIGINT! Exiting";
     ];
+    print_stats ();
     exit 1
   in
   set_sigint_handler (sigint_handler_f h')
@@ -413,10 +419,6 @@ let handle_error e =
         Util.print_error "Please file a bug report, ideally with a minimized version of the source program that triggered the error.\n"
     end;
     report_errors []
-
-let print_stats () =
-  if Options.Ext.enabled "stats" then
-    print1_error "Stats:\n%s\n" (Stats.print_all ())
 
 let main () =
   try
