@@ -623,7 +623,7 @@ let check_bqual (b0 b1:bqual)
     | None, Some Equality // The equality qualifier is metadata, ignore it
     | Some Equality, Some Equality ->
       return ()
-    | Some (Meta t1), Some (Meta t2) when equal_term t1 t2 ->
+    | Some (Meta t1), Some (Meta t2) -> // when equal_term t1 t2 ->
       return ()
     | _ ->
       fail_str (Format.fmt2 "Binder qualifier mismatch, %s vs %s" (show b0) (show b1))
