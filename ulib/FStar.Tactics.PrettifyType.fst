@@ -345,6 +345,57 @@ let rec mk_left_right_body (tynm pretty_tynm : name) (at : parsed_type) (i : nat
     let branch = mk_left_right_case tynm pretty_tynm i at in
     i+1, pack (Tv_Match sc None [branch])
 
+(* In this case we are matching something of the flat type.
+We must follow the structure of the type in order to match
+deeply enough. *)
+let rec prove_left_right_aux (at : parsed_type) (m : term) (k : unit -> Tac unit) : Tac unit =
+  match at with
+  | Atom _ -> k ()
+  | Either (l, r) ->
+    let cases = t_destruct m in
+    guard (List.length cases = 2);
+    Util.zip cases [l;r] |> Util.iter #((_ & nat) & _) (fun ((c, n), at') ->
+      focus fun () ->
+        let bs : list binding = repeatn n intro in
+        guard (List.length bs = 1);
+        let [b] = bs in
+        let b_eq = intro () in
+        rewrite b_eq;
+        prove_left_right_aux at' b k
+    )
+
+  | Tuple2 (l, r) ->
+    let cases = t_destruct m in
+    guard (List.length cases = 1);
+    let [(_, n)] = cases in
+    guard (n = 2);
+    let bs : list binding = repeatn n intro in
+    let [b1;b2] = bs in
+    let b_eq = intro () in
+    rewrite b_eq;
+    prove_left_right_aux l b1 (fun () ->
+      prove_left_right_aux r b2 k);
+    ()
+
+let prove_left_right at =
+  let b = intro () in
+  prove_left_right_aux at b trefl;
+  ()
+
+(* Just match on the pretty type and trefl. *)
+let prove_right_left () : Tac unit =
+  let b = intro () in
+  let cases = t_destruct b in
+  cases |> Util.iter #(_ & nat) (fun (c, n) ->
+    focus fun () ->
+      dump "case";
+      let bs = repeatn n intro in
+      let b_eq = intro () in
+      rewrite b_eq;
+      trefl ();
+      qed ()
+  )
+
 private
 let mk_left_right (tynm pretty_tynm : name) (at : parsed_type) : Tac decls =
   let b = fresh_binder (pack (Tv_FVar (pack_fv tynm))) in
@@ -360,7 +411,9 @@ let mk_left_right (tynm pretty_tynm : name) (at : parsed_type) : Tac decls =
           mk_tot_arr
             [b]
             (`(f_inverses (`#tm_left) (`#tm_right) (`#b)));
-        lb_def = mk_abs [b] (snd <| mk_left_right_body tynm pretty_tynm at 0 (pack (Tv_Var b)));
+        lb_def = (`(_ by (prove_left_right (`#(quote at)))));
+        // explicit proof term, slower
+        // mk_abs [b] (snd <| mk_left_right_body tynm pretty_tynm at 0 (pack (Tv_Var b)));
       }
     ]
   }
@@ -415,7 +468,9 @@ let mk_right_left (tynm pretty_tynm : name) (at : parsed_type) (ctors : list cto
           mk_tot_arr
             [b]
             (`(f_inverses (`#tm_right) (`#tm_left) (`#bt)));
-        lb_def = mk_abs [b] (mk_right_left_body tynm pretty_tynm at ctors (Tv_Var b));
+        lb_def = (`(_ by (prove_right_left ())));
+        // explicit proof term, slower
+        //mk_abs [b] (mk_right_left_body tynm pretty_tynm at ctors (Tv_Var b));
       }
     ]
   }
