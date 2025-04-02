@@ -63,3 +63,33 @@ type big =
   string
 
 %splice[] (entry "_pretty" (`%big))
+
+
+type bigger =
+  either (
+  either (
+  either (
+  either (
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  either (tuple2 (tuple2 (tuple2 int int) (tuple2 int int)) (tuple2 (tuple2 int int) (tuple2 int int))) <|
+  string
+  ) bool
+  ) bool
+  ) bool
+  ) bool
+
+%splice[] (entry "_pretty" (`%bigger))
