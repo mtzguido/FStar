@@ -227,8 +227,17 @@ let rec is_type_aux env t =
     | Tm_fvar fv when S.fv_eq_lid fv (PC.failwith_lid()) ->
       false //special case this, since we emit it during extraction even in prims, before it is in the F* scope
 
-    | Tm_fvar fv ->
-      UEnv.is_type_name env fv
+    | Tm_fvar fv -> (
+      (* Try unfolding. *)
+      match TypeChecker.Env.lookup_definition [Env.Unfold delta_constant] (tcenv_of_uenv env) fv.fv_name.v with
+      | None -> UEnv.is_type_name env fv
+      | Some (_, t') ->
+        (* If this is a recursive definition, just say it is not a type.
+           This avoids possible infinite loops. *)
+        if fv.fv_name.v `Class.Setlike.mem` FStarC.Syntax.Free.fvars t'
+        then false
+        else is_type_aux env t'
+    )
 
     | Tm_uvar (u, s) ->
       let t= U.ctx_uvar_typ u in
