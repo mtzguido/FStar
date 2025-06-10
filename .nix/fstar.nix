@@ -45,6 +45,8 @@ buildDunePackage {
     patchShebangs .scripts/*.sh
     patchShebangs ulib/ml/app/ints/mk_int_file.sh
     sed -i 's/Ast_502/Ast_500/' stage0/dune/fstar-guts/ml/FStarC_Extraction_ML_PrintML.ml src/ml/FStarC_Extraction_ML_PrintML.ml
+    cp ".nix/FStarC_Parser_LexFStar.ml" "src/ml/FStarC_Parser_LexFStar.ml"
+    cp ".nix/FStarC_Parser_LexFStar.ml" "stage0/dune/fstar-guts/ml/FStarC_Parser_LexFStar.ml"
   '';
 
   src = lib.sourceByRegex ./.. [
@@ -59,6 +61,7 @@ buildDunePackage {
     "LICENSE.*"
     "README.md"
     "INSTALL.md"
+    ".nix.*"
   ];
 
   buildPhase = ''
