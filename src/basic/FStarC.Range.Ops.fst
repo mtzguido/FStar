@@ -90,7 +90,7 @@ let extend_to_end_of_line r = mk_range (file_of_range r)
                                        (end_of_line (end_of_range r))
 
 let json_of_pos pos =
-  JsonList [JsonInt (line_of_pos pos); JsonInt (col_of_pos pos)]
+  JsonList [JsonInt (line_of_pos pos); JsonInt (col_of_pos pos - 1)]
 
 let json_of_range_fields file b e =
   JsonAssoc [("fname", JsonStr file);
