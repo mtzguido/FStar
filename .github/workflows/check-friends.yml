@@ -146,7 +146,8 @@ jobs:
         uses: actions/checkout@master
         with:
           path: pulse/
-          repository: FStarLang/pulse
+          repository: mtzguido/pulse
+          ref: update
 
       - uses: actions/download-artifact@v4
         with:
