@@ -613,15 +613,16 @@ let check_bqual (b0 b1:bqual)
   : result unit
   = match b0, b1 with
     | None, None -> return ()
-    | Some (Implicit b0), Some (Implicit b1) ->
+    | Some (Implicit _), Some (Implicit _)
+    | Some (Meta _), Some (Implicit _)
+    | Some (Implicit _), Some (Meta _)
+    | Some (Meta _), Some (Meta _) -> // when equal_term t1 t2 ->
       //we don't care about the inaccessibility qualifier
-      //when comparing bquals
+      //when comparing bquals. Also, implicits and meta are interchangeable.
       return ()
     | Some Equality, None
     | None, Some Equality // The equality qualifier is metadata, ignore it
     | Some Equality, Some Equality ->
-      return ()
-    | Some (Meta t1), Some (Meta t2) -> // when equal_term t1 t2 ->
       return ()
     | _ ->
       fail_str (Format.fmt2 "Binder qualifier mismatch, %s vs %s" (show b0) (show b1))
