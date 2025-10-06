@@ -2,8 +2,8 @@ name: Check world (test F* + all subprojects)
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 1 * * *' # 1AM UTC
+  # schedule:
+  #   - cron: '0 1 * * *' # 1AM UTC
 
 defaults:
   run:
