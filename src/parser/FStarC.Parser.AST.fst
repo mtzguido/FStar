@@ -178,8 +178,7 @@ let mkListLit r elts =
 let mkSeqLit r elts =
   mk_term (SeqLiteral elts) r Expr
 
-let unit_const r = mk_term (Const Const_unit) r Expr
-let unit_type  r = mk_term (Var (Ident.lid_of_str (`%unit))) r Expr
+let unit_const r = mk_term(Const Const_unit) r Expr
 
 let ml_comp t =
     let lid = C.effect_ML_lid () in
