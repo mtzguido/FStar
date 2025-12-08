@@ -4113,9 +4113,13 @@ and solve_t' (problem:tprob) (wl:worklist) : solution =
         let mk_imp imp phi1 phi2 = imp phi1 phi2 |> guard_on_element wl problem x1 in
         let fallback () =
            let impl =
-               if problem.relation = EQ
-               then mk_imp U.mk_iff phi1 phi2
-               else mk_imp U.mk_imp phi1 phi2 in
+               if problem.relation = EQ then
+                 mk_imp U.mk_iff phi1 phi2
+               else if Some? problem.element then // subtyping with an element
+                 guard_on_element wl problem x1 phi2
+               else
+                 mk_imp U.mk_imp phi1 phi2
+           in
            let guard = U.mk_conj (p_guard base_prob) impl in
            def_check_scoped (p_loc orig) "ref.1" (List.map (fun b -> b.binder_bv) (p_scope orig)) (p_guard base_prob);
            def_check_scoped (p_loc orig) "ref.2" (List.map (fun b -> b.binder_bv) (p_scope orig)) impl;
