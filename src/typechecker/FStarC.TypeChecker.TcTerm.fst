@@ -3976,12 +3976,13 @@ and check_inner_let env e =
        let _ =
         if (is_inline_let || is_inline_let_vc)  //inline let is allowed only if it is pure or ghost
         && not (pure_or_ghost || Env.is_erasable_effect env c1.eff_name)  //inline let is allowed on erasable effects
-        then raise_error e1
-               Errors.Fatal_ExpectedPureExpression
-               (Format.fmt2 "Definitions marked @inline_let are expected to be pure or ghost; \
-                            got an expression \"%s\" with effect \"%s\""
-                             (show e1)
-                             (show c1.eff_name))
+        then
+          let open FStarC.Pprint in
+          raise_error e1 Errors.Fatal_ExpectedPureExpression [
+               text "Definitions marked @inline_let are expected to be pure or ghost.";
+               prefix 2 1 (text "Got an expression") (pp e1) ^/^
+               prefix 2 1 (text "with effect") (pp c1.eff_name) ^^ dot;
+          ]
        in
        let x = {Inl?.v lb.lbname with sort=c1.res_typ} in
        let xb, e2 = SS.open_term [S.mk_binder x] e2 in
@@ -4379,8 +4380,10 @@ and check_let_bound_def top_level env lb
     (* 1. extract the annotation of the let-bound term, e1, if any *)
     let topt, wf_annot, univ_vars, univ_opening, env1 = check_lbtyp top_level env lb in
 
-    if not top_level && univ_vars <> []
-    then raise_error e1 Errors.Fatal_UniversePolymorphicInnerLetBound "Inner let-bound definitions cannot be universe polymorphic";
+    if not top_level && univ_vars <> [] then
+      raise_error e1 Errors.Fatal_UniversePolymorphicInnerLetBound [
+        text "Inner let-bound definitions cannot be universe polymorphic."
+      ];
 
     (* 2. type-check e1 *)
     (* Only toplevel terms should have universe openings *)

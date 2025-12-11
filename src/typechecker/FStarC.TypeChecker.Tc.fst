@@ -456,6 +456,15 @@ let tc_sig_let env r se lbs lids : list sigelt & list sigelt & Env.env =
     (* 2. Turn the top-level lb into a Tm_let with a unit body *)
     let e = mk (Tm_let {lbs=(fst lbs, lbs'); body=mk (Tm_constant (Const_unit)) r}) r in
 
+    (* For the second phase (if any), we will call the core typechecker
+       for terms marked with a @@"core" attribute, or if the extension
+       "core_phase2" is enabled. *)
+    let use_core =
+      do_two_phases env && (
+        Options.Ext.enabled "core_phase2"
+        || List.existsb (U.term_eq (U.exp_string "core")) se.sigattrs)
+    in
+
     (* 3. Type-check the Tm_let and convert it back to Sig_let *)
     let env' = { env with top_level = true; generalize = should_generalize } in
     let e =
@@ -492,13 +501,24 @@ let tc_sig_let env r se lbs lids : list sigelt & list sigelt & Env.env =
         if Debug.medium () || !dbg_TwoPhases then
           Format.print1 "Let binding after phase 1, before removing uvars: %s\n" (show e);
 
-        let e = N.remove_uvar_solutions env' e |> drop_lbtyp in
+        let e = N.remove_uvar_solutions env' e in
+
+        (* Wart: the normal typechecker drops the lbtyp to avoid double
+        ascriptions. But we need it to call the core checker. *)
+        let e =
+          if use_core
+          then e
+          else drop_lbtyp e
+        in
 
         if Debug.medium () || !dbg_TwoPhases then
           Format.print1 "Let binding after phase 1, uvars removed: %s\n" (show e);
         e)
       else e
     in
+
+    (* Phony, just so that we can print the result from Core below. *)
+    let _ : Class.Show.showable Core.guard_commit_token_cb = { show = (fun _ -> "_") } in
 
     let env' =
         match (SS.compress e).n with
@@ -510,12 +530,53 @@ let tc_sig_let env r se lbs lids : list sigelt & list sigelt & Env.env =
     in
     Errors.stop_if_err ();
     let r =
-        //We already generalized phase1; don't need to generalize again
-      let should_generalize = not (do_two_phases env') in
-      Profiling.profile (fun () -> tc_maybe_toplevel_term { env' with generalize = should_generalize } e)
-                        (Some (Ident.string_of_lid (Env.current_module env)))
-                        "FStarC.TypeChecker.Tc.tc_sig_let-tc-phase2"
+      let fallback () =
+        // We already generalized phase1; don't need to generalize again
+        let should_generalize = not (do_two_phases env') in
+        Profiling.profile (fun () -> tc_maybe_toplevel_term { env' with generalize = should_generalize } e)
+                          (Some (Ident.string_of_lid (Env.current_module env)))
+                          "FStarC.TypeChecker.Tc.tc_sig_let-tc-phase2"
+      in
+      if not use_core then
+        fallback ()
+      else (
+        if Debug.any () then
+          Format.print1 "Using core as phase2 for let binding: %s\n" (show e);
+        match (SS.compress e).n with
+        | Tm_let {lbs=(_, [lb])} -> (
+          // Format.print1 "GGG lbdef = %s\n" (show lb.lbdef);
+          // Format.print1 "GGG lbtyp = %s\n" (show lb.lbtyp);
+          let env'= push_univ_vars env' lb.lbunivs in
+          let _, def = SS.open_univ_vars lb.lbunivs lb.lbdef in
+          let _, typ = SS.open_univ_vars lb.lbunivs lb.lbtyp in
+          let core_res = Core.check_term env' def typ true in
+          // Format.print1 "Core computed type: %s\n" (show core_res);
+          match core_res with
+          | Inl gopt ->
+            begin match gopt with
+            | Some (g, _) -> ignore (Rel.discharge_guard env' (Env.guard_of_guard_formula (NonTrivial g)))
+            | None -> ()
+            end;
+            // Format.print1 "Core type: %s\n" (show typ);
+            let lcomp =
+              // match tg with
+              // | Core.E_Total ->
+              lcomp_of_comp (S.mk_Total typ)
+              // | Core.E_Ghost -> lcomp_of_comp (S.mk_GTotal typ)
+            in
+            e, lcomp, Env.trivial_guard
+
+          | Inr err ->
+            let open FStarC.Pprint in
+            Errors.diag e [
+              text "Core (for phase 2) failed:" ^/^ doc_of_string (show err);
+            ];
+            fallback ()
+        )
+        | _ -> failwith "unexpected: not a let"
+      )
     in
+
     let se, lbs = match r with
       | {n=Tm_let {lbs; body=e}}, _, g when Env.is_trivial g ->
         U.check_mutual_universes (snd lbs);
