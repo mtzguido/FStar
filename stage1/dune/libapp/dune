@@ -1,4 +1,51 @@
 (include_subdirs unqualified)
+
+; Platform-agnostic: copy all needed files without symlinks
+(copy_files ../../../ulib/ml/app/*.ml)
+(copy_files ../../../ulib/ml/app/*.mli)
+(copy_files ../../../ulib/ml/app-extra/*.ml)
+(copy_files ../../../ulib/ml/app-extra/*.mli)
+
+; Copy integer generation dependencies
+(copy_files ../../../ulib/ml/app/ints/mk_int_file.sh)
+(copy_files ../../../ulib/ml/app/ints/FStar_Ints.ml.body)
+
+; Generate integer modules
+(rule
+  (target FStar_UInt16.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 16))))
+
+(rule
+  (target FStar_UInt32.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 32))))
+
+(rule
+  (target FStar_UInt64.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 64))))
+
+(rule
+  (target FStar_Int8.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 8))))
+
+(rule
+  (target FStar_Int16.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 16))))
+
+(rule
+  (target FStar_Int32.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 32))))
+
+(rule
+  (target FStar_Int64.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 64))))
+
 (library
  (name fstar)
  (public_name fstar.lib)

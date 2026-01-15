@@ -162,7 +162,7 @@ let call_subtac g (t : unit -> unit __tac) u ty =
 let call_subtac_tm               = from_tac_4 "B.call_subtac_tm" B.call_subtac_tm
 
 let stats_record (s : string) (f : unit -> 'c __tac) : 'c __tac =
-  from_tac_2 "B.stats_record" (B.stats_record () ()) s (to_tac_0 (f ()))
+  TM.mk_tac (fun ps -> FStarC_Stats.record s (fun _ -> TM.run (f ()) ps))
 
 let with_error_context (s : string) (f : unit -> 'c __tac) : 'c __tac =
-  from_tac_2 "B.with_error_context" (B.with_error_context () ()) s (to_tac_0 (f ()))
+  TM.mk_tac (fun ps -> FStarC_Errors.with_ctx s (fun _ -> TM.run (f ()) ps))

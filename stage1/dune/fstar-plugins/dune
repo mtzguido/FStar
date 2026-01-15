@@ -1,4 +1,67 @@
 (include_subdirs unqualified)
+
+; Cross-platform build without symlinks or glob patterns
+; copy_files flattens into current dir, which is correct for (include_subdirs unqualified)
+
+; Copy plugins.ml directory from stage0 (contains extracted modules)  
+(copy_files ../../../stage0/dune/fstar-plugins/plugins.ml/*.ml)
+(copy_files ../../../stage0/dune/fstar-plugins/plugins.ml/*.mli)
+
+; Copy app directory files (root level)
+(copy_files ../../../stage0/dune/fstar-plugins/app/*.ml)
+(copy_files ../../../stage0/dune/fstar-plugins/app/*.mli)
+
+; Copy plugin directory files  
+(copy_files ../../../stage0/dune/fstar-plugins/plugin/*.ml)
+(copy_files ../../../stage0/dune/fstar-plugins/plugin/*.mli)
+
+; Copy integer generation dependencies directly to root (avoiding subdir issues)
+(copy_files ../../../ulib/ml/app/ints/mk_int_file.sh)
+(copy_files ../../../ulib/ml/app/ints/FStar_Ints.ml.body)
+
+; Generate integer modules using copied files in root
+(rule
+  (target FStar_UInt16.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Uint16'; echo 'type uint16 = M.t'; echo 'let n = Prims.of_int 16'; echo ''; echo 'let uint_to_t x = M.of_string (Z.to_string x)'; echo 'let __uint_to_t = uint_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_UInt32.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Uint32'; echo 'type uint32 = M.t'; echo 'let n = Prims.of_int 32'; echo ''; echo 'let uint_to_t x = M.of_string (Z.to_string x)'; echo 'let __uint_to_t = uint_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_UInt64.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Uint64'; echo 'type uint64 = M.t'; echo 'let n = Prims.of_int 64'; echo ''; echo 'let uint_to_t x = M.of_string (Z.to_string x)'; echo 'let __uint_to_t = uint_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_Int8.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Int8'; echo 'type int8 = M.t'; echo 'let n = Prims.of_int 8'; echo ''; echo 'let int_to_t x = M.of_string (Z.to_string x)'; echo 'let __int_to_t = int_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_Int16.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Int16'; echo 'type int16 = M.t'; echo 'let n = Prims.of_int 16'; echo ''; echo 'let int_to_t x = M.of_string (Z.to_string x)'; echo 'let __int_to_t = int_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_Int32.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Int32'; echo 'type int32 = M.t'; echo 'let n = Prims.of_int 32'; echo ''; echo 'let int_to_t x = M.of_string (Z.to_string x)'; echo 'let __int_to_t = int_to_t'; cat FStar_Ints.ml.body"))))
+
+(rule
+  (target FStar_Int64.ml)
+  (deps mk_int_file.sh FStar_Ints.ml.body)
+  (action (with-stdout-to %{target}
+    (bash "echo 'module M = Stdint.Int64'; echo 'type int64 = M.t'; echo 'let n = Prims.of_int 64'; echo ''; echo 'let int_to_t x = M.of_string (Z.to_string x)'; echo 'let __int_to_t = int_to_t'; cat FStar_Ints.ml.body"))))
+
 (library
  (name fstar_plugins)
  (libraries
@@ -7,5 +70,4 @@
  (modes native)
  (wrapped false)
  (preprocess (pps ppx_deriving.show ppx_deriving_yojson sedlex.ppx))
- ; ^ Needed for some of the base modules.
 )

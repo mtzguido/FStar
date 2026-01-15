@@ -67,27 +67,29 @@ install: # NOTE: no deps, dune figures it out and rebuilds if needed
 	@# We check for absolute so there's no confusion between the makefiles
 	@# that call each other. Do NOT just use $(abspath ..) here. Also not use
 	@# bashisms or 'expr' (does not work in macos)
-	if ! echo '$(PREFIX)' | grep -q '^/' ; then echo "PREFIX (= $(PREFIX)) must be absolute">&2; false; fi
+	@# On Windows, paths may start with drive letters (C:\) instead of /
+	if ! echo '$(PREFIX)' | grep -qE '^(/|[A-Za-z]:)' ; then echo "PREFIX (= $(PREFIX)) must be absolute">&2; false; fi
 	@# Seems to need one final build?
 	cd dune && $(DUNE) build $(FSTAR_DUNE_BUILD_OPTIONS)
-	cd dune && $(DUNE) install $(FSTAR_DUNE_OPTIONS) --prefix=$(PREFIX)
+	cd dune && $(DUNE) install $(FSTAR_DUNE_OPTIONS) --prefix=$(call cygpath,$(PREFIX))
 	@# Install library and its checked files
-	rm -rf $(PREFIX)/lib/fstar/ulib
-	$(INSTALL_DIR) ulib $(PREFIX)/lib/fstar/ulib
-	rm -rf $(PREFIX)/lib/fstar/ulib.checked
-	$(INSTALL_DIR) ulib.checked $(PREFIX)/lib/fstar/ulib.checked
-	echo 'ulib'          > $(PREFIX)/lib/fstar/fstar.include
-	echo 'ulib.checked' >> $(PREFIX)/lib/fstar/fstar.include
+	mkdir -p $(call cygpath,$(PREFIX))/lib/fstar
+	rm -rf $(call cygpath,$(PREFIX))/lib/fstar/ulib
+	$(INSTALL_DIR) ulib $(call cygpath,$(PREFIX))/lib/fstar/ulib
+	rm -rf $(call cygpath,$(PREFIX))/lib/fstar/ulib.checked
+	$(INSTALL_DIR) ulib.checked $(call cygpath,$(PREFIX))/lib/fstar/ulib.checked
+	echo 'ulib'          > $(call cygpath,$(PREFIX))/lib/fstar/fstar.include
+	echo 'ulib.checked' >> $(call cygpath,$(PREFIX))/lib/fstar/fstar.include
 	@# Install checked files for FStarC
-	rm -rf $(PREFIX)/lib/fstar/fstarc
-	mkdir -p $(PREFIX)/lib/fstar/fstarc/
-	$(INSTALL_DIR) $(FSTAR_ROOT)/src $(PREFIX)/lib/fstar/fstarc/src
-	$(INSTALL_DIR) fstarc.checked    $(PREFIX)/lib/fstar/fstarc/src.checked
-	echo 'src'          > $(PREFIX)/lib/fstar/fstarc/fstar.include
-	echo 'src.checked' >> $(PREFIX)/lib/fstar/fstarc/fstar.include
+	rm -rf $(call cygpath,$(PREFIX))/lib/fstar/fstarc
+	mkdir -p $(call cygpath,$(PREFIX))/lib/fstar/fstarc/
+	$(INSTALL_DIR) $(FSTAR_ROOT)/src $(call cygpath,$(PREFIX))/lib/fstar/fstarc/src
+	$(INSTALL_DIR) fstarc.checked    $(call cygpath,$(PREFIX))/lib/fstar/fstarc/src.checked
+	echo 'src'          > $(call cygpath,$(PREFIX))/lib/fstar/fstarc/fstar.include
+	echo 'src.checked' >> $(call cygpath,$(PREFIX))/lib/fstar/fstarc/fstar.include
 	@# If we're not linking, remove the VS code configs, they have paths
 	@# into the repo.
 ifneq ($(FSTAR_LINK_LIBDIRS),1)
-	rm -f $(PREFIX)/lib/fstar/ulib/*.fst.config.json
-	rm -f $(PREFIX)/lib/fstar/fstarc/src/*.fst.config.json
+	rm -f $(call cygpath,$(PREFIX))/lib/fstar/ulib/*.fst.config.json
+	rm -f $(call cygpath,$(PREFIX))/lib/fstar/fstarc/src/*.fst.config.json
 endif

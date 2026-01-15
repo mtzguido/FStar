@@ -12,6 +12,23 @@ FSTAR_DEFAULT_GOAL ?= build
 all: stage1 stage2 1.tests 2.tests stage3-bare lib-fsharp
 all-packages: package-1 package-2 package-src-1 package-src-2
 
+# Platform agnostic path resolution
+ifeq ($(OS),Windows_NT)
+    # Check if cygpath exists (MSYS2, Git Bash, Cygwin)
+    CYGPATH_EXISTS := $(shell which cygpath 2>/dev/null)
+    
+    ifneq ($(CYGPATH_EXISTS),)
+        # Windows with cygpath: Convert to Mixed Mode (C:/path)
+        platform_path = $(shell cygpath -m $(1))
+    else
+        # Windows without cygpath (Standard CMD/PowerShell)
+        platform_path = $(abspath $(1))
+    endif
+else
+    # 2. Linux / macOS: Use standard absolute path
+    platform_path = $(abspath $(1))
+endif
+
 ### STAGES
 
 # For developers: you can set this variable externally, pointing
@@ -198,7 +215,7 @@ $(FSTAR1_FULL_EXE): .bare1.src.touch .full1.src.touch .src.ml.touch $(MAYBEFORCE
 	# NOTE: see the explanation for FSTAR_LIB near top of file.
 	env \
 	  SRC=src/ \
-	  FSTAR_LIB=$(abspath ulib) \
+	  FSTAR_LIB=$(call platform_path,ulib) \
 	  FSTAR_EXE=$(FSTAR1_FULL_EXE) \
 	  CACHE_DIR=stage2/fstarc.checked/ \
 	  OUTPUT_DIR=stage2/fstarc.ml/ \
@@ -323,7 +340,7 @@ stage3-bare: $(FSTAR2_FULL_EXE) .force
 	env \
 	  SRC=src/ \
 	  FSTAR_EXE=$(FSTAR2_FULL_EXE) \
-	  FSTAR_LIB=$(abspath ulib) \
+	  FSTAR_LIB=$(call platform_path,ulib) \
 	  CACHE_DIR=stage3/fstarc.checked/ \
 	  OUTPUT_DIR=stage3/fstarc.ml/ \
 	  CODEGEN=OCaml \

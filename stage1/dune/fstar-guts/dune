@@ -1,4 +1,56 @@
 (include_subdirs unqualified)
+
+; Platform-agnostic file inclusion using copy_files  
+; Symlinks don't work reliably with dune on Windows, so we copy all files
+; copy_files with glob patterns flattens into current dir, which is what we want
+; because (include_subdirs unqualified) treats everything as one namespace
+(copy_files ../../../stage0/dune/fstar-guts/fstarc.ml/*.ml)
+(copy_files ../../../stage0/dune/fstar-guts/fstarc.ml/*.mli)
+(copy_files ../../../stage0/dune/fstar-guts/app/*.ml)
+(copy_files ../../../stage0/dune/fstar-guts/app/*.mli)
+(copy_files ../../../src/ml/*.ml)
+(copy_files ../../../src/ml/*.mli)
+
+; Copy script and body for integer generation
+(copy_files ../../../ulib/ml/app/ints/mk_int_file.sh)
+(copy_files ../../../ulib/ml/app/ints/FStar_Ints.ml.body)
+
+; Generate integer modules from ulib
+(rule
+  (target FStar_UInt16.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 16))))
+
+(rule
+  (target FStar_UInt32.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 32))))
+
+(rule
+  (target FStar_UInt64.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh U 64))))
+
+(rule
+  (target FStar_Int8.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 8))))
+
+(rule
+  (target FStar_Int16.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 16))))
+
+(rule
+  (target FStar_Int32.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 32))))
+
+(rule
+  (target FStar_Int64.ml)
+  (deps (:script mk_int_file.sh) (:body FStar_Ints.ml.body))
+  (action (with-stdout-to %{target} (run bash ./mk_int_file.sh S 64))))
+
 (library
  (name fstarcompiler)
  (public_name fstar.compiler)

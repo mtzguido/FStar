@@ -1,0 +1,3 @@
+; Build configuration: copy extracted ML files from stage ulib.pluginml
+(copy_files ../../../ulib.pluginml/*.ml)
+(copy_files ../../../ulib.pluginml/*.mli)
