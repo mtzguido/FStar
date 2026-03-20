@@ -213,6 +213,12 @@ let withinfo v r = {v=v; p=r}
 (*********************************************************************************)
 
 (* Constructors for each term form; NO HASH CONSING; just makes all the auxiliary data at each node *)
+(* Shared sentinel refs for Tm_delayed nodes. These nodes are always compressed
+   before Free/Hash analysis, so their vars/hash_code memos are never accessed.
+   Sharing avoids 2 ref allocations per delayed substitution node. *)
+let delayed_vars_ref : ref (option free_vars) = mk_ref None
+let delayed_hash_ref : ref (option FStarC.Hash.hash_code) = mk_ref None
+
 let mk (t:'a) r : ML (syntax 'a) = {
     n=t;
     pos=r;
@@ -264,7 +270,12 @@ let extend_app_n t args' r = match t.n with
     | Tm_app {hd; args} -> mk_Tm_app hd (args@args') r
     | _ -> mk_Tm_app t args' r
 let extend_app t arg r = extend_app_n t [arg] r
-let mk_Tm_delayed lr pos : ML term = mk (Tm_delayed {tm=fst lr; substs=snd lr}) pos
+let mk_Tm_delayed lr pos : ML term = {
+    n = Tm_delayed {tm=fst lr; substs=snd lr};
+    pos = pos;
+    vars = delayed_vars_ref;
+    hash_code = delayed_hash_ref;
+}
 let mk_Total t : ML comp = mk (Total t) t.pos
 let mk_GTotal t : ML comp = mk (GTotal t) t.pos
 
