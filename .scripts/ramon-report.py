@@ -5,21 +5,27 @@ two directories of .ramon files (produced by the `ramon` tool).
 
 Usage:
     python3 ramon-report.py <baseline_dir> <patched_dir> [--output report.html]
+    python3 ramon-report.py <baseline_dir> <patched_dir> -o report.md
 
-Produces an HTML report with:
-  - Summary statistics (median/mean/min/max changes)
-  - Memory and time scatter plots
+Produces an HTML or Markdown report with:
+  - Summary statistics (median/mean/geo mean/std dev/percentiles)
+  - Change distribution (improved/unchanged/regressed counts)
+  - Memory and time scatter plots (HTML only)
   - Top regressions and improvements tables
   - Full comparison table
+
+The output format can be chosen with --format, or auto-detected from
+the output filename extension (.md → markdown, .html → HTML).
 """
 
 import os
 import sys
 import argparse
 import json
+import math
 import re
 from collections import defaultdict
-from statistics import median, mean
+from statistics import median, mean, stdev
 
 # ── Parsing ──────────────────────────────────────────────────────────────────
 
@@ -95,36 +101,191 @@ def make_matching(root1, root2, files1, files2):
         })
     return matches, d1, d2
 
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+def percentile(sorted_data, p):
+    """Compute the p-th percentile of already-sorted data."""
+    if not sorted_data:
+        return 0
+    k = (len(sorted_data) - 1) * p / 100
+    f = int(k)
+    c = min(f + 1, len(sorted_data) - 1)
+    return sorted_data[f] + (k - f) * (sorted_data[c] - sorted_data[f])
+
+def geo_mean(ratios):
+    """Geometric mean of a list of positive ratios."""
+    valid = [r for r in ratios if r > 0]
+    if not valid:
+        return 1.0
+    log_sum = sum(math.log(r) for r in valid)
+    return math.exp(log_sum / len(valid))
+
 # ── Statistics ───────────────────────────────────────────────────────────────
+
+CHANGE_THRESHOLD = 5  # percent: changes beyond ±this are "significant"
 
 def compute_stats(matches):
     if not matches: return {}
+
     mem_pcts = [(m["r"]["mem"] - m["l"]["mem"]) / m["l"]["mem"] * 100
                 for m in matches if m["l"]["mem"] > 0]
     time_pcts = [(m["r"]["time"] - m["l"]["time"]) / m["l"]["time"] * 100
                  for m in matches if m["l"]["time"] > 0.1]  # skip very fast tests
     mem_diffs = [m["r"]["mem"] - m["l"]["mem"] for m in matches]
     time_diffs = [m["r"]["time"] - m["l"]["time"] for m in matches]
-    # Heavy tests: baseline mem > 100MiB
-    heavy = [m for m in matches if m["l"]["mem"] > 100*1024*1024]
+
+    # Ratios for geometric mean (patched / baseline)
+    mem_ratios = [m["r"]["mem"] / m["l"]["mem"]
+                  for m in matches if m["l"]["mem"] > 0]
+    time_ratios = [m["r"]["time"] / m["l"]["time"]
+                   for m in matches if m["l"]["time"] > 0.1]
+
+    # Heavy tests: baseline mem > 100 MiB
+    heavy = [m for m in matches if m["l"]["mem"] > 100 * 1024 * 1024]
     heavy_mem_pcts = [(m["r"]["mem"] - m["l"]["mem"]) / m["l"]["mem"] * 100
                       for m in heavy if m["l"]["mem"] > 0]
     heavy_time_pcts = [(m["r"]["time"] - m["l"]["time"]) / m["l"]["time"] * 100
                        for m in heavy if m["l"]["time"] > 0.1]
-    def stats(xs):
-        if not xs: return {"median": 0, "mean": 0, "min": 0, "max": 0, "count": 0}
-        return {"median": median(xs), "mean": mean(xs),
-                "min": min(xs), "max": max(xs), "count": len(xs)}
+    heavy_mem_ratios = [m["r"]["mem"] / m["l"]["mem"]
+                        for m in heavy if m["l"]["mem"] > 0]
+    heavy_time_ratios = [m["r"]["time"] / m["l"]["time"]
+                         for m in heavy if m["l"]["time"] > 0.1]
+
+    def mk_stats(xs, ratios=None):
+        if not xs:
+            return {"median": 0, "mean": 0, "stdev": 0,
+                    "min": 0, "max": 0,
+                    "p5": 0, "p25": 0, "p75": 0, "p95": 0,
+                    "count": 0, "geo_mean": 1.0,
+                    "n_improved": 0, "n_regressed": 0, "n_unchanged": 0}
+        s = sorted(xs)
+        return {
+            "median": median(xs),
+            "mean": mean(xs),
+            "stdev": stdev(xs) if len(xs) > 1 else 0.0,
+            "min": min(xs),
+            "max": max(xs),
+            "p5": percentile(s, 5),
+            "p25": percentile(s, 25),
+            "p75": percentile(s, 75),
+            "p95": percentile(s, 95),
+            "count": len(xs),
+            "geo_mean": geo_mean(ratios) if ratios else 1.0,
+            "n_improved": sum(1 for x in xs if x < -CHANGE_THRESHOLD),
+            "n_regressed": sum(1 for x in xs if x > CHANGE_THRESHOLD),
+            "n_unchanged": sum(1 for x in xs if -CHANGE_THRESHOLD <= x <= CHANGE_THRESHOLD),
+        }
+
     return {
-        "mem_pct": stats(mem_pcts),
-        "time_pct": stats(time_pcts),
-        "mem_abs": stats(mem_diffs),
-        "time_abs": stats(time_diffs),
-        "heavy_mem_pct": stats(heavy_mem_pcts),
-        "heavy_time_pct": stats(heavy_time_pcts),
+        "mem_pct": mk_stats(mem_pcts, mem_ratios),
+        "time_pct": mk_stats(time_pcts, time_ratios),
+        "mem_abs": mk_stats(mem_diffs),
+        "time_abs": mk_stats(time_diffs),
+        "heavy_mem_pct": mk_stats(heavy_mem_pcts, heavy_mem_ratios),
+        "heavy_time_pct": mk_stats(heavy_time_pcts, heavy_time_ratios),
         "n_matches": len(matches),
         "n_heavy": len(heavy),
+        "total_mem_diff": sum(m["r"]["mem"] - m["l"]["mem"] for m in matches),
+        "total_time_diff": sum(m["r"]["time"] - m["l"]["time"] for m in matches),
     }
+
+# ── Markdown Report ──────────────────────────────────────────────────────────
+
+def generate_markdown(matches, stats, lhs_label, rhs_label):
+    s = stats
+    mp = s["mem_pct"]
+    tp = s["time_pct"]
+    hm = s["heavy_mem_pct"]
+    ht = s["heavy_time_pct"]
+
+    def sgn(x):
+        return f"+{x:.1f}" if x >= 0 else f"{x:.1f}"
+
+    def pct_md(base, new):
+        if base == 0: return "N/A"
+        p = (new - base) / base * 100
+        return f"{sgn(p)}%"
+
+    by_mem_diff = sorted(matches, key=lambda m: m["r"]["mem"] - m["l"]["mem"])
+    by_time_diff = sorted(matches, key=lambda m: m["r"]["time"] - m["l"]["time"])
+
+    def md_table(items, n=20):
+        rows = []
+        rows.append("| File | Mem (base) | Mem (patch) | Mem Δ | Time (base) | Time (patch) | Time Δ |")
+        rows.append("|------|----------:|----------:|------:|----------:|----------:|------:|")
+        for m in items[:n]:
+            fn = m["fn"]
+            if len(fn) > 60:
+                fn = "…" + fn[-59:]
+            lm, rm = m["l"]["mem"], m["r"]["mem"]
+            lt, rt = m["l"]["time"], m["r"]["time"]
+            rows.append(f"| `{fn}` | {humanize(lm)} | {humanize(rm)} | {pct_md(lm, rm)} | {lt:.2f}s | {rt:.2f}s | {pct_md(lt, rt)} |")
+        return "\n".join(rows)
+
+    L = []
+
+    L.append("## 🔬 F* Performance Comparison\n")
+    L.append(f"**Baseline:** `{lhs_label}` | **Patched:** `{rhs_label}` | **Matched:** {s['n_matches']} tests\n")
+
+    # ── Summary table ──
+    L.append("### Summary\n")
+    L.append("| Metric | Median | Mean | Geo Mean | Std Dev | P5 → P95 | Min → Max |")
+    L.append("|--------|-------:|-----:|---------:|--------:|---------:|----------:|")
+    L.append(f"| **Memory** | {sgn(mp['median'])}% | {sgn(mp['mean'])}% | {mp['geo_mean']:.3f}× | {mp['stdev']:.1f}% | {sgn(mp['p5'])}% → {sgn(mp['p95'])}% | {sgn(mp['min'])}% → {sgn(mp['max'])}% |")
+    L.append(f"| **Time** | {sgn(tp['median'])}% | {sgn(tp['mean'])}% | {tp['geo_mean']:.3f}× | {tp['stdev']:.1f}% | {sgn(tp['p5'])}% → {sgn(tp['p95'])}% | {sgn(tp['min'])}% → {sgn(tp['max'])}% |")
+    L.append("")
+    L.append(f"**Totals:** Memory: {humanize(s['total_mem_diff'])} | Time: {sgn(s['total_time_diff'])}s\n")
+
+    # ── Distribution ──
+    L.append("### Change Distribution\n")
+    L.append("| Metric | 🟢 Improved (>5%) | ⚪ Unchanged (±5%) | 🔴 Regressed (>5%) |")
+    L.append("|--------|-------------------:|--------------------:|--------------------:|")
+    for label, st in [("Memory", mp), ("Time", tp)]:
+        total = st['n_improved'] + st['n_unchanged'] + st['n_regressed']
+        if total > 0:
+            L.append(f"| **{label}** | {st['n_improved']} ({st['n_improved']/total*100:.0f}%) | {st['n_unchanged']} ({st['n_unchanged']/total*100:.0f}%) | {st['n_regressed']} ({st['n_regressed']/total*100:.0f}%) |")
+    L.append("")
+
+    # ── Heavy tests ──
+    if s['n_heavy'] > 0:
+        L.append(f"### Heavy Tests (baseline > 100 MiB, n={s['n_heavy']})\n")
+        L.append("| Metric | Median | Mean | Geo Mean | Std Dev | P5 → P95 |")
+        L.append("|--------|-------:|-----:|---------:|--------:|---------:|")
+        L.append(f"| **Memory** | {sgn(hm['median'])}% | {sgn(hm['mean'])}% | {hm['geo_mean']:.3f}× | {hm['stdev']:.1f}% | {sgn(hm['p5'])}% → {sgn(hm['p95'])}% |")
+        L.append(f"| **Time** | {sgn(ht['median'])}% | {sgn(ht['mean'])}% | {ht['geo_mean']:.3f}× | {ht['stdev']:.1f}% | {sgn(ht['p5'])}% → {sgn(ht['p95'])}% |")
+        L.append("")
+
+    # ── Top tables ──
+    L.append("<details><summary>📉 Top 20 Memory Improvements</summary>\n")
+    L.append(md_table(by_mem_diff[:20]))
+    L.append("\n</details>\n")
+
+    L.append("<details><summary>📈 Top 20 Memory Regressions</summary>\n")
+    L.append(md_table(list(reversed(by_mem_diff[-20:]))))
+    L.append("\n</details>\n")
+
+    L.append("<details><summary>⬇️ Top 20 Time Improvements</summary>\n")
+    L.append(md_table(by_time_diff[:20]))
+    L.append("\n</details>\n")
+
+    L.append("<details><summary>⬆️ Top 20 Time Regressions</summary>\n")
+    L.append(md_table(list(reversed(by_time_diff[-20:]))))
+    L.append("\n</details>\n")
+
+    # ── Full comparison ──
+    L.append(f"<details><summary>📋 Full Comparison ({s['n_matches']} tests)</summary>\n")
+    L.append(md_table(sorted(matches, key=lambda m: m["fn"]), n=len(matches)))
+    L.append("\n</details>\n")
+
+    # ── Notes ──
+    L.append("---\n")
+    L.append("> **Note:** Time measurements are from single runs and may be noisy, especially for fast tests. "
+             "Memory measurements are generally more deterministic. "
+             "Tests with baseline time < 0.1s are excluded from time statistics. "
+             "The geometric mean (Geo Mean) of the patched/baseline ratio is the most robust summary "
+             "statistic for performance comparisons (1.0× = no change, <1× = improvement).")
+
+    return "\n".join(L)
 
 # ── HTML Report ──────────────────────────────────────────────────────────────
 
@@ -198,6 +359,11 @@ def generate_html(matches, stats, lhs_label, rhs_label):
         rows = "\n".join(row(m) for m in items[:n])
         return hdr + rows + "</table>"
 
+    def stat_class(val, invert=False):
+        if invert:
+            return 'good' if val > 1 else ('bad' if val < -1 else 'neutral')
+        return 'good' if val < -1 else ('bad' if val > 1 else 'neutral')
+
     html = f"""<!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
@@ -220,6 +386,8 @@ tr:hover {{ background: #f8f8ff; }}
 canvas {{ max-width: 100%; margin: 1em 0; }}
 details {{ margin: 0.5em 0; }}
 summary {{ cursor: pointer; font-weight: bold; padding: 0.5em; background: #f0f0f0; border-radius: 4px; }}
+.dist-bar {{ display: inline-block; height: 1em; vertical-align: middle; }}
+.note {{ background: #fff8e1; border-left: 4px solid #ffc107; padding: 0.8em 1em; margin: 1em 0; font-size: 0.9em; color: #666; }}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head><body>
@@ -231,23 +399,41 @@ summary {{ cursor: pointer; font-weight: bold; padding: 0.5em; background: #f0f0
 <div class="summary">
     <div class="card">
         <h3>Memory Change (median)</h3>
-        <div class="value {'good' if mp['median'] < -1 else ('bad' if mp['median'] > 1 else 'neutral')}">{mp['median']:+.1f}%</div>
-        <div class="detail">mean: {mp['mean']:+.1f}% · min: {mp['min']:+.1f}% · max: {mp['max']:+.1f}%</div>
+        <div class="value {stat_class(mp['median'])}">{mp['median']:+.1f}%</div>
+        <div class="detail">mean: {mp['mean']:+.1f}% · geo mean: {mp['geo_mean']:.3f}× · σ: {mp['stdev']:.1f}%</div>
+        <div class="detail">P5–P95: [{mp['p5']:+.1f}%, {mp['p95']:+.1f}%] · range: [{mp['min']:+.1f}%, {mp['max']:+.1f}%]</div>
     </div>
     <div class="card">
         <h3>Time Change (median)</h3>
-        <div class="value {'good' if tp['median'] < -1 else ('bad' if tp['median'] > 1 else 'neutral')}">{tp['median']:+.1f}%</div>
-        <div class="detail">mean: {tp['mean']:+.1f}% · min: {tp['min']:+.1f}% · max: {tp['max']:+.1f}%</div>
+        <div class="value {stat_class(tp['median'])}">{tp['median']:+.1f}%</div>
+        <div class="detail">mean: {tp['mean']:+.1f}% · geo mean: {tp['geo_mean']:.3f}× · σ: {tp['stdev']:.1f}%</div>
+        <div class="detail">P5–P95: [{tp['p5']:+.1f}%, {tp['p95']:+.1f}%] · range: [{tp['min']:+.1f}%, {tp['max']:+.1f}%]</div>
     </div>
     <div class="card">
         <h3>Total Memory Saved</h3>
-        <div class="value {'good' if s['mem_abs']['mean'] < 0 else 'bad'}">{humanize(sum(m['r']['mem'] - m['l']['mem'] for m in matches))}</div>
+        <div class="value {stat_class(s['total_mem_diff'])}">{humanize(s['total_mem_diff'])}</div>
         <div class="detail">sum across all {s['n_matches']} tests</div>
     </div>
     <div class="card">
         <h3>Total Time Change</h3>
-        <div class="value {'good' if s['time_abs']['mean'] < 0 else ('bad' if s['time_abs']['mean'] > 0.5 else 'neutral')}">{sum(m['r']['time'] - m['l']['time'] for m in matches):+.1f}s</div>
+        <div class="value {stat_class(s['total_time_diff'])}">{s['total_time_diff']:+.1f}s</div>
         <div class="detail">sum across all {s['n_matches']} tests</div>
+    </div>
+</div>
+
+<h2>📊 Change Distribution</h2>
+<div class="summary">
+    <div class="card">
+        <h3>Memory</h3>
+        <div class="detail">🟢 Improved (&gt;{CHANGE_THRESHOLD}%): <strong>{mp['n_improved']}</strong> tests ({mp['n_improved']/max(mp['count'],1)*100:.0f}%)</div>
+        <div class="detail">⚪ Unchanged (±{CHANGE_THRESHOLD}%): <strong>{mp['n_unchanged']}</strong> tests ({mp['n_unchanged']/max(mp['count'],1)*100:.0f}%)</div>
+        <div class="detail">🔴 Regressed (&gt;{CHANGE_THRESHOLD}%): <strong>{mp['n_regressed']}</strong> tests ({mp['n_regressed']/max(mp['count'],1)*100:.0f}%)</div>
+    </div>
+    <div class="card">
+        <h3>Time</h3>
+        <div class="detail">🟢 Improved (&gt;{CHANGE_THRESHOLD}%): <strong>{tp['n_improved']}</strong> tests ({tp['n_improved']/max(tp['count'],1)*100:.0f}%)</div>
+        <div class="detail">⚪ Unchanged (±{CHANGE_THRESHOLD}%): <strong>{tp['n_unchanged']}</strong> tests ({tp['n_unchanged']/max(tp['count'],1)*100:.0f}%)</div>
+        <div class="detail">🔴 Regressed (&gt;{CHANGE_THRESHOLD}%): <strong>{tp['n_regressed']}</strong> tests ({tp['n_regressed']/max(tp['count'],1)*100:.0f}%)</div>
     </div>
 </div>
 
@@ -255,14 +441,24 @@ summary {{ cursor: pointer; font-weight: bold; padding: 0.5em; background: #f0f0
 <div class="summary">
     <div class="card">
         <h3>Memory Change (median)</h3>
-        <div class="value {'good' if hm['median'] < -1 else ('bad' if hm['median'] > 1 else 'neutral')}">{hm['median']:+.1f}%</div>
-        <div class="detail">mean: {hm['mean']:+.1f}% · min: {hm['min']:+.1f}% · max: {hm['max']:+.1f}% · n={hm['count']}</div>
+        <div class="value {stat_class(hm['median'])}">{hm['median']:+.1f}%</div>
+        <div class="detail">mean: {hm['mean']:+.1f}% · geo mean: {hm['geo_mean']:.3f}× · σ: {hm['stdev']:.1f}%</div>
+        <div class="detail">P5–P95: [{hm['p5']:+.1f}%, {hm['p95']:+.1f}%] · n={hm['count']}</div>
     </div>
     <div class="card">
         <h3>Time Change (median)</h3>
-        <div class="value {'good' if ht['median'] < -1 else ('bad' if ht['median'] > 1 else 'neutral')}">{ht['median']:+.1f}%</div>
-        <div class="detail">mean: {ht['mean']:+.1f}% · min: {ht['min']:+.1f}% · max: {ht['max']:+.1f}% · n={ht['count']}</div>
+        <div class="value {stat_class(ht['median'])}">{ht['median']:+.1f}%</div>
+        <div class="detail">mean: {ht['mean']:+.1f}% · geo mean: {ht['geo_mean']:.3f}× · σ: {ht['stdev']:.1f}%</div>
+        <div class="detail">P5–P95: [{ht['p5']:+.1f}%, {ht['p95']:+.1f}%] · n={ht['count']}</div>
     </div>
+</div>
+
+<div class="note">
+<strong>Note on measurement reliability:</strong> Time measurements are from single runs and may be noisy,
+especially for tests completing in under 5 seconds. Memory measurements are generally more deterministic.
+Tests with baseline time &lt; 0.1s are excluded from time statistics.
+The geometric mean (Geo Mean) of the patched/baseline ratio is the most robust summary statistic
+for performance comparisons (1.0× = no change, &lt;1× = improvement).
 </div>
 
 <h2>📊 Distribution of Memory Changes (%)</h2>
@@ -389,10 +585,20 @@ def main():
     parser = argparse.ArgumentParser(description="Generate visual performance comparison from ramon files")
     parser.add_argument("lhs", help="Baseline directory with .ramon files")
     parser.add_argument("rhs", help="Patched directory with .ramon files")
-    parser.add_argument("--output", "-o", default="report.html", help="Output HTML file")
+    parser.add_argument("--output", "-o", default="report.html", help="Output file (default: report.html)")
+    parser.add_argument("--format", "-f", choices=["html", "md"], default=None,
+                        help="Output format (default: auto-detect from filename)")
     parser.add_argument("--lhs-label", default=None, help="Label for baseline")
     parser.add_argument("--rhs-label", default=None, help="Label for patched")
     args = parser.parse_args()
+
+    # Auto-detect format from filename
+    fmt = args.format
+    if fmt is None:
+        if args.output.endswith(".md"):
+            fmt = "md"
+        else:
+            fmt = "html"
 
     lhs = args.lhs.rstrip("/")
     rhs = args.rhs.rstrip("/")
@@ -412,28 +618,35 @@ def main():
         print("No matching test results found!")
         sys.exit(1)
 
-    stats = compute_stats(matches)
+    st = compute_stats(matches)
 
     lhs_label = args.lhs_label or lhs
     rhs_label = args.rhs_label or rhs
 
-    html = generate_html(matches, stats, lhs_label, rhs_label)
+    if fmt == "md":
+        output = generate_markdown(matches, st, lhs_label, rhs_label)
+    else:
+        output = generate_html(matches, st, lhs_label, rhs_label)
 
     with open(args.output, "w") as f:
-        f.write(html)
+        f.write(output)
 
-    print(f"\nReport written to {args.output}")
+    print(f"\nReport written to {args.output} (format: {fmt})")
     print(f"\nSummary:")
-    mp = stats["mem_pct"]
-    tp = stats["time_pct"]
-    hm = stats["heavy_mem_pct"]
-    ht = stats["heavy_time_pct"]
-    print(f"  All tests ({stats['n_matches']}):")
-    print(f"    Memory: median {mp['median']:+.1f}%, mean {mp['mean']:+.1f}%, range [{mp['min']:+.1f}%, {mp['max']:+.1f}%]")
-    print(f"    Time:   median {tp['median']:+.1f}%, mean {tp['mean']:+.1f}%, range [{tp['min']:+.1f}%, {tp['max']:+.1f}%]")
-    print(f"  Heavy tests ({stats['n_heavy']}, baseline > 100 MiB):")
-    print(f"    Memory: median {hm['median']:+.1f}%, mean {hm['mean']:+.1f}%, range [{hm['min']:+.1f}%, {hm['max']:+.1f}%]")
-    print(f"    Time:   median {ht['median']:+.1f}%, mean {ht['mean']:+.1f}%, range [{ht['min']:+.1f}%, {ht['max']:+.1f}%]")
+    mp = st["mem_pct"]
+    tp = st["time_pct"]
+    hm = st["heavy_mem_pct"]
+    ht = st["heavy_time_pct"]
+    print(f"  All tests ({st['n_matches']}):")
+    print(f"    Memory: median {mp['median']:+.1f}%, mean {mp['mean']:+.1f}%, geo mean {mp['geo_mean']:.3f}×, σ {mp['stdev']:.1f}%")
+    print(f"            range [{mp['min']:+.1f}%, {mp['max']:+.1f}%], P5–P95 [{mp['p5']:+.1f}%, {mp['p95']:+.1f}%]")
+    print(f"    Time:   median {tp['median']:+.1f}%, mean {tp['mean']:+.1f}%, geo mean {tp['geo_mean']:.3f}×, σ {tp['stdev']:.1f}%")
+    print(f"            range [{tp['min']:+.1f}%, {tp['max']:+.1f}%], P5–P95 [{tp['p5']:+.1f}%, {tp['p95']:+.1f}%]")
+    print(f"  Heavy tests ({st['n_heavy']}, baseline > 100 MiB):")
+    print(f"    Memory: median {hm['median']:+.1f}%, mean {hm['mean']:+.1f}%, geo mean {hm['geo_mean']:.3f}×, σ {hm['stdev']:.1f}%")
+    print(f"    Time:   median {ht['median']:+.1f}%, mean {ht['mean']:+.1f}%, geo mean {ht['geo_mean']:.3f}×, σ {ht['stdev']:.1f}%")
+    print(f"  Distribution (mem): 🟢 {mp['n_improved']} improved, ⚪ {mp['n_unchanged']} unchanged, 🔴 {mp['n_regressed']} regressed")
+    print(f"  Distribution (time): 🟢 {tp['n_improved']} improved, ⚪ {tp['n_unchanged']} unchanged, 🔴 {tp['n_regressed']} regressed")
 
 if __name__ == "__main__":
     main()
