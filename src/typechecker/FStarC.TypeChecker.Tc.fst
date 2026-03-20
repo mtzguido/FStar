@@ -250,8 +250,18 @@ let proc_check_with (attrs:list attribute) (kont : unit -> ML 'a) : ML 'a =
       kont ())
   | _ -> failwith "ill-formed `check_with`"
 
-let store_sigopts (se:sigelt) : ML sigelt =
-  { se with sigopts = Some (Options.get_vconfig ()) }
+let store_sigopts =
+  // Cache the last vconfig to avoid allocating duplicate records
+  // when many sigelts share the same configuration
+  let last_vconfig : ref (option FStarC.VConfig.vconfig) = mk_ref None in
+  fun (se:sigelt) ->
+    let vc = Options.get_vconfig () in
+    let cached =
+      match !last_vconfig with
+      | Some vc' -> if vc = vc' then vc' else (last_vconfig := Some vc; vc)
+      | None -> last_vconfig := Some vc; vc
+    in
+    { se with sigopts = Some cached }
 
 (* Alternative to making a huge let rec... knot is set below in this file *)
 let tc_decls_knot : ref (option (Env.env -> list sigelt -> ML (list sigelt & Env.env))) =
