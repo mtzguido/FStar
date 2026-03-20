@@ -448,13 +448,8 @@ let go_normal () =
             files, deps, false
           )
         in
-        let tcrs, env, cleanup = Universal.batch_mode_tc fly_deps filenames dep_graph in
+        let module_names, env, cleanup = Universal.batch_mode_tc fly_deps filenames dep_graph in
         ignore (cleanup env);
-        let module_names =
-          tcrs
-          |> List.map (fun tcr ->
-             Universal.module_or_interface_name tcr.checked_module)
-        in
         report_errors module_names;
         finished_message module_names 0
       end //end batch mode

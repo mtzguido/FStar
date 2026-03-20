@@ -726,11 +726,11 @@ and tc_one_file_from_remaining
 
 and tc_fold_interleave
       (fly_deps:bool) 
-      (acc:list tc_result &
+      (acc:list (bool & lident) &
            list (uenv & MLSyntax.mlmodule) &  // initial env in which this module is extracted
            uenv)
       (remaining:list string)
-: ML (list Ch.tc_result & list (uenv & MLSyntax.mlmodule) & uenv) =
+: ML (list (bool & lident) & list (uenv & MLSyntax.mlmodule) & uenv) =
   let as_list env mllib =
     match mllib with
     | None -> []
@@ -738,11 +738,12 @@ and tc_fold_interleave
   match remaining with
     | [] -> acc
     | _  ->
-      let mods, mllibs, env_before = acc in
+      let mod_names, mllibs, env_before = acc in
       let remaining, nmod, mllib, env = tc_one_file_from_remaining fly_deps remaining env_before in
       if not (Options.profile_group_by_decl())
       then Profiling.report_and_clear (Ident.string_of_lid nmod.checked_module.name);
-      tc_fold_interleave fly_deps (mods@[nmod], mllibs@(as_list env mllib), env) remaining
+      let mod_name = module_or_interface_name nmod.checked_module in
+      tc_fold_interleave fly_deps (mod_names@[mod_name], mllibs@(as_list env mllib), env) remaining
 
 
 let load_file
@@ -880,7 +881,7 @@ let batch_mode_tc fly_deps filenames dep_graph
       (String.concat " " (filenames |> List.filter Options.should_verify_file))
   end;
   let env = FStarC.Extraction.ML.UEnv.new_uenv (init_env dep_graph) in
-  let all_mods, mllibs, env = tc_fold_interleave fly_deps ([], [], env) filenames in
+  let mod_names, mllibs, env = tc_fold_interleave fly_deps ([], [], env) filenames in
   if FStarC.Errors.get_err_count() = 0 then
     emit dep_graph mllibs;
   let solver_refresh env =
@@ -889,4 +890,4 @@ let batch_mode_tc fly_deps filenames dep_graph
          tcenv.solver.finish();
         (), tcenv)
   in
-  all_mods, env, solver_refresh
+  mod_names, env, solver_refresh
