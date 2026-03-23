@@ -243,6 +243,8 @@ val hint_info                   : unit    -> ML bool
 
 val hint_file_for_src           : string  -> ML string
 
+val html                        : unit    -> ML bool
+
 val ide                         : unit    -> ML bool
 
 val ide_id_info_off             : unit    -> ML bool

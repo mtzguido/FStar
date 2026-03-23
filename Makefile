@@ -578,6 +578,24 @@ _doc_book_code: need_fstar_exe .force
 _doc_old_tutorial: need_fstar_exe .force
 	+$(MAKE) -C doc/old/tutorial regressions FSTAR_EXE=$(FSTAR_EXE)
 
+# Generate syntax-highlighted HTML with cross-reference links for the
+# standard library. Output goes to html/. Runs in parallel via make -j.
+# Each .html is produced from its .checked file independently.
+# Reuses the ulib checked files from the stage that built FSTAR_EXE.
+_html: ULIB_CHECKED_DIR ?= stage1/ulib.checked
+_html: FSTAR_EXE ?= $(FSTAR1_FULL_EXE)
+_html: need_fstar_exe .force
+	$(call bold_msg, "HTML", "LIBRARY")
+	+env \
+	  SRC=ulib/ \
+	  FSTAR_EXE=$(FSTAR_EXE) \
+	  CACHE_DIR=$(ULIB_CHECKED_DIR)/ \
+	  OUTPUT_DIR=html/.extract/ \
+	  HTML_OUTPUT_DIR=html/ \
+	  CODEGEN=OCaml \
+	  TAG=html \
+	  $(MAKE) -k -f mk/lib.mk html
+
 _unit-tests: need_fstar_exe .force
 	+$(MAKE) -C tests all FSTAR_EXE=$(FSTAR_EXE)
 

@@ -438,6 +438,15 @@ let rec tc_one_file_internal
             env
           )
   in
+  let maybe_generate_html (fn:string) (tcmod:Syntax.modul) (env:uenv) : ML unit =
+    if Options.html () && Options.should_check_file fn then
+      let tcenv = tcenv_of_uenv env in
+      let files = match interface_fn with
+        | Some iface -> [iface; fn]
+        | None -> [fn]
+      in
+      FStarC.Html.generate_html tcenv tcmod files
+  in
   let tc_source_file () =
       let mname, fmod, env = 
         Profiling.profile (fun () -> parse fly_deps env interface_fn fn)
@@ -473,6 +482,7 @@ let rec tc_one_file_internal
           let tc_time = 0 in
           let extracted_defs, extract_time = maybe_extract_mldefs tcmod env in
           let env, iface_extraction_time = maybe_extract_ml_iface tcmod env in
+          maybe_generate_html fn tcmod env;
           let pd =
             let deps = TcEnv.dep_graph (tcenv_of_uenv env) in
             match fmod with
@@ -597,6 +607,7 @@ let rec tc_one_file_internal
         in
 
         let env, _time = maybe_extract_ml_iface tcmod env in
+        maybe_generate_html fn tcmod env;
         tc_result,
         mllib,
         env

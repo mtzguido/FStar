@@ -62,3 +62,5 @@ tags
 
 boot-diff/**
 __pycache__/
+
+/html

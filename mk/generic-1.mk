@@ -108,3 +108,18 @@ all-ml: $(ALL_ML_FILES)
 
 all-fs: $(ALL_FS_FILES)
 	rm -vf $(filter-out $(realpath $(ALL_FS_FILES)), $(realpath $(wildcard $(OUTPUT_DIR)/*.fs)))
+
+# HTML generation: produce .html from .checked files, in parallel.
+# Set HTML_OUTPUT_DIR to enable. Each file loads its deps from cache
+# and resolves identifiers via the dsenv — no typechecking needed.
+ifneq ($(HTML_OUTPUT_DIR),)
+$(HTML_OUTPUT_DIR)/%.html: $(CACHE_DIR)/%$(EXTENSION)
+	@mkdir -p $(HTML_OUTPUT_DIR)
+	$(call msg, "HTML", $*)
+	$(FSTAR) --html --already_cached '*,' --odir "$(HTML_OUTPUT_DIR)" $<
+
+ALL_HTML_FILES=$(patsubst $(CACHE_DIR)/%$(EXTENSION),$(HTML_OUTPUT_DIR)/%.html,$(ALL_CHECKED_FILES))
+
+.PHONY: html
+html: $(ALL_HTML_FILES)
+endif
