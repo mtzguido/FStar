@@ -1,0 +1,92 @@
+name: HTML library documentation
+
+# Generate syntax-highlighted HTML for the F* standard library
+# and deploy to GitHub Pages. Called from ci.yml after the build
+# job completes, only on pushes to master.
+
+on:
+  workflow_call:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    container: mtzguido/dev-base
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Cleanup
+        run: sudo find . -delete
+      - run: echo "HOME=/home/user" >> $GITHUB_ENV
+      - uses: mtzguido/set-opam-env@master
+
+      - uses: mtzguido/gci-download@master
+        with:
+          name: fstar-repo
+
+      # Use -k so make continues past individual file failures.
+      # continue-on-error allows deployment of partial results.
+      - name: Generate HTML library
+        continue-on-error: true
+        run: make -skj$(nproc) _html FSTAR_EXE=out/bin/fstar.exe ULIB_CHECKED_DIR=stage2/ulib.checked
+        working-directory: FStar
+
+      - name: Verify HTML output
+        working-directory: FStar
+        run: |
+          count=$(find html -name '*.html' 2>/dev/null | wc -l)
+          echo "Generated $count HTML files"
+          if [ "$count" -lt 100 ]; then
+            echo "::error::Too few HTML files generated ($count), aborting deployment"
+            exit 1
+          fi
+
+      - name: Generate index page
+        working-directory: FStar/html
+        run: |
+          cat > index.html <<'HEADER'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <title>F* Standard Library</title>
+          <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            max-width: 72em; margin: 2em auto; padding: 0 1em; color: #24292e;
+          }
+          h1 { border-bottom: 1px solid #e1e4e8; padding-bottom: 0.3em; }
+          .modules { column-count: 3; column-gap: 2em; list-style: none; padding: 0; }
+          @media (max-width: 900px) { .modules { column-count: 2; } }
+          @media (max-width: 600px) { .modules { column-count: 1; } }
+          .modules li { margin: 0.15em 0; break-inside: avoid; }
+          a { color: #0366d6; text-decoration: none; }
+          a:hover { text-decoration: underline; }
+          </style>
+          </head>
+          <body>
+          <h1>F&#42; Standard Library</h1>
+          <ul class="modules">
+          HEADER
+          for f in $(ls *.fst.html *.fsti.html 2>/dev/null | sort); do
+            name="${f%.html}"
+            echo "<li><a href=\"$f\">$name</a></li>" >> index.html
+          done
+          cat >> index.html <<'FOOTER'
+          </ul>
+          </body>
+          </html>
+          FOOTER
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: FStar/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

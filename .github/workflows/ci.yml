@@ -30,6 +30,15 @@ jobs:
     name: nix
     uses: ./.github/workflows/nix.yml
 
+  html-pages:
+    name: html-pages
+    needs: build
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    permissions:
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/html-pages.yml
+
   # Branch protection points here
   ciok:
     runs-on: ubuntu-latest
