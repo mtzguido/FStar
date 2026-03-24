@@ -82,10 +82,12 @@ jobs:
           </html>
           FOOTER
 
+      - run: mv FStar/html libhtml
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: FStar/html
+          path: libhtml
 
       - name: Deploy to GitHub Pages
         id: deployment
