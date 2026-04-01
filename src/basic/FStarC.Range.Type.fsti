@@ -43,8 +43,8 @@ val range_of_rng: def_rng:rng -> use_rng:rng -> range
 val set_use_range: range -> rng -> range
 val set_def_range: range -> rng -> range
 val mk_pos: int -> int -> pos
-val mk_rng : string -> pos -> pos -> rng
-val mk_range: string -> pos -> pos -> range
+val mk_rng : string -> pos -> pos -> ML rng
+val mk_range: string -> pos -> pos -> ML range
 
 val json_of_pos: pos -> FStarC.Json.json
 val json_of_rng: rng -> FStarC.Json.json
