@@ -130,7 +130,7 @@ jobs:
         with:
           path: everparse/
           ref: _taramana_fstar2_krml
-          repository: tahina-pro/everparse
+          repository: tahina-pro/quackyducky
 
       - name: Build
         run: make -C everparse -skj$(nproc) all
