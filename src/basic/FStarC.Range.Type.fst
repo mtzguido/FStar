@@ -85,13 +85,22 @@ let mk_pos l c = {
     line=max 0 l;
     col=max 0 c
 }
-let mk_rng file_name start_pos end_pos = {
-    file_name = Filepath.basename file_name;
+(* Cache basename results to avoid recomputing and duplicating strings.
+   The number of distinct input filenames is very small. *)
+let basename_cache : SMap.t string = SMap.create 20
+let cached_basename (s:string) : ML string =
+  match SMap.try_find basename_cache s with
+  | Some r -> r
+  | None -> let r = Filepath.basename s in
+            SMap.add basename_cache s r; r
+
+let mk_rng file_name start_pos end_pos : ML rng = {
+    file_name = cached_basename file_name;
     start_pos = start_pos;
     end_pos   = end_pos
 }
 
-let mk_range f b e = let r = mk_rng f b e in range_of_rng r r
+let mk_range f b e : ML range = let r = mk_rng f b e in range_of_rng r r
 
 open FStarC.Json
 let json_of_pos (r: pos): json

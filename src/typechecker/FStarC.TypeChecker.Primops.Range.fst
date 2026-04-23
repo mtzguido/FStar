@@ -15,11 +15,11 @@ module PC = FStarC.Parser.Const
 (* this type only here to use typeclass hackery *)
 type unsealedRange = | U of Range.t
 
-let mk_range (fn : string) (from_l from_c to_l to_c : int) : Range.t =
+let mk_range (fn : string) (from_l from_c to_l to_c : int) : ML Range.t =
   Range.mk_range fn (mk_pos from_l from_c)
                     (mk_pos to_l   to_c)
 
-let __mk_range (fn : string) (from_l from_c to_l to_c : int) : unsealedRange =
+let __mk_range (fn : string) (from_l from_c to_l to_c : int) : ML unsealedRange =
   U (mk_range fn from_l from_c to_l to_c)
 
 let explode (r : unsealedRange) : (string & int & int & int & int) =
@@ -47,8 +47,12 @@ instance nbe_e_unsealedRange : FStarC.TypeChecker.NBETerm.embedding unsealedRang
     None
 
 let ops = [
-  mk5 0 PC.__mk_range_lid __mk_range;
-  mk5 0 PC.mk_range_lid   mk_range;
+  mk5' 0 PC.__mk_range_lid
+    (fun a b c d e -> Some (__mk_range a b c d e))
+    (fun a b c d e -> Some (__mk_range a b c d e));
+  mk5' 0 PC.mk_range_lid
+    (fun a b c d e -> Some (mk_range a b c d e))
+    (fun a b c d e -> Some (mk_range a b c d e));
   mk1 0 PC.__explode_range_lid explode;
   mk2' 0 PC.join_range_lid
     (fun r1 r2 -> Some (FStarC.Range.union_ranges r1 r2))
