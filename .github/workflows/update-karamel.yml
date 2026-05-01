@@ -36,6 +36,7 @@ jobs:
         id: update
         run: |
           cd karamel
+          git fetch --unshallow  # need full history for --ff-only
           git pull --ff-only origin master
           cd ..
 
