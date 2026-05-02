@@ -94,4 +94,4 @@ val batch_mode_tc :
     fly_deps:bool ->
     list string ->
     FStarC.Parser.Dep.deps ->
-    ML (list tc_result & uenv & (uenv -> ML uenv))
+    ML (list (bool & lid) & uenv & (uenv -> ML uenv))
