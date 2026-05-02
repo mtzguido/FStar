@@ -38,12 +38,12 @@ val start_of_use_range: range -> pos
 val end_of_use_range: range -> pos
 val line_of_pos: pos -> int
 val col_of_pos: pos -> int
-val end_range: range -> range
+val end_range: range -> ML range
 val compare: range -> range -> int
 val compare_use_range: range -> range -> int
 val range_before_pos : range -> pos -> ML bool
 val end_of_line: pos -> pos
-val extend_to_end_of_line: range -> range
+val extend_to_end_of_line: range -> ML range
 
 val json_of_pos : pos -> Json.json
 val json_of_use_range : range -> Json.json
