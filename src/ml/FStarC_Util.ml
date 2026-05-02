@@ -931,3 +931,10 @@ let exn_is_enoent (e:exn) : bool =
   match e with
   | Unix.Unix_error (Unix.ENOENT, _, _) -> true
   | _ -> false
+
+(* GC utilities for memory optimization *)
+let gc_compact () = Gc.compact ()
+let gc_full_major () = Gc.full_major ()
+let gc_get_heap_mbs () =
+  let s = Gc.stat () in
+  Z.of_int (int_of_float ((float_of_int (s.Gc.heap_words) *. (float_of_int Sys.word_size /. 8.0)) /. (1024.0 *. 1024.0)))

@@ -264,3 +264,8 @@ val create_process : prog:string -> args:(list string) -> ML (*pid:*)int
 val waitpid : pid:int -> ML (either int int) // Inl: exited, Inr: killed by signal
 
 val exn_is_enoent (e:exn) : bool
+
+(* GC utilities for memory optimization *)
+val gc_compact : unit -> ML unit
+val gc_full_major : unit -> ML unit
+val gc_get_heap_mbs : unit -> ML int
