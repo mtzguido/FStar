@@ -689,7 +689,20 @@ let closure_as_term cfg (env:env) (t:term) : ML term =
   let t = SS.subst es t in
   let t =
      if cfg.steps.erase_universes
-     then _erase_universes t
+     then
+       (* In extraction's weak-head pass, closing an argument or a lambda
+          need not force substitutions throughout its body and annotations.
+          In particular, projector reduction may immediately discard it.
+          Keep the substitution delayed and let the enclosing normalization
+          process the selected result. This is enabled by default; use
+          --ext defer_whnf_universe_erasure=0 to compare eager readback.
+
+          Check the mode before the option: ordinary normalization retains
+          its existing readback and memoization behavior. *)
+       if cfg.steps.for_extraction && cfg.steps.weak && cfg.steps.hnf &&
+          Options.Ext.enabled "defer_whnf_universe_erasure"
+       then t
+       else _erase_universes t
      else if cfg.steps.default_univs_to_zero
      then default_univ_uvars_to_zero t
      else t
