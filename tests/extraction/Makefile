@@ -25,7 +25,7 @@ RUN += ExtractMe.fst
 RUN += ExtractAs.fst
 RUN += ParseTest.fst
 
-include $(FSTAR_ROOT)/mk/test.mk
+include $(FSTAR_ROOT)/mk/test.mk WhnfReadback.mk
 
 all: $(OUTPUT_DIR)/FloatLiteralExtraction.krml
 all: $(OUTPUT_DIR)/FloatLiteralInjection.rejected
