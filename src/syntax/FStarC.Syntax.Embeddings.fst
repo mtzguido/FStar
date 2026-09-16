@@ -799,7 +799,7 @@ let e_list (ea:embedding 'a) =
                 | Tm_fvar fv, [(hd, None); (tl, None)]
                     when S.fv_eq_lid fv PC.cons_lid ->
                     Option.bind (try_unembed hd norm) (fun hd ->
-                    Option.bind (un tl norm) (fun tl ->
+                    Option.bind (unembed_with_norm un tl norm) (fun tl ->
                     Some (hd :: tl)))
                 | _ ->
                     None)

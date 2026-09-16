@@ -43,7 +43,7 @@ let mk_interp1 #a #r
     fun psc cb us args ->
       match args with
       | [(a, _)] ->
-        let! a = try_unembed_simple a in
+        let! a = EMB.try_unembed a cb in
         return (embed_simple psc.psc_range (f a))
       | _ -> failwith "arity"
 
@@ -69,7 +69,7 @@ let mk_interp2 #a #b #r
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _)] ->
-        let! r = f <$> try_unembed_simple a <*> try_unembed_simple b in
+        let! r = f <$> EMB.try_unembed a cb <*> EMB.try_unembed b cb in
         return (embed_simple psc.psc_range r)
       | _ -> failwith "arity"
 
@@ -97,7 +97,7 @@ let mk_interp3 #a #b #c #r
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _)] ->
-        let! r = f <$> try_unembed_simple a <*> try_unembed_simple b <*> try_unembed_simple c in
+        let! r = f <$> EMB.try_unembed a cb <*> EMB.try_unembed b cb <*> EMB.try_unembed c cb in
         return (embed_simple psc.psc_range r)
       | _ -> failwith "arity"
 
@@ -127,7 +127,7 @@ let mk_interp4 #a #b #c #d #r
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _); (d, _)] ->
-        let! r = f <$> try_unembed_simple a <*> try_unembed_simple b <*> try_unembed_simple c <*> try_unembed_simple d in
+        let! r = f <$> EMB.try_unembed a cb <*> EMB.try_unembed b cb <*> EMB.try_unembed c cb <*> EMB.try_unembed d cb in
         return (embed_simple psc.psc_range r)
       | _ -> failwith "arity"
 
@@ -159,7 +159,7 @@ let mk_interp5 #a #b #c #d #e #r
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _); (d, _); (e, _)] ->
-        let! r = f <$> try_unembed_simple a <*> try_unembed_simple b <*> try_unembed_simple c <*> try_unembed_simple d <*> try_unembed_simple e in
+        let! r = f <$> EMB.try_unembed a cb <*> EMB.try_unembed b cb <*> EMB.try_unembed c cb <*> EMB.try_unembed d cb <*> EMB.try_unembed e cb in
         return (embed_simple psc.psc_range r)
       | _ -> failwith "arity"
 
@@ -257,7 +257,7 @@ let mk1' #a #r #na #nr
     fun psc cb us args ->
       match args with
       | [(a, _)] ->
-        let! a = try_unembed_simple a in
+        let! a = EMB.try_unembed a cb in
         let r = f a in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -287,7 +287,7 @@ let mk1_psc' #a #r #na #nr
     fun psc cb us args ->
       match args with
       | [(a, _)] ->
-        let! a = try_unembed_simple a in
+        let! a = EMB.try_unembed a cb in
         let r = f psc a in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -319,8 +319,8 @@ let mk2' #a #b #r #na #nb #nr
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _)] ->
-        let! a = try_unembed_simple a in
-        let! b = try_unembed_simple b in
+        let! a = EMB.try_unembed a cb in
+        let! b = EMB.try_unembed b cb in
         let r = f a b in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -353,9 +353,9 @@ let mk3' #a #b #c #r #na #nb #nc #nr
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _)] ->
-        let! a = try_unembed_simple a in
-        let! b = try_unembed_simple b in
-        let! c = try_unembed_simple c in
+        let! a = EMB.try_unembed a cb in
+        let! b = EMB.try_unembed b cb in
+        let! c = EMB.try_unembed c cb in
         let r = f a b c in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -390,10 +390,10 @@ let mk4' #a #b #c #d #r #na #nb #nc #nd #nr
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _); (d, _)] ->
-        let! a = try_unembed_simple a in
-        let! b = try_unembed_simple b in
-        let! c = try_unembed_simple c in
-        let! d = try_unembed_simple d in
+        let! a = EMB.try_unembed a cb in
+        let! b = EMB.try_unembed b cb in
+        let! c = EMB.try_unembed c cb in
+        let! d = EMB.try_unembed d cb in
         let r = f a b c d in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -430,11 +430,11 @@ let mk5' #a #b #c #d #e #r #na #nb #nc #nd #ne #nr
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _); (d, _); (e, _)] ->
-        let! a = try_unembed_simple a in
-        let! b = try_unembed_simple b in
-        let! c = try_unembed_simple c in
-        let! d = try_unembed_simple d in
-        let! e = try_unembed_simple e in
+        let! a = EMB.try_unembed a cb in
+        let! b = EMB.try_unembed b cb in
+        let! c = EMB.try_unembed c cb in
+        let! d = EMB.try_unembed d cb in
+        let! e = EMB.try_unembed e cb in
         let r = f a b c d e in
         let! r = r in
         return (embed_simple psc.psc_range r)
@@ -473,12 +473,12 @@ let mk6' #a #b #c #d #e #f #r #na #nb #nc #nd #ne #nf #nr
     fun psc cb us args ->
       match args with
       | [(a, _); (b, _); (c, _); (d, _); (e, _); (f, _)] ->
-        let! a = try_unembed_simple a in
-        let! b = try_unembed_simple b in
-        let! c = try_unembed_simple c in
-        let! d = try_unembed_simple d in
-        let! e = try_unembed_simple e in
-        let! f = try_unembed_simple f in
+        let! a = EMB.try_unembed a cb in
+        let! b = EMB.try_unembed b cb in
+        let! c = EMB.try_unembed c cb in
+        let! d = EMB.try_unembed d cb in
+        let! e = EMB.try_unembed e cb in
+        let! f = EMB.try_unembed f cb in
         let r = ff a b c d e f in
         let! r = r in
         return (embed_simple psc.psc_range r)

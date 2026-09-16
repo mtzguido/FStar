@@ -193,11 +193,31 @@ let printer_of   (e:embedding 'a) = e.print
 let set_type ty  (e:embedding 'a) = { e with typ = (fun () -> ty) }
 
 let embed        {| e:embedding 'a |} = e.em
-let try_unembed  {| e:embedding 'a |} t n =
-  (* Unembed always receives a term without the meta_monadics above,
-  and also already compressed. *)
-  let t = unmeta_div_results t in
-  e.un (SS.compress t) n
+let unembed_with_norm #a (un:term -> norm_cb -> ML (option a)) (t:term) n : ML (option a) =
+  let t = SS.compress (unmeta_div_results t) in
+  match un t n with
+  | Some x -> Some x
+  | None ->
+    (* WHNF arguments can still have computed fields. Let the decoder ask
+       for those fields, rather than fully normalizing every primitive input.
+       A known constructor's failed child has already made its own request;
+       retrying the whole constructor would repeat work on earlier fields. *)
+    let may_reduce =
+      match t.n with
+      | Tm_app _ | Tm_uinst _ | Tm_fvar _ ->
+        let head, _ = U.head_and_args_full t in
+        (match (U.un_uinst head).n with
+         | Tm_fvar {fv_qual=Some Data_ctor}
+         | Tm_fvar {fv_qual=Some (Record_ctor _)} -> false
+         | _ -> true)
+      | Tm_let _ | Tm_match _ | Tm_meta _ | Tm_ascribed _ -> true
+      | _ -> false
+    in
+    if may_reduce
+    then un (SS.compress (unmeta_div_results (n (Inr t)))) n
+    else None
+
+let try_unembed  {| e:embedding 'a |} t n = unembed_with_norm e.un t n
 
 let unembed #a {| e:embedding a |} t n =
   let r = try_unembed t n in

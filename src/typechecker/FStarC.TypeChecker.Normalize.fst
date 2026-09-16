@@ -867,8 +867,8 @@ let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
            log_primops cfg (fun () -> Format.print1 "primop: reducing <%s>\n" (show tm));
            begin match args with
            | [(t, _); (r, _)] ->
-                begin match PO.try_unembed_simple r with
-                | Some rng -> Subst.set_use_range rng t, false
+                begin match EMB.try_unembed r norm_cb with
+                | Some rng -> Subst.set_use_range rng t, true
                 | None -> tm, false
                 end
            | _ -> tm, false
@@ -2807,7 +2807,10 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
            constructor/abstraction closures that must re-enter [norm]. *)
         set_memo cfg r (empty_env, t);
         log cfg  (fun () -> Format.print1 "\tSet memo %s\n" (show t));
-        rebuild cfg env stack t
+        (* A terminal closure and intervening memos cannot enable another
+           reduction. Retrying a blocked primitive would repeat its decoder. *)
+        if wants_closure stack then do_rebuild cfg env stack t
+        else rebuild cfg env stack t
 
       | Let(env', bs, lb, r)::stack ->
         let body = SS.close bs t in
@@ -3102,7 +3105,10 @@ and norm_match cfg env stack (s:match_scrutinee) asc_opt branches lopt r : ML te
     let Clos (cenv, t, _, _) = match_scrutinee_closure s in
     (* A residual match must still satisfy the caller's requested normal
        form. This work is needed only when branch selection is blocked. *)
-    let t = norm cfg cenv [] t in
+    let t =
+      if cfg.steps.weak && cfg.steps.hnf && Some? (!s.whnf)
+      then closure_as_term cfg cenv t
+      else norm cfg cenv [] t in
     rebuild_match cfg empty_env env stack t asc_opt branches lopt r
   in
   let rec select branches_left : ML term =

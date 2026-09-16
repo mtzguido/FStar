@@ -166,6 +166,54 @@ let demand_matching_tests () : ML unit =
   let steps = [Env.Weak; Env.HNF; Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
   run_env env 713 (Env.UnfoldOnly [strict_lid]::steps) t (int 42) [1; 0; 0; 0; 0];
   run_env env 714 (Env.UnfoldOnly []::steps) t t [0; 0; 0; 0; 0];
+  (* Primitive inputs may contain computed fields and list tails. Their
+     embeddings must request those values before the outer match can select. *)
+  let str (s:string) = FStarC.TypeChecker.Primops.Base.embed_simple r s in
+  let string_typ = S.fvar Const.string_lid None in
+  let nil = S.mk_Tm_app (S.tdataconstr Const.nil_lid) [S.iarg string_typ] r in
+  let cons hd tl = S.mk_Tm_app (S.tdataconstr Const.cons_lid)
+    [S.iarg string_typ; S.as_arg hd; S.as_arg tl] r in
+  let strings = cons (probe 0 (str "a"))
+    (probe 1 (cons (probe 2 (str "b")) nil)) in
+  let joined = app (S.fvar Const.string_concat_lid None) [str "-"; strings] in
+  let p = match (str "a-b").n with
+    | Tm_constant c -> pat (Pat_constant c)
+    | _ -> failwith "string constant" in
+  run 715 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt joined [p, None, int 42; wild, None, int 0])
+    (int 42) [1; 1; 1; 0; 0];
+  let tail = S.bv_to_name (S.new_bv None S.tun) in
+  let joined = app (S.fvar Const.string_concat_lid None)
+    [str "-"; cons (probe 0 (str "a")) tail] in
+  let t = mt joined [p, None, int 42; wild, None, int 0] in
+  (* A blocked decoder must not repeat its prefix while saving the memo or
+     returning the already computed WHNF residual. *)
+  run 716 [Env.Weak; Env.HNF; Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    t t [1; 0; 0; 0; 0];
+  let int_typ = S.fvar Const.int_lid None in
+  let nil = S.mk_Tm_app (S.tdataconstr Const.nil_lid) [S.iarg int_typ] r in
+  let cons hd tl = S.mk_Tm_app (S.tdataconstr Const.cons_lid)
+    [S.iarg int_typ; S.as_arg hd; S.as_arg tl] r in
+  let payload = app (Pars.pars "fun x -> x") [probe 0 (int 7)] in
+  let xs = cons payload (probe 1 (cons (probe 2 (int 99)) nil)) in
+  let poly_call lid args = S.mk_Tm_app
+    (S.mk_Tm_uinst (S.fvar lid None) [U_zero]) (S.iarg int_typ::args) r in
+  let array = poly_call Const.immutable_array_of_list_lid [S.as_arg xs] in
+  let select n t = mt t [pc n, None, int 42; wild, None, int 0] in
+  run 717 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 (poly_call Const.immutable_array_index_lid [S.as_arg array; S.as_arg (int 0)]))
+    (int 42) [1; 1; 0; 0; 0];
+  run 718 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 2 (poly_call Const.immutable_array_length_lid [S.as_arg array]))
+    (int 42) [0; 1; 0; 0; 0];
+  let hidden = poly_call Const.hide [S.as_arg payload] in
+  run 719 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 (poly_call Const.reveal [S.as_arg hidden]))
+    (int 42) [1; 0; 0; 0; 0];
+  let set_range = app (S.mk (Tm_constant FStarC.Const.Const_set_range_of) r)
+    [payload; FStarC.TypeChecker.Primops.Base.embed_simple r r] in
+  run 720 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 set_range) (int 42) [1; 0; 0; 0; 0];
   Format.print_string "Demand-driven matching tests passed\n"
 
 
