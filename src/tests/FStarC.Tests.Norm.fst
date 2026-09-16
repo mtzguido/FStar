@@ -33,6 +33,103 @@ open FStarC.Syntax.Subst { subst }
 
 open FStarC.Class.Show
 
+(* Count reductions, rather than timing them: a correct result alone cannot
+   detect eagerly evaluated fields or repeated work across failed branches. *)
+let demand_matching_tests () : ML unit =
+  let r = dummyRange in
+  let int n = U.exp_int n in
+  let pat p = withinfo p r in
+  let wild = pat (Pat_var (S.new_bv None S.tun)) in
+  let pc n = match (int n).n with
+    | Tm_constant c -> pat (Pat_constant c)
+    | _ -> failwith "integer constant" in
+  let ctor name = S.lid_as_fv (lid_of_path ["Test"; name] r) (Some Data_ctor) in
+  let c = ctor "DemandC" in
+  let d = ctor "DemandD" in
+  let other = ctor "DemandOther" in
+  let construct c args = S.mk_Tm_app (S.mk (Tm_fvar c) r) (List.map S.as_arg args) r in
+  let pattern c args = pat (Pat_cons (c, None, List.map (fun p -> p, false) args)) in
+  let mt scrutinee branches = S.mk (Tm_match {
+    scrutinee; ret_opt=None; brs=branches; rc_opt=None}) r in
+  let counts = List.map (fun _ -> mk_ref 0) [0; 1; 2; 3; 4] in
+  let names = List.map (fun i -> lid_of_path ["Test"; "demand_probe_" ^ show i] r) [0; 1; 2; 3; 4] in
+  let probe i t = app (S.fvar (List.nth names i) None) [t] in
+  let primitives = List.mapi (fun i name ->
+    FStarC.TypeChecker.Primops.Base.as_primitive_step_nbecbs true
+      (name, 1, 0,
+       (fun _ _ _ args ->
+         let counter = List.nth counts i in
+         counter := !counter + 1;
+         match args with
+         | [(t, _)] -> Some t
+         | _ -> failwith "demand probe arity"),
+       (fun _ _ _ -> None))) names in
+  let run id steps t expected expected_counts =
+    List.iter (fun counter -> counter := 0) counts;
+    let result = N.normalize_with_primitive_steps primitives steps (Pars.init ()) t in
+    always id (term_eq result expected);
+    let actual_counts = List.map (fun counter -> !counter) counts in
+    if actual_counts <> expected_counts then
+      failwith (Format.fmt3 "Demand test %s: reductions %s, expected %s"
+        (show id) (show actual_counts) (show expected_counts))
+  in
+  List.iter (fun extra ->
+    let steps = FStar.List.Tot.append extra [Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+    (* A wildcard does not even ask for the outer head. *)
+    run 701 steps (mt (probe 0 (int 7)) [(wild, None, int 42)])
+      (int 42) [0; 0; 0; 0; 0];
+    (* All three branches inspect the same nested path. The second field
+       is irrelevant, and every node on the inspected path is forced once. *)
+    let s = probe 0 (construct c [probe 1 (construct d [probe 2 (int 2)]);
+                                 probe 3 (int 99)]) in
+    let branch n result = pattern c [pattern d [pc n]; wild], None, int result in
+    run 702 steps (mt s [branch 0 10; branch 1 20; branch 2 42])
+      (int 42) [1; 1; 1; 0; 0];
+    (* Stop at the first failing nested test; do not inspect the sibling. *)
+    run 703 steps (mt s [pattern c [pattern other []; pc 99], None, int 0;
+                        wild, None, int 42])
+      (int 42) [1; 1; 0; 0; 0];
+    (* A false guard on a variable pattern does not force the scrutinee. *)
+    run 704 steps (mt (probe 0 (int 7))
+      [(wild, Some (probe 4 U.exp_false_bool), int 0); wild, None, int 42])
+      (int 42) [0; 0; 0; 0; 1];
+    (* A failed guard must retain the work done by its pattern. *)
+    run 705 steps (mt s
+      [pattern c [pattern d [pc 2]; wild], Some (probe 4 U.exp_false_bool), int 0;
+       branch 2 42])
+      (int 42) [1; 1; 1; 0; 1];
+    (* Field binding order, including variables in nested constructors. *)
+    let x = S.new_bv None S.tun in
+    let y = S.new_bv None S.tun in
+    let p = pattern c [pattern d [pat (Pat_var x)]; pat (Pat_var y)] in
+    run 706 steps (mt s [U.branch (p, None, S.bv_to_name x)])
+      (int 2) [1; 1; 1; 0; 0];
+    (* Once an earlier constructor differs, a wildcard still need not force
+       any of the constructor's fields. *)
+    run 707 steps (mt s [pattern other [], None, int 0; wild, None, int 42])
+      (int 42) [1; 0; 0; 0; 0])
+    [[]; [Env.Weak]; [Env.Weak; Env.HNF]];
+  (* A blocked guard retains the pattern binding in its then branch and the
+     caller's environment in the fallback. Only residual branches are reduced. *)
+  let x = S.new_bv None S.tun in
+  let outer = S.new_bv None S.tun in
+  let guard = S.new_bv None U.t_bool in
+  let p = pattern c [pat (Pat_var x); wild] in
+  let s = construct c [probe 0 (int 42); probe 1 (int 99)] in
+  run 708 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt s [U.branch (p, Some (S.bv_to_name guard), S.bv_to_name x);
+           wild, None, S.bv_to_name outer])
+    (U.if_then_else (S.bv_to_name guard) (int 42) (S.bv_to_name outer))
+    [1; 0; 0; 0; 0];
+  (* A guard can force a field before a subsequent pattern inspects it. *)
+  let s = construct c [probe 0 U.exp_false_bool; probe 1 (int 99)] in
+  run 709 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt s [U.branch (p, Some (probe 4 (S.bv_to_name x)), int 0);
+           pattern c [pat (Pat_constant (FStarC.Const.Const_bool false)); wild], None, int 42])
+    (int 42) [1; 0; 0; 0; 1];
+  Format.print_string "Demand-driven matching tests passed\n"
+
+
 (* A big chunk of this module is thunkued to not incur in a top-level effect. *)
 
 let run_all () : ML unit =
@@ -407,4 +504,5 @@ let run_all () : ML unit =
       compare_times l_int l_nbe
   in
 
-  run_all ()
+  run_all ();
+  demand_matching_tests ()
