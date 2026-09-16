@@ -9,7 +9,7 @@ let nested #a (x:a) : a =
   match make_box (Some x) with
   | Box (Some y) _ -> y
   | Box None _ -> x
-let _ #a (x:a) = assert_norm (nested x == x)
+let polymorphic #a (x:a) = assert_norm (nested x == x)
 
 let apply_field (captured caller:int) : int =
   match make_box (Some (fun x -> captured + x)) with
@@ -40,7 +40,7 @@ let blocked (x:option int) =
   match Box x 7 with
   | Box (Some y) _ -> y
   | _ -> 0
-let _ (x:option int) =
+let blocked_equivalence (x:option int) =
   assert_norm (blocked x == (match Box x 7 with Box (Some y) _ -> y | _ -> 0))
 
 (* Pattern-variable order across several levels. *)
@@ -57,4 +57,4 @@ let _ = assert_norm (length [1;2;3;4;5] == 5)
 
 (* A wildcard may discard a total scrutinee even when its head is open. *)
 let ignore_box #a (b:box a) = match b with _ -> 42
-let _ #a (b:box a) = assert_norm (ignore_box b == 42)
+let wildcard_result #a (b:box a) = assert_norm (ignore_box b == 42)
