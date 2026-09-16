@@ -1049,17 +1049,36 @@ let is_fext_on_domain (t:term) : ML (option term) =
 let __get_n_binders : ref ((env:Env.env) -> list step -> (n:int) -> (t:term) -> ML (list binder & comp)) =
   mk_ref (fun e s n t -> failwith "Impossible: __get_n_binders unset")
 
-(* Returns `true` iff the head of `t` is a primop, and
-it not applied or only partially applied. *)
-let is_partial_primop_app (cfg:Cfg.cfg) (t:term) : ML bool =
+(* Whether a primitive needs its next argument to make progress. Boolean
+   short-circuiting only needs the first argument; the second is selected
+   below once the first has a value. *)
+let primop_needs_arg (cfg:Cfg.cfg) (t:term) : ML bool =
   let hd, args = U.head_and_args_full t in
   match (U.un_uinst hd).n with
+  | Tm_fvar fv when cfg.steps.primops && List.length args = 1 &&
+                   (S.fv_eq_lid fv PC.op_And || S.fv_eq_lid fv PC.op_Or) -> false
   | Tm_fvar fv ->
     begin match find_prim_step cfg fv with
     | Some prim_step -> prim_step.arity > List.length args
     | None -> false
     end
   | _ -> false
+
+(* Inl returns the known result without even closing the unused argument.
+   Inr selects the argument in its original closure environment. *)
+let short_circuit_bool (cfg:Cfg.cfg) (t:term) : ML (option (either bool unit)) =
+  if not (cfg.steps.hnf && cfg.steps.primops) then None
+  else
+    let hd, args = U.head_and_args_full t in
+    match (U.un_uinst hd).n, args with
+    | Tm_fvar fv, [(a, None)] when
+        S.fv_eq_lid fv PC.op_And || S.fv_eq_lid fv PC.op_Or ->
+      (match (PO.try_unembed_simple a <: option bool) with
+       | Some b ->
+         if b = S.fv_eq_lid fv PC.op_Or then Some (Inl b)
+         else Some (Inr ())
+       | None -> None)
+    | _ -> None
 
 (* A strict_on_arguments definition also needs its designated arguments in
    WHNF before it may unfold. Do not inspect other arguments, or inspect a
@@ -2837,9 +2856,17 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
       | Arg (Clos(env_arg, tm, m, _), aq, r) :: stack ->
         log cfg (fun () -> Format.print1 "Rebuilding with arg %s\n" (show tm));
 
+        begin match (if aq = None then short_circuit_bool cfg t else None) with
+        | Some (Inl b) ->
+          rebuild cfg empty_env stack (if b then U.exp_true_bool else U.exp_false_bool)
+        | Some (Inr ()) ->
+          (match read_memo cfg m with
+           | Some (memo_env, a) -> norm cfg memo_env stack a
+           | None -> norm cfg env_arg (MemoLazy m::stack) tm)
+        | None ->
         (* In HNF, only primitive operations and strict_on_arguments may
            demand an argument before the head can reduce further. *)
-        if cfg.steps.hnf && not (is_partial_primop_app cfg t) &&
+        if cfg.steps.hnf && not (primop_needs_arg cfg t) &&
            not (is_strict_arg cfg t stack) then (
            let arg = closure_as_term cfg env_arg tm in
            let t = extend_app t (arg, aq) r in
@@ -2874,6 +2901,7 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
             let stack = MemoLazy m::App(env, t, aq, r)::stack in
             norm cfg env_arg stack tm
         )
+        end
 
       | App(env, head, aq, r)::stack' when should_reify cfg stack ->
         let t0 = t in

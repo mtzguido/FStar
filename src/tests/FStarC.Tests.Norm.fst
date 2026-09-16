@@ -214,6 +214,25 @@ let demand_matching_tests () : ML unit =
     [payload; FStarC.TypeChecker.Primops.Base.embed_simple r r] in
   run 720 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
     (select 7 set_range) (int 42) [1; 0; 0; 0; 0];
+  (* Short-circuiting demands the right operand only when selected. A
+     blocked left operand also leaves the right operand untouched in WHNF. *)
+  let boolop lid a b = app (S.fvar lid None) [a; b] in
+  let steps = [Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+  run 721 steps
+    (choose_bool (boolop Const.op_And U.exp_false_bool (probe 0 U.exp_true_bool)))
+    (int 0) [0; 0; 0; 0; 0];
+  run 722 steps
+    (choose_bool (boolop Const.op_And U.exp_true_bool (probe 0 U.exp_true_bool)))
+    (int 42) [1; 0; 0; 0; 0];
+  run 723 steps
+    (choose_bool (boolop Const.op_Or U.exp_true_bool (probe 0 U.exp_false_bool)))
+    (int 42) [0; 0; 0; 0; 0];
+  run 724 steps
+    (choose_bool (boolop Const.op_Or U.exp_false_bool (probe 0 U.exp_false_bool)))
+    (int 0) [1; 0; 0; 0; 0];
+  let lhs = S.bv_to_name (S.new_bv None U.t_bool) in
+  let t = choose_bool (boolop Const.op_And lhs (probe 0 U.exp_false_bool)) in
+  run 725 (Env.Weak::Env.HNF::steps) t t [0; 0; 0; 0; 0];
   Format.print_string "Demand-driven matching tests passed\n"
 
 
