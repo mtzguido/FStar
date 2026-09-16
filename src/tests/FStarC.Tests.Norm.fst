@@ -64,6 +64,15 @@ let demand_matching_tests () : ML unit =
          | [(t, _)] -> Some t
          | _ -> failwith "demand probe arity"),
        (fun _ _ _ -> None))) names in
+  let blocked_lid = lid_of_path ["Test"; "demand_blocked"] r in
+  let blocked_primitive = FStarC.TypeChecker.Primops.Base.as_primitive_step_nbecbs true
+    (blocked_lid, 1, 0,
+     (fun _ _ _ _ ->
+       let counter = List.nth counts 4 in
+       counter := !counter + 1;
+       None),
+     (fun _ _ _ -> None)) in
+  let primitives = blocked_primitive::primitives in
   let run_env env id steps t expected expected_counts =
     List.iter (fun counter -> counter := 0) counts;
     let result = N.normalize_with_primitive_steps primitives steps env t in
@@ -233,6 +242,16 @@ let demand_matching_tests () : ML unit =
   let lhs = S.bv_to_name (S.new_bv None U.t_bool) in
   let t = choose_bool (boolop Const.op_And lhs (probe 0 U.exp_false_bool)) in
   run 725 (Env.Weak::Env.HNF::steps) t t [0; 0; 0; 0; 0];
+  (* Failed scalar decoding must not normalize already inspected operands
+     again. The blocked primitive's retry count is independent of depth. *)
+  let blocked = app (S.fvar blocked_lid None) [int 0] in
+  let add t = app (S.fvar Const.op_Plus None) [t; int 1] in
+  List.iter (fun (id, depth) ->
+    let rec nest (n:Prims.int) (t:term) : ML term =
+      if n = 0 then t else nest (n - 1) (add t) in
+    let t = select 0 (nest depth blocked) in
+    run id (Env.Weak::Env.HNF::steps) t t [0; 0; 0; 0; 2])
+    [726, 1; 727, 10];
   Format.print_string "Demand-driven matching tests passed\n"
 
 

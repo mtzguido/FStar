@@ -794,7 +794,7 @@ let mk_psc_subst cfg (env:env) =
 (* Boolean indicates whether further normalization of the result is
 required. It is usually false, unless we call into a 'renorm' primitive
 step. *)
-let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
+let reduce_primops (norm_cb:EMB.norm_cb) cfg (env:env) tm : ML (term & bool) =
     if not cfg.steps.primops
     then tm, false
     else begin
@@ -829,6 +829,17 @@ let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
                                             then mk_psc_subst cfg env
                                             else []
                   } in
+                  (* The argument heads have already been normalized before
+                     reaching this primitive. Decoders may demand their lazy
+                     fields, but retrying an argument itself makes symbolic
+                     arithmetic revisit its operands exponentially. *)
+                  let norm_cb : EMB.norm_cb = fun request ->
+                    match request with
+                    | Inr x when List.existsb (fun (a, _) ->
+                        BU.physical_equality x
+                          (SS.compress (EMB.unmeta_div_results a))) args_1 -> x
+                    | _ -> norm_cb request
+                  in
                   let r =
                       if false
                       then begin let (r, ns) = Timing.record_ns (fun () -> prim_step.interpretation psc norm_cb universes args_1) in
