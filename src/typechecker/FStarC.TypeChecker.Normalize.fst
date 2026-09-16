@@ -1078,7 +1078,13 @@ let is_strict_arg cfg t stack : ML bool =
          | _ -> 0 in
        let i = List.length args in
        let arity = i + 1 + pending_args stack in
-       List.contains i indices && List.for_all (fun j -> j < arity) indices)
+       if not (List.contains i indices && List.for_all (fun j -> j < arity) indices)
+       then false
+       else
+         let qninfo = Env.lookup_qname cfg.tcenv fv.fv_name in
+         let cfg_zeta = {cfg with steps = {cfg.steps with zeta = true}} in
+         Some? (Env.lookup_definition_qninfo cfg.delta_level fv.fv_name qninfo) &&
+         Should_unfold_yes? (should_unfold true cfg_zeta (fun _ -> false) fv qninfo))
   | _ -> false
 
 let maybe_drop_rc_typ cfg (rc:residual_comp) : ML residual_comp =

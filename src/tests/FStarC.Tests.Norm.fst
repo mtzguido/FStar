@@ -64,15 +64,17 @@ let demand_matching_tests () : ML unit =
          | [(t, _)] -> Some t
          | _ -> failwith "demand probe arity"),
        (fun _ _ _ -> None))) names in
-  let run id steps t expected expected_counts =
+  let run_env env id steps t expected expected_counts =
     List.iter (fun counter -> counter := 0) counts;
-    let result = N.normalize_with_primitive_steps primitives steps (Pars.init ()) t in
+    let result = N.normalize_with_primitive_steps primitives steps env t in
     always id (term_eq result expected);
     let actual_counts = List.map (fun counter -> !counter) counts in
     if actual_counts <> expected_counts then
       failwith (Format.fmt3 "Demand test %s: reductions %s, expected %s"
         (show id) (show actual_counts) (show expected_counts))
   in
+  let run id steps t expected expected_counts =
+    run_env (Pars.init ()) id steps t expected expected_counts in
   List.iter (fun extra ->
     let steps = FStar.List.Tot.append extra [Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
     (* A wildcard does not even ask for the outer head. *)
@@ -148,6 +150,22 @@ let demand_matching_tests () : ML unit =
   run 712 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
     (choose_bool (eq pair_value (construct (ctor "DemandPairOther") [])))
     (int 0) [0; 0; 0; 0; 0];
+  (* Strictness only demands designated arguments, and only when unfolding
+     is permitted. Install the attribute directly: this unit-test environment
+     contains Prims, without the library declaration of the attribute. *)
+  let _ = Pars.pars_and_tc_fragment
+    "let demand_strict (x:int) (unused:int) = x" in
+  let strict_lid = lid_of_path ["Test"; "demand_strict"] r in
+  let env = Pars.init () in
+  let se = Option.must (Env.lookup_sigelt env strict_lid) in
+  let attr = app (S.fvar Const.strict_on_arguments_attr None)
+    [FStarC.TypeChecker.Primops.Base.embed_simple r ([0] <: list Prims.int)] in
+  let env = Env.push_sigelt_force env {se with sigattrs=attr::se.sigattrs} in
+  let t = mt (app (S.fvar strict_lid None) [probe 0 (int 7); probe 1 (int 99)])
+    [pc 7, None, int 42; wild, None, int 0] in
+  let steps = [Env.Weak; Env.HNF; Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+  run_env env 713 (Env.UnfoldOnly [strict_lid]::steps) t (int 42) [1; 0; 0; 0; 0];
+  run_env env 714 (Env.UnfoldOnly []::steps) t t [0; 0; 0; 0; 0];
   Format.print_string "Demand-driven matching tests passed\n"
 
 
