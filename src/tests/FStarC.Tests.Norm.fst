@@ -127,6 +127,27 @@ let demand_matching_tests () : ML unit =
     (mt s [U.branch (p, Some (probe 4 (S.bv_to_name x)), int 0);
            pattern c [pat (Pat_constant (FStarC.Const.Const_bool false)); wild], None, int 42])
     (int 42) [1; 0; 0; 0; 1];
+  (* Equality in a scrutinee must inspect computed fields too. Use a real
+     inductive declaration so its injective arguments are known to the env. *)
+  let _ = Pars.pars_and_tc_fragment
+    "type demand_pair = | DemandPair : int -> int -> demand_pair | DemandPairOther" in
+  let pair = ctor "DemandPair" in
+  let pair_typ = S.fvar (lid_of_path ["Test"; "demand_pair"] r) None in
+  let eq x y = S.mk_Tm_app (S.fvar Const.op_Eq None)
+    [S.iarg pair_typ; S.as_arg x; S.as_arg y] r in
+  let choose_bool b = mt b
+    [pat (Pat_constant (FStarC.Const.Const_bool true)), None, int 42;
+     wild, None, int 0] in
+  let pair_value = construct pair [probe 0 (int 1); probe 1 (int 2)] in
+  run 710 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct pair [int 1; int 2])))
+    (int 42) [1; 1; 0; 0; 0];
+  run 711 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct pair [int 0; probe 2 (int 3)])))
+    (int 0) [1; 0; 0; 0; 0];
+  run 712 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct (ctor "DemandPairOther") [])))
+    (int 0) [0; 0; 0; 0; 0];
   Format.print_string "Demand-driven matching tests passed\n"
 
 

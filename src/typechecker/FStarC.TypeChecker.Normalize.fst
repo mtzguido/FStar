@@ -47,6 +47,7 @@ module EMB = FStarC.Syntax.Embeddings
 module TcComm = FStarC.TypeChecker.Common
 module Free = FStarC.Syntax.Free
 module PO = FStarC.TypeChecker.Primops
+module TEQ = FStarC.TypeChecker.TermEqAndSimplify
 module Print = FStarC.Syntax.Print //bring into scope for show instances
 open FStarC.TypeChecker.Normalize.Unfolding
 
@@ -551,6 +552,14 @@ let mk_match_scrutinee env t : ML match_scrutinee =
   in
   {source; whnf = fresh_memo (); fields = fresh_memo ()}
 
+let match_scrutinee_fields s env args : ML (list (match_scrutinee & aqual)) =
+  match !s.fields with
+  | Some fields -> fields
+  | None ->
+    let fields = List.map (fun (t, aq) -> mk_match_scrutinee env t, aq) args in
+    s.fields := Some fields;
+    fields
+
 (* Resume from everything the patterns have already forced, including nested
    fields. Keep uninspected fields as their original closures. The additional
    environment entries avoid substituting those fields back into syntax. *)
@@ -1052,6 +1061,26 @@ let is_partial_primop_app (cfg:Cfg.cfg) (t:term) : ML bool =
     end
   | _ -> false
 
+(* A strict_on_arguments definition also needs its designated arguments in
+   WHNF before it may unfold. Do not inspect other arguments, or inspect a
+   partial application that cannot yet satisfy the strictness annotation. *)
+let is_strict_arg cfg t stack : ML bool =
+  let head, args = U.head_and_args_full t in
+  match (U.un_uinst head).n with
+  | Tm_fvar fv ->
+    (match Env.fv_has_strict_args cfg.tcenv fv with
+     | None -> false
+     | Some indices ->
+       let rec pending_args stack : ML int =
+         match stack with
+         | Arg _::stack -> 1 + pending_args stack
+         | Meta _::stack | MemoLazy _::stack -> pending_args stack
+         | _ -> 0 in
+       let i = List.length args in
+       let arity = i + 1 + pending_args stack in
+       List.contains i indices && List.for_all (fun j -> j < arity) indices)
+  | _ -> false
+
 let maybe_drop_rc_typ cfg (rc:residual_comp) : ML residual_comp =
   if cfg.steps.for_extraction
   then {rc with residual_typ = None}
@@ -1547,7 +1576,14 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
             let push_args env args stack =
               push_args_env (args |> List.map (fun a -> (a, env))) stack
             in
-            (* Do not close a constructor just to project one of its fields.
+            (* Equality can demand fields even while computing only a head. *)
+            if cfg.steps.hnf && cfg.steps.primops && List.length args = 3 &&
+               (match (U.un_uinst head).n with
+                | Tm_fvar fv -> S.fv_eq_lid fv PC.op_Eq || S.fv_eq_lid fv PC.op_notEq
+                | _ -> false)
+            then norm_decidable_equality cfg env stack head args t.pos
+            else
+            (* Do not close a constructor just to inspect one of its fields.
                Give each argument a closure of its own before memoizing the
                constructor, so repeated selections share the field's memo too
                (not merely the environments of its subterms). See #4537. *)
@@ -2792,9 +2828,10 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
       | Arg (Clos(env_arg, tm, m, _), aq, r) :: stack ->
         log cfg (fun () -> Format.print1 "Rebuilding with arg %s\n" (show tm));
 
-        (* If we are doing hnf (and the head is not a primop), then there is
-        no need to normalize the argument. *)
-        if cfg.steps.hnf && not (is_partial_primop_app cfg t) then (
+        (* In HNF, only primitive operations and strict_on_arguments may
+           demand an argument before the head can reduce further. *)
+        if cfg.steps.hnf && not (is_partial_primop_app cfg t) &&
+           not (is_strict_arg cfg t stack) then (
            let arg = closure_as_term cfg env_arg tm in
            let t = extend_app t (arg, aq) r in
            rebuild cfg env_arg stack t
@@ -2937,35 +2974,86 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
                         asc_opt branches lopt r
         else rebuild_match cfg env env' stack t asc_opt branches lopt r
 
-and norm_match cfg env stack (s:match_scrutinee) asc_opt branches lopt r : ML term =
+and force_match_scrutinee cfg (s:match_scrutinee) : ML (env & term) =
   let cfg_whnf = whnf_cfg cfg in
-  let force s =
-    match !s.whnf with
-    | Some et -> et
-    | None ->
-      let et =
-        match s.source with
-        | Clos (cenv, t, m, _) ->
-          (match read_memo cfg_whnf m with
-           | Some et -> et
-           | None ->
-             let result = fresh_memo () in
-             let save env t = result := Some (env, t); t in
-             let _ = norm cfg_whnf cenv [MemoLazy m; Closure save] t in
-             Option.must !result)
-        | _ -> failwith "norm_match: expected a term closure"
-      in
-      s.whnf := Some et;
-      et
+  match !s.whnf with
+  | Some et -> et
+  | None ->
+    let et =
+      match s.source with
+      | Clos (cenv, t, m, _) ->
+        (match read_memo cfg_whnf m with
+         | Some et -> et
+         | None ->
+           let result = fresh_memo () in
+           let save env t = result := Some (env, t); t in
+           let _ = norm cfg_whnf cenv [MemoLazy m; Closure save] t in
+           Option.must !result)
+      | _ -> failwith "norm_match: expected a term closure"
+    in
+    s.whnf := Some et;
+    et
+
+(* Decidable equality can itself be the scrutinee of an if. Its syntax-based
+   primitive cannot compare unevaluated constructor fields. Inspect those
+   fields on demand, retaining their closures and stopping at inequality. *)
+and norm_decidable_equality cfg env stack head args r : ML term =
+  let rec equal_nodes x y : ML TEQ.eq_result =
+    let xenv, xt = force_match_scrutinee cfg x in
+    let yenv, yt = force_match_scrutinee cfg y in
+    let xh, xa = U.head_and_args_full (U.unlazy (U.unmeta xt)) in
+    let yh, ya = U.head_and_args_full (U.unlazy (U.unmeta yt)) in
+    let is_data fv =
+      match fv.fv_qual with
+      | Some Data_ctor | Some (Record_ctor _) -> true
+      | _ -> Env.is_datacon cfg.tcenv fv.fv_name in
+    let fallback () = TEQ.eq_tm cfg.tcenv
+      (closure_as_term cfg xenv xt) (closure_as_term cfg yenv yt) in
+    match (U.un_uinst xh).n, (U.un_uinst yh).n with
+    | Tm_fvar xf, Tm_fvar yf when is_data xf && is_data yf ->
+      (match Env.num_datacon_non_injective_ty_params cfg.tcenv xf.fv_name with
+       | None -> fallback ()
+       | Some n ->
+         if not (S.fv_eq xf yf) then TEQ.NotEqual
+         else if List.length xa <> List.length ya || List.length xa < n
+         then TEQ.Unknown
+         else
+           let _, xs = BU.first_N n (match_scrutinee_fields x xenv xa) in
+           let _, ys = BU.first_N n (match_scrutinee_fields y yenv ya) in
+           equal_fields TEQ.Equal xs ys)
+    | _ -> fallback ()
+  and equal_fields result xs ys : ML TEQ.eq_result =
+    match xs, ys with
+    | [], [] -> result
+    | (x, _)::xs, (y, _)::ys ->
+      (match equal_nodes x y with
+       | TEQ.NotEqual -> TEQ.NotEqual
+       | TEQ.Unknown -> equal_fields TEQ.Unknown xs ys
+       | TEQ.Equal -> equal_fields result xs ys)
+    | _ -> TEQ.Unknown
   in
-  let fields s env args =
-    match !s.fields with
-    | Some fields -> fields
-    | None ->
-      let fields = List.map (fun (t, aq) -> mk_match_scrutinee env t, aq) args in
-      s.fields := Some fields;
-      fields
+  let (typ, aq)::(x, xq)::(y, yq)::[] = args in
+  let x = mk_match_scrutinee env x in
+  let y = mk_match_scrutinee env y in
+  let result = equal_nodes x y in
+  let t =
+    match result with
+    | TEQ.Equal | TEQ.NotEqual ->
+      let is_eq = match (U.un_uinst head).n with
+        | Tm_fvar fv -> S.fv_eq_lid fv PC.op_Eq
+        | _ -> false in
+      if (result = TEQ.Equal) = is_eq then U.exp_true_bool else U.exp_false_bool
+    | TEQ.Unknown ->
+      let close s =
+        let Clos (env, t, _, _) = match_scrutinee_closure s in
+        closure_as_term cfg env t in
+      S.mk_Tm_app (closure_as_term cfg env head)
+        [(closure_as_term cfg env typ, aq); (close x, xq); (close y, yq)] r
   in
+  rebuild cfg empty_env stack t
+
+and norm_match cfg env stack (s:match_scrutinee) asc_opt branches lopt r : ML term =
+  let force s = force_match_scrutinee cfg s in
   let is_cons head =
     match (U.un_uinst head).n with
     | Tm_constant _ -> true
@@ -2993,7 +3081,7 @@ and norm_match cfg env stack (s:match_scrutinee) asc_opt branches lopt r : ML te
       let head, args = U.head_and_args_full (U.unlazy (U.unmeta t)) in
       (match (U.un_uinst head).n with
        | Tm_fvar fv' when S.fv_eq fv fv' ->
-         matches_args [] (fields s cenv args) ps
+         matches_args [] (match_scrutinee_fields s cenv args) ps
        | _ -> Inr (not (is_cons head)))
   and matches_args out args ps : ML (either (list (bv & match_scrutinee)) bool) =
     match args, ps with
