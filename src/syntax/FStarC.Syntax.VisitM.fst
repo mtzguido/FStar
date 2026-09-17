@@ -141,7 +141,9 @@ let on_sub_term #m {|d : lvm m |} (tm : term) : ML (m term) =
   let tm = compress tm in
   (* Preserve unchanged application spines during repeated readback. Still
      run every visitor callback: the visitor's monad may have effects. The
-     original range must also agree, since compression can retag a term. *)
+     original range must also agree, since compression can retag a term.
+     Check hash_code after the callbacks: internal nodes must discard their
+     memoized hash, and a callback can populate that memo during traversal. *)
   let can_reuse = BU.physical_equality original_pos tm.pos in
   match tm.n with
   | Tm_lazy _
@@ -160,19 +162,20 @@ let on_sub_term #m {|d : lvm m |} (tm : term) : ML (m term) =
   | Tm_uinst (f, us) ->
     let! f' = f_term f in
     let! us' = mapM f_univ us in
-    return (if can_reuse && BU.physical_equality f f' && same_list us us'
+    return (if can_reuse && BU.physical_equality f f' && same_list us us' &&
+               None? !tm.hash_code
             then tm else mk (Tm_uinst (f', us')))
 
   | Tm_type u ->
     let! u' = u |> f_univ in
-    return (if can_reuse && BU.physical_equality u u'
+    return (if can_reuse && BU.physical_equality u u' && None? !tm.hash_code
             then tm else mk (Tm_type u'))
 
   | Tm_app {hd; arg} ->
     let! hd'  = f_term hd in
     let! arg' = f_arg #m #d arg in
     return (if can_reuse && BU.physical_equality hd hd' &&
-               BU.physical_equality arg arg'
+               BU.physical_equality arg arg' && None? !tm.hash_code
             then tm else mk (Tm_app {hd=hd'; arg=arg'}))
 
   | Tm_abs {b; body=t; rc_opt} ->

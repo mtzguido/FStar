@@ -67,7 +67,36 @@ let readback_sharing_tests () : ML unit =
     (fun u -> u) t in
   let aq' = Some {aqual_implicit=true; aqual_attributes=[U.exp_int 10]} in
   let expected = S.mk_Tm_app f [(stable, aq'); S.as_arg poly] r in
-  always 736 (term_eq changed_attr expected && not (BU.physical_equality changed_attr t))
+  always 736 (term_eq changed_attr expected && not (BU.physical_equality changed_attr t));
+  (* The visitor discards cached hashes of internal nodes. Preserve that
+     contract without mutating the input's memo, even for an identity visit. *)
+  List.iter (fun (id, node) ->
+    let h = Syntax.Hash.ext_hash_term node in
+    let visited = visit (fun t -> t) (fun u -> u) node in
+    always id (None? !visited.hash_code && !node.hash_code = Some h &&
+               not (BU.physical_equality node visited)))
+    [(737, stable); (738, S.mk (Tm_type U_zero) r); (739, poly)];
+  (* A child callback may populate its parent's memo during traversal. *)
+  let leaf = U.exp_int 11 in
+  let parent = S.mk_Tm_app f [S.as_arg leaf] r in
+  let visited = visit
+    (fun t ->
+      if BU.physical_equality t leaf then
+        ignore (Syntax.Hash.ext_hash_term parent);
+      t)
+    (fun u -> u) parent in
+  always 740 (None? !visited.hash_code && Some? !parent.hash_code);
+  (* A universe union can change the hash without changing the syntax. *)
+  let u = Syntax.Unionfind.univ_fresh r in
+  let v = Syntax.Unionfind.univ_fresh r in
+  let typ = S.mk (Tm_type (U_unif v)) r in
+  let old_hash = Syntax.Hash.ext_hash_term typ in
+  Syntax.Unionfind.univ_union u v;
+  let visited = visit (fun t -> t) (fun u -> u) typ in
+  let expected_hash = Syntax.Hash.ext_hash_term_no_memo typ in
+  always 741 (None? !visited.hash_code &&
+              Syntax.Hash.ext_hash_term visited = expected_hash &&
+              !typ.hash_code = Some old_hash)
 
 (* Count reductions, rather than timing them: a correct result alone cannot
    detect eagerly evaluated fields or repeated work across failed branches. *)
