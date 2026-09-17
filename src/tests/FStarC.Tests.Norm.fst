@@ -33,6 +33,42 @@ open FStarC.Syntax.Subst { subst }
 
 open FStarC.Class.Show
 
+(* Universe readback must preserve unchanged syntax without skipping the
+   visitor's effects, and rebuild paths whose terms or attributes change. *)
+let readback_sharing_tests () : ML unit =
+  let r = dummyRange in
+  let f = S.fvar (lid_of_path ["Test"; "readback"] r) None in
+  let stable = S.mk_Tm_app f [S.as_arg (U.exp_int 7); S.as_arg (U.exp_int 8)] r in
+  let attr = U.exp_int 9 in
+  let aq = Some {aqual_implicit=true; aqual_attributes=[attr]} in
+  let poly = S.mk_Tm_uinst f [U_zero] in
+  let t = S.mk_Tm_app f [(stable, aq); S.as_arg poly] r in
+  let terms = mk_ref 0 in
+  let univs = mk_ref 0 in
+  let visit (vt:term -> ML term) (vu:universe -> ML universe) (t:term) : ML term =
+    terms := 0;
+    univs := 0;
+    Syntax.Visit.visit_term_univs false
+      (fun t -> terms := !terms + 1; vt t)
+      (fun u -> univs := !univs + 1; vu u) t in
+  let unchanged = visit (fun t -> t) (fun u -> u) t in
+  always 730 (BU.physical_equality unchanged t);
+  always 731 (!terms = 11 && !univs = 1);
+  let erased = visit (fun t -> t) (fun _ -> U_unknown) t in
+  let expected = S.mk_Tm_app f [(stable, aq); S.as_arg (S.mk_Tm_uinst f [U_unknown])] r in
+  always 732 (term_eq erased expected && not (BU.physical_equality erased t));
+  let _, args = U.head_and_args_full erased in
+  always 733 (BU.physical_equality (fst (List.hd args)) stable);
+  always 734 (!terms = 11 && !univs = 1);
+  let erased_again = visit (fun t -> t) (fun _ -> U_unknown) erased in
+  always 735 (BU.physical_equality erased_again erased && !terms = 11 && !univs = 1);
+  let changed_attr = visit
+    (fun t -> if BU.physical_equality t attr then U.exp_int 10 else t)
+    (fun u -> u) t in
+  let aq' = Some {aqual_implicit=true; aqual_attributes=[U.exp_int 10]} in
+  let expected = S.mk_Tm_app f [(stable, aq'); S.as_arg poly] r in
+  always 736 (term_eq changed_attr expected && not (BU.physical_equality changed_attr t))
+
 (* Count reductions, rather than timing them: a correct result alone cannot
    detect eagerly evaluated fields or repeated work across failed branches. *)
 let demand_matching_tests () : ML unit =
@@ -630,4 +666,5 @@ let run_all () : ML unit =
   in
 
   run_all ();
-  demand_matching_tests ()
+  demand_matching_tests ();
+  readback_sharing_tests ()
