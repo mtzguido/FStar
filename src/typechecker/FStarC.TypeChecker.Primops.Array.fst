@@ -20,15 +20,15 @@ module U       = FStarC.Syntax.Util
 let as_primitive_step is_strong (l, arity, u_arity, (f:interp_t), (f_nbe : nbe_interp_t)) =
   FStarC.TypeChecker.Primops.Base.as_primitive_step_nbecbs is_strong (l, arity, u_arity, f, f_nbe)
 
-let arg_as_int (a:arg) : ML (option int) = fst a |> try_unembed_simple
+let arg_as_int norm_cb (a:arg) : ML (option int) = EMB.try_unembed (fst a) norm_cb
 
-let arg_as_list {|e:EMB.embedding 'a|} (a:arg)
+let arg_as_list {|e:EMB.embedding 'a|} norm_cb (a:arg)
 : ML (option (list 'a))
-  = fst a |> try_unembed_simple
+  = EMB.try_unembed (fst a) norm_cb
 
 let mixed_binary_op
-  (as_a : arg -> ML (option 'a))
-  (as_b : arg -> ML (option 'b))
+  (as_a : EMB.norm_cb -> arg -> ML (option 'a))
+  (as_b : EMB.norm_cb -> arg -> ML (option 'b))
   (embed_c : Range.t -> 'c -> ML term)
   (f : Range.t -> universes -> 'a -> 'b -> ML (option 'c))
   (psc : psc)
@@ -39,7 +39,7 @@ let mixed_binary_op
   = match args with
     | [a;b] ->
        begin
-       match as_a a, as_b b with
+       match as_a norm_cb a, as_b norm_cb b with
        | Some a, Some b ->
          (match f psc.psc_range univs a b with
           | Some c -> Some (embed_c psc.psc_range c)
@@ -49,9 +49,9 @@ let mixed_binary_op
     | _ -> None
 
 let mixed_ternary_op
-  (as_a : arg -> ML (option 'a))
-  (as_b : arg -> ML (option 'b))
-  (as_c : arg -> ML (option 'c))
+  (as_a : EMB.norm_cb -> arg -> ML (option 'a))
+  (as_b : EMB.norm_cb -> arg -> ML (option 'b))
+  (as_c : EMB.norm_cb -> arg -> ML (option 'c))
   (embed_d : Range.t -> 'd -> ML term)
   (f : Range.t -> universes -> 'a -> 'b -> 'c -> ML (option 'd))
   (psc : psc)
@@ -62,7 +62,7 @@ let mixed_ternary_op
   = match args with
     | [a;b;c] ->
        begin
-       match as_a a, as_b b, as_c c with
+       match as_a norm_cb a, as_b norm_cb b, as_c norm_cb c with
        | Some a, Some b, Some c ->
          (match f psc.psc_range univs a b c with
           | Some d -> Some (embed_d psc.psc_range d)
@@ -110,9 +110,9 @@ let ops : list primitive_step =
     in
     (  PC.immutable_array_of_list_lid, 2, 1,
        mixed_binary_op
-          (fun (elt_t, _) -> Some elt_t) //the first arg of of_list is the element type
-          (fun (l, q) -> //2nd arg: try_unembed_simple as a list term
-            match arg_as_list #_ #FStarC.Syntax.Embeddings.e_any (l, q) with
+          (fun _cb (elt_t, _) -> Some elt_t) //the first arg of of_list is the element type
+          (fun cb (l, q) -> //Demand the list spine, preserving its elements as terms.
+            match arg_as_list #_ #FStarC.Syntax.Embeddings.e_any cb (l, q) with
             | Some lst -> Some (l, lst)
             | _ -> None)
           (fun r (universes, elt_t, (l, blob)) ->
@@ -133,8 +133,8 @@ let ops : list primitive_step =
              Some (universes, elt_t, (l, FStar.Dyn.mkdyn blob))),
        nbe_of_list)
   in
-  let arg1_as_elt_t (x:arg) : option term = Some (fst x) in
-  let arg2_as_blob (x:arg) : ML (option FStar.Dyn.dyn) =
+  let arg1_as_elt_t (_cb:EMB.norm_cb) (x:arg) : option term = Some (fst x) in
+  let arg2_as_blob (_cb:EMB.norm_cb) (x:arg) : ML (option FStar.Dyn.dyn) =
       //try_unembed_simple an arg as a IA.t blob if the emb_typ
       //of the lkind tells us it has the right type
       match (SS.compress (fst x)).n with
@@ -193,5 +193,7 @@ let ops : list primitive_step =
   in
   let s1 = as_primitive_step true of_list_op in
   let s2 = as_primitive_step true length_op in
-  let s3 = as_primitive_step true index_op in
+  (* Elements are retained as terms by of_list; only the selected element
+     needs normalization when indexing the array. *)
+  let s3 = {as_primitive_step true index_op with renorm_after = true} in
   [s1; s2; s3]

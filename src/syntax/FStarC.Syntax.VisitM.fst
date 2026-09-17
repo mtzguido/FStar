@@ -6,6 +6,8 @@ open FStarC.List
 
 open FStarC.Class.Monad
 
+module BU = FStarC.Util
+
 open FStarC.Syntax
 open FStarC.Syntax.Syntax
 
@@ -42,16 +44,30 @@ let novfs (#m:Type->Type) {| monad m |} : lvm m = {
   proc_quotes     = false;
 }
 
+let same_option (#a:Type) (x y:option a) =
+  match x, y with
+  | None, None -> true
+  | Some x, Some y -> BU.physical_equality x y
+  | _ -> false
+
+let rec same_list (#a:Type) (xs ys:list a) =
+  match xs, ys with
+  | [], [] -> true
+  | x::xs, y::ys -> BU.physical_equality x y && same_list xs ys
+  | _ -> false
+
 let f_aqual #m {|_ : lvm m|} aq : ML (m _) =
   let  {aqual_implicit=i; aqual_attributes=attrs} = aq in
-  let! attrs = mapM f_term attrs in
-  return {aqual_implicit=i; aqual_attributes=attrs}
+  let! attrs' = mapM f_term attrs in
+  return (if same_list attrs attrs' then aq
+          else {aqual_implicit=i; aqual_attributes=attrs'})
 
 let on_sub_arg #m {|_ : lvm m|} (a : arg) : ML (m arg) =
   let  (t, q) = a in
-  let! t = t |> f_term in
-  let! q = q |> map_optM f_aqual in
-  return (t, q)
+  let! t' = t |> f_term in
+  let! q' = q |> map_optM f_aqual in
+  return (if BU.physical_equality t t' && same_option q q' then a
+          else (t', q'))
 
 let on_sub_tscheme #m {| monad m |} {|_ : lvm m|}  (ts : tscheme) : ML (m tscheme) =
   let  (us, t) = ts in
@@ -121,7 +137,14 @@ let rec compress (tm:term) : ML term =
 recursion on deep subterms comes from the knot being tied below. *)
 let on_sub_term #m {|d : lvm m |} (tm : term) : ML (m term) =
   let mk t = Syntax.mk t tm.pos in
+  let original_pos = tm.pos in
   let tm = compress tm in
+  (* Preserve unchanged application spines during repeated readback. Still
+     run every visitor callback: the visitor's monad may have effects. The
+     original range must also agree, since compression can retag a term.
+     Check hash_code after the callbacks: internal nodes must discard their
+     memoized hash, and a callback can populate that memo during traversal. *)
+  let can_reuse = BU.physical_equality original_pos tm.pos in
   match tm.n with
   | Tm_lazy _
   | Tm_delayed _ ->
@@ -137,18 +160,23 @@ let on_sub_term #m {|d : lvm m |} (tm : term) : ML (m term) =
     return tm
 
   | Tm_uinst (f, us) ->
-    let! f = f_term f in
-    let! us = mapM f_univ us in
-    return <| mk (Tm_uinst (f, us))
+    let! f' = f_term f in
+    let! us' = mapM f_univ us in
+    return (if can_reuse && BU.physical_equality f f' && same_list us us' &&
+               None? !tm.hash_code
+            then tm else mk (Tm_uinst (f', us')))
 
   | Tm_type u ->
-    let! u = u |> f_univ in
-    return <| mk (Tm_type u)
+    let! u' = u |> f_univ in
+    return (if can_reuse && BU.physical_equality u u' && None? !tm.hash_code
+            then tm else mk (Tm_type u'))
 
   | Tm_app {hd; arg} ->
-    let! hd    = f_term hd in
-    let! arg   = f_arg #m #d arg in
-    return <| mk (Tm_app {hd; arg})
+    let! hd'  = f_term hd in
+    let! arg' = f_arg #m #d arg in
+    return (if can_reuse && BU.physical_equality hd hd' &&
+               BU.physical_equality arg arg' && None? !tm.hash_code
+            then tm else mk (Tm_app {hd=hd'; arg=arg'}))
 
   | Tm_abs {b; body=t; rc_opt} ->
     let! b      = f_binder b in

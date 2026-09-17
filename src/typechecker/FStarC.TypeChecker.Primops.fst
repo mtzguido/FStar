@@ -121,7 +121,7 @@ let short_circuit_ops : list primitive_step =
     fun _cb _us args -> NBETerm.or_op args in
   let s1 = as_primitive_step true PC.op_And 2 0 and_op nbe_and in
   let s2 = as_primitive_step true PC.op_Or 2 0 or_op nbe_or in
-  [s1; s2]
+  [{s1 with renorm_after=true}; {s2 with renorm_after=true}]
 
 let built_in_primitive_steps_list : list primitive_step =
   simple_ops

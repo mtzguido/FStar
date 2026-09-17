@@ -47,6 +47,7 @@ module EMB = FStarC.Syntax.Embeddings
 module TcComm = FStarC.TypeChecker.Common
 module Free = FStarC.Syntax.Free
 module PO = FStarC.TypeChecker.Primops
+module TEQ = FStarC.TypeChecker.TermEqAndSimplify
 module Print = FStarC.Syntax.Print //bring into scope for show instances
 open FStarC.TypeChecker.Normalize.Unfolding
 
@@ -364,14 +365,14 @@ let check_strict (cfg : Cfg.cfg) (hua : fv & universes & args) : ML (option bool
  * exact same object in memory. See read_memo and set_memo below.
  *
  * The normalizer constantly alternates between weak and strong
- * normalization (e.g. match scrutinees are first weakly reduced, and
- * then strongly reduced), and the results of these two modes are not
+ * normalization (e.g. a field is inspected by a pattern and later
+ * normalized fully by the selected branch), and the results are not
  * interchangeable. To avoid each mode invalidating the memo of the
  * other one (causing repeated recomputation, see issue #4394), we keep
  * independent memo cells, one per mode. There are three modes: strong
  * normalization, weak normalization, and weak head normalization (the
- * last one is used to reduce the scrutinee of a projector or
- * discriminator; see whnf_cfg and issue #4463). *)
+ * last one is used to inspect patterns, projectors, and discriminators;
+ * see whnf_cfg and issue #4463). *)
 type cfg_memo 'a = {
   weak_memo   : memo (Cfg.cfg & 'a);
   whnf_memo   : memo (Cfg.cfg & 'a);
@@ -426,6 +427,9 @@ type stack_elt =
  | CBVApp   of env & term & aqual & Range.t
  | Meta     of env & S.metadata & Range.t
  | Let      of env & binders & letbinding & Range.t
+ (* A terminal continuation requesting a WHNF closure, rather than a closed
+    term. In particular, constructor fields must retain their shared env. *)
+ | Closure  of (env -> term -> ML term)
 type stack = list stack_elt
 
 let head_of t = let hd, _ = U.head_and_args_full t in hd
@@ -437,31 +441,10 @@ let cfg_equivalent (c1 c2 : Cfg.cfg) : ML bool =
   c1.delta_level =? c2.delta_level &&
   c1.normalize_pure_lets =? c2.normalize_pure_lets
 
-(* The cfg used to weakly reduce the scrutinee of a match (see the Tm_match
-   case of norm). We cache the last one so that, besides saving the allocation,
-   the same cfg object is reused across calls: memo lookups then succeed on the
-   cheap physical equality test instead of a structural comparison of the whole
-   fsteps record. *)
-let weak_cfg_cache : ref (option (Cfg.cfg & Cfg.cfg)) = mk_ref None
-
-let weak_cfg (cfg:Cfg.cfg) : ML Cfg.cfg =
-  if cfg.steps.weak then cfg
-  else
-    match !weak_cfg_cache with
-    | Some (cfg0, cfg0') when BU.physical_equality cfg cfg0 -> cfg0'
-    | _ ->
-      let cfg' = { cfg with steps = { cfg.steps with weak = true } } in
-      weak_cfg_cache := Some (cfg, cfg');
-      cfg'
-
-(* The cfg used to reduce the scrutinee of a projector or discriminator to
-   weak head normal form (see the Tm_app case of norm). Like weak_cfg it is
-   cached, so that the same object is reused across calls and memo lookups
-   succeed on physical equality (issue #4463).
-
-   It sets [weak], not just [hnf]: otherwise the result would land in the memo
-   cell of the enclosing strong normalization and the two modes would evict
-   each other's memos, which is exactly the pathology of issue #4394. *)
+(* Inspect match scrutinees and projector arguments in WHNF. Cache this cfg
+   so repeated inspections can reuse the same physical cfg for memo lookups.
+   Keep both [weak] and [hnf] set: otherwise WHNF results would evict strong
+   normalization results from the same memo slot (issues #4394 and #4463). *)
 let whnf_cfg_cache : ref (option (Cfg.cfg & Cfg.cfg)) = mk_ref None
 
 let whnf_cfg (cfg:Cfg.cfg) : ML Cfg.cfg =
@@ -514,6 +497,7 @@ instance showable_stack_elt : showable stack_elt = {
   show = (function
           | Arg (c, _, _) -> Format.fmt1 "Arg %s" (show c)
           | MemoLazy _ -> "MemoLazy"
+          | Closure _ -> "Closure"
           | Abs (_, bs, _, _, _) -> Format.fmt1 "Abs %s" (show <| List.length bs)
           | UnivArgs us -> "UnivArgs " ^ show us
           | Match   _ -> "Match"
@@ -527,9 +511,84 @@ let is_empty = function
     | [] -> true
     | _ -> false
 
+(* Only memo frames may precede a closure continuation: arguments, matches,
+   etc. still have to be reduced before the constructor is a result. *)
+let rec wants_closure (stack:stack) : bool =
+  match stack with
+  | MemoLazy _ :: stack -> wants_closure stack
+  | [Closure _] -> true
+  | _ -> false
+
+let rec return_closure cfg env stack t : ML term =
+  match stack with
+  | MemoLazy r :: stack ->
+    set_memo cfg r (env, t);
+    return_closure cfg env stack t
+  | [Closure k] -> k env t
+  | _ -> failwith "return_closure: unexpected stack"
+
 let lookup_bvar (env : env) x =
     try (List.nth env x.index)._2
     with _ -> failwith (Format.fmt2 "Failed to find %s\nEnv is %s\n" (show x) (show env))
+
+(* The nodes of this tree are shared by every branch of one match. Neither
+   constructing a node nor binding it to a pattern variable forces its term.
+   The view and its children are installed only when a pattern needs them. *)
+type match_scrutinee = {
+  source : closure;
+  whnf : memo (env & term);
+  fields : memo (list (match_scrutinee & aqual));
+}
+
+let mk_match_scrutinee env t : ML match_scrutinee =
+  let source =
+    match t.n with
+    | Tm_bvar x ->
+      let c = lookup_bvar env x in
+      (match c with
+       | Clos (_, _, _, false) -> c
+       | _ -> Clos (env, t, fresh_cfg_memo (), false))
+    | _ -> Clos (env, t, fresh_cfg_memo (), false)
+  in
+  {source; whnf = fresh_memo (); fields = fresh_memo ()}
+
+let match_scrutinee_fields s env args : ML (list (match_scrutinee & aqual)) =
+  match !s.fields with
+  | Some fields -> fields
+  | None ->
+    let fields = List.map (fun (t, aq) -> mk_match_scrutinee env t, aq) args in
+    s.fields := Some fields;
+    fields
+
+(* Resume from everything the patterns have already forced, including nested
+   fields. Keep uninspected fields as their original closures. The additional
+   environment entries avoid substituting those fields back into syntax. *)
+let rec match_scrutinee_closure (s:match_scrutinee) : ML closure =
+  match !s.whnf with
+  | None -> s.source
+  | Some (env, t) ->
+    let env, t =
+      match !s.fields with
+      | None -> env, t
+      | Some fields ->
+        let offset = List.length env in
+        let entries, args = fields |> List.mapi (fun i (field, aq) ->
+          let bv = { ppname = Ident.mk_ident ("_", t.pos);
+                     index = offset + i; sort = S.tun } in
+          ((None, match_scrutinee_closure field, fresh_memo ()),
+           (S.bv_to_tm bv, aq))) |> List.unzip in
+        let rec replace_args t : ML term =
+          match (SS.compress t).n with
+          | Tm_meta {tm; meta} ->
+            S.mk (Tm_meta {tm = replace_args tm; meta}) t.pos
+          | Tm_lazy _ -> replace_args (U.unlazy t)
+          | _ ->
+            let head, _ = U.head_and_args_full t in
+            S.mk_Tm_app head args t.pos
+        in
+        env @ entries, replace_args t
+    in
+    Clos (env, t, fresh_cfg_memo (), false)
 
 let downgrade_ghost_effect_name l =
     if Ident.lid_equals l PC.effect_Ghost_lid
@@ -735,7 +794,7 @@ let mk_psc_subst cfg (env:env) =
 (* Boolean indicates whether further normalization of the result is
 required. It is usually false, unless we call into a 'renorm' primitive
 step. *)
-let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
+let reduce_primops (norm_cb:EMB.norm_cb) cfg (env:env) tm : ML (term & bool) =
     if not cfg.steps.primops
     then tm, false
     else begin
@@ -770,6 +829,17 @@ let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
                                             then mk_psc_subst cfg env
                                             else []
                   } in
+                  (* The argument heads have already been normalized before
+                     reaching this primitive. Decoders may demand their lazy
+                     fields, but retrying an argument itself makes symbolic
+                     arithmetic revisit its operands exponentially. *)
+                  let norm_cb : EMB.norm_cb = fun request ->
+                    match request with
+                    | Inr x when List.existsb (fun (a, _) ->
+                        BU.physical_equality x
+                          (SS.compress (EMB.unmeta_div_results a))) args_1 -> x
+                    | _ -> norm_cb request
+                  in
                   let r =
                       if false
                       then begin let (r, ns) = Timing.record_ns (fun () -> prim_step.interpretation psc norm_cb universes args_1) in
@@ -808,8 +878,8 @@ let reduce_primops norm_cb cfg (env:env) tm : ML (term & bool) =
            log_primops cfg (fun () -> Format.print1 "primop: reducing <%s>\n" (show tm));
            begin match args with
            | [(t, _); (r, _)] ->
-                begin match PO.try_unembed_simple r with
-                | Some rng -> Subst.set_use_range rng t, false
+                begin match EMB.try_unembed r norm_cb with
+                | Some rng -> Subst.set_use_range rng t, true
                 | None -> tm, false
                 end
            | _ -> tm, false
@@ -990,16 +1060,61 @@ let is_fext_on_domain (t:term) : ML (option term) =
 let __get_n_binders : ref ((env:Env.env) -> list step -> (n:int) -> (t:term) -> ML (list binder & comp)) =
   mk_ref (fun e s n t -> failwith "Impossible: __get_n_binders unset")
 
-(* Returns `true` iff the head of `t` is a primop, and
-it not applied or only partially applied. *)
-let is_partial_primop_app (cfg:Cfg.cfg) (t:term) : ML bool =
+(* Whether a primitive needs its next argument to make progress. Boolean
+   short-circuiting only needs the first argument; the second is selected
+   below once the first has a value. *)
+let primop_needs_arg (cfg:Cfg.cfg) (t:term) : ML bool =
   let hd, args = U.head_and_args_full t in
   match (U.un_uinst hd).n with
+  | Tm_fvar fv when cfg.steps.primops && List.length args = 1 &&
+                   (S.fv_eq_lid fv PC.op_And || S.fv_eq_lid fv PC.op_Or) -> false
   | Tm_fvar fv ->
     begin match find_prim_step cfg fv with
     | Some prim_step -> prim_step.arity > List.length args
     | None -> false
     end
+  | _ -> false
+
+(* Inl returns the known result without even closing the unused argument.
+   Inr selects the argument in its original closure environment. *)
+let short_circuit_bool (cfg:Cfg.cfg) (t:term) : ML (option (either bool unit)) =
+  if not (cfg.steps.hnf && cfg.steps.primops) then None
+  else
+    let hd, args = U.head_and_args_full t in
+    match (U.un_uinst hd).n, args with
+    | Tm_fvar fv, [(a, None)] when
+        S.fv_eq_lid fv PC.op_And || S.fv_eq_lid fv PC.op_Or ->
+      (match (PO.try_unembed_simple a <: option bool) with
+       | Some b ->
+         if b = S.fv_eq_lid fv PC.op_Or then Some (Inl b)
+         else Some (Inr ())
+       | None -> None)
+    | _ -> None
+
+(* A strict_on_arguments definition also needs its designated arguments in
+   WHNF before it may unfold. Do not inspect other arguments, or inspect a
+   partial application that cannot yet satisfy the strictness annotation. *)
+let is_strict_arg cfg t stack : ML bool =
+  let head, args = U.head_and_args_full t in
+  match (U.un_uinst head).n with
+  | Tm_fvar fv ->
+    (match Env.fv_has_strict_args cfg.tcenv fv with
+     | None -> false
+     | Some indices ->
+       let rec pending_args stack : ML int =
+         match stack with
+         | Arg _::stack -> 1 + pending_args stack
+         | Meta _::stack | MemoLazy _::stack -> pending_args stack
+         | _ -> 0 in
+       let i = List.length args in
+       let arity = i + 1 + pending_args stack in
+       if not (List.contains i indices && List.for_all (fun j -> j < arity) indices)
+       then false
+       else
+         let qninfo = Env.lookup_qname cfg.tcenv fv.fv_name in
+         let cfg_zeta = {cfg with steps = {cfg.steps with zeta = true}} in
+         Some? (Env.lookup_definition_qninfo cfg.delta_level fv.fv_name qninfo) &&
+         Should_unfold_yes? (should_unfold true cfg_zeta (fun _ -> false) fv qninfo))
   | _ -> false
 
 let maybe_drop_rc_typ cfg (rc:residual_comp) : ML residual_comp =
@@ -1351,7 +1466,10 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
                    then match read_memo cfg r with
                         | Some (env, t') ->
                             log cfg  (fun () -> Format.print2 "Lazy hit: %s cached to %s\n" (show t) (show t'));
-                            if maybe_weakly_reduced t'
+                            (* A WHNF constructor, like an abstraction, may be
+                               memoized with its environment still attached. *)
+                            if Cons? env then norm cfg env stack t'
+                            else if maybe_weakly_reduced t'
                             then match stack with
                                  | [] when cfg.steps.weak || cfg.steps.compress_uvars ->
                                    rebuild cfg env stack t'
@@ -1453,6 +1571,7 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
             | App _ :: _
             | CBVApp _ :: _
             | Abs _ :: _
+            | Closure _ :: _
             | [] ->
               fallback ()
             end
@@ -1463,7 +1582,7 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
             let head, args = U.head_and_args_full t in
             (* Each argument is pushed together with the environment it lives
                in: they are usually all under [env], but a scrutinee that we
-               have already reduced (see below) is closed. *)
+               have already reduced (see below) may have its own environment. *)
             let push_args_env args stack =
               List.fold_right
                 (fun ((a, aq), env) stack ->
@@ -1486,13 +1605,64 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
                     | Tm_fvar _ -> empty_env
                     | _ -> env
                   in
-                  Arg (Clos(env, a, fresh_cfg_memo (), false),aq,t.pos)::stack)
+                  (* Passing a variable passes its existing thunk. Wrapping it
+                     in another closure would retain this entire environment,
+                     including unrelated arguments, for as long as the thunk
+                     survives. It would also give the alias a separate memo.
+                     Keep recursive bindings behind the variable lookup so its
+                     zeta checks still govern opening the recursive knot. *)
+                  let c =
+                    match a.n with
+                    | Tm_bvar x ->
+                      let c = lookup_bvar env x in
+                      (match c with
+                       | Clos (_, _, _, false) -> c
+                       | _ -> Clos (env, a, fresh_cfg_memo (), false))
+                    | _ -> Clos (env, a, fresh_cfg_memo (), false)
+                  in
+                  Arg (c,aq,t.pos)::stack)
                 args
                 stack
             in
             let push_args env args stack =
               push_args_env (args |> List.map (fun a -> (a, env))) stack
             in
+            (* Equality can demand fields even while computing only a head. *)
+            if cfg.steps.hnf && cfg.steps.primops && List.length args = 3 &&
+               (match (U.un_uinst head).n with
+                | Tm_fvar fv -> S.fv_eq_lid fv PC.op_Eq || S.fv_eq_lid fv PC.op_notEq
+                | _ -> false)
+            then norm_decidable_equality cfg env stack head args t.pos
+            else
+            (* Do not close a constructor just to inspect one of its fields.
+               Give each argument a closure of its own before memoizing the
+               constructor, so repeated selections share the field's memo too
+               (not merely the environments of its subterms). See #4537. *)
+            if cfg.steps.hnf && wants_closure stack &&
+               (match (U.un_uinst head).n with
+                | Tm_fvar fv -> Env.is_datacon cfg.tcenv fv.fv_name
+                | _ -> false)
+            then
+              let cenv, cargs =
+                push_args env args [] |> List.mapi (fun i arg ->
+                  match arg with
+                  | Arg (c, aq, _) ->
+                    let bv = { ppname = Ident.mk_ident ("_", t.pos);
+                               index = i; sort = S.tun } in
+                    ((None, c, fresh_memo ()), (S.bv_to_tm bv, aq))
+                  | _ -> failwith "push_args: expected Arg")
+                |> List.unzip
+              in
+              (* The head's universe variables refer to [env], not [cenv]. *)
+              let head =
+                match head.n with
+                | Tm_uinst (h, us) ->
+                  if cfg.steps.erase_universes then h
+                  else S.mk_Tm_uinst h (List.map (norm_universe cfg env) us)
+                | _ -> head
+              in
+              return_closure cfg cenv stack (S.mk_Tm_app head cargs t.pos)
+            else
             let fallback args =
               let stack = push_args_env args stack in
               log cfg (fun () -> Format.print1 "\tPushed %s arguments\n" (show <| List.length args));
@@ -1544,16 +1714,14 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
              | Some (d, is_disc, n_indexed, idx) when List.length args > n_indexed ->
                let scrutinee0, aq = List.nth args n_indexed in
                let cfg' = whnf_cfg cfg in
-               (* The reduced scrutinee is closed, hence the empty environments
-                  below. *)
-               let scrutinee = norm cfg' env [] scrutinee0 in
-               (match reduce_disc_proj cfg d is_disc idx scrutinee with
+               let project scrutinee_env scrutinee =
+                match reduce_disc_proj cfg d is_disc idx scrutinee with
                 | None ->
                   (* Stuck: keep the weak head normal form we just computed
                      rather than making the enclosing pass recompute it. *)
                   let args =
                     args |> List.mapi (fun i a ->
-                      if i = n_indexed then ((scrutinee, aq), empty_env) else (a, env))
+                      if i = n_indexed then ((scrutinee, aq), scrutinee_env) else (a, env))
                   in
                   unfold_fallback args
                 | Some field ->
@@ -1563,7 +1731,9 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
                      the extra arguments are re-applied to the selected field. *)
                   let _, rest = BU.first_N (n_indexed + 1) args in
                   let stack = push_args env rest stack in
-                  norm cfg empty_env stack field)
+                  norm cfg scrutinee_env stack field
+               in
+               norm cfg' env [Closure project] scrutinee0
              | _ -> fallback (args |> List.map (fun a -> (a, env))))
 
           | Tm_refine {b=x}
@@ -1610,6 +1780,7 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
               form of t1? *)
               match s with
               | Match _ :: _
+              | Closure _ :: _
               | Arg _ :: _
               | App (_, {n=Tm_constant (FC.Const_reify _)}, _, _) :: _
               | MemoLazy _ :: _ when cfg.steps.beta ->
@@ -1631,14 +1802,10 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
 
           | Tm_match {scrutinee=head; ret_opt=asc_opt; brs=branches; rc_opt=lopt} ->
             let lopt = Option.map (maybe_drop_rc_typ cfg) lopt in
-            let stack = Match(env, asc_opt, branches, lopt, cfg, t.pos)::stack in
             if cfg.steps.iota
-                && cfg.steps.weakly_reduce_scrutinee
-                && not cfg.steps.weak
-            then let cfg' = weak_cfg cfg in
-                 let head_norm = norm cfg' env [] head in
-                 rebuild cfg env stack head_norm
-            else norm cfg env stack head
+            then norm_match cfg env stack (mk_match_scrutinee env head)
+                            asc_opt branches lopt t.pos
+            else norm cfg env (Match(env, asc_opt, branches, lopt, cfg, t.pos)::stack) head
 
           | Tm_let {lbs=(b, lbs); body=lbody} when is_top_level lbs && cfg.steps.compress_uvars ->
             let lbs = lbs |> List.map (fun lb ->
@@ -2658,6 +2825,10 @@ and rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
 and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
       match stack with
       | [] -> t
+      (* [rebuild] receives a closed term. Constructor applications can bypass
+         it via [return_closure], retaining their original environment. *)
+      | [Closure k] -> k empty_env t
+      | Closure _ :: _ -> failwith "Closure continuation must be terminal"
 
       | Meta(_, m, r)::stack ->
         let t =
@@ -2676,9 +2847,15 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
         rebuild cfg env stack t
 
       | MemoLazy r::stack ->
-        set_memo cfg r (env, t);
+        (* Unlike the closures memoized by [norm], [t] is already closed.
+           Dropping [env] also lets cache hits distinguish these results from
+           constructor/abstraction closures that must re-enter [norm]. *)
+        set_memo cfg r (empty_env, t);
         log cfg  (fun () -> Format.print1 "\tSet memo %s\n" (show t));
-        rebuild cfg env stack t
+        (* A terminal closure and intervening memos cannot enable another
+           reduction. Retrying a blocked primitive would repeat its decoder. *)
+        if wants_closure stack then do_rebuild cfg env stack t
+        else rebuild cfg env stack t
 
       | Let(env', bs, lb, r)::stack ->
         let body = SS.close bs t in
@@ -2705,18 +2882,30 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
       | Arg (Clos(env_arg, tm, m, _), aq, r) :: stack ->
         log cfg (fun () -> Format.print1 "Rebuilding with arg %s\n" (show tm));
 
-        (* If we are doing hnf (and the head is not a primop), then there is
-        no need to normalize the argument. *)
-        if cfg.steps.hnf && not (is_partial_primop_app cfg t) then (
+        begin match (if aq = None then short_circuit_bool cfg t else None) with
+        | Some (Inl b) ->
+          rebuild cfg empty_env stack (if b then U.exp_true_bool else U.exp_false_bool)
+        | Some (Inr ()) ->
+          (match read_memo cfg m with
+           | Some (memo_env, a) -> norm cfg memo_env stack a
+           | None -> norm cfg env_arg (MemoLazy m::stack) tm)
+        | None ->
+        (* In HNF, only primitive operations and strict_on_arguments may
+           demand an argument before the head can reduce further. *)
+        if cfg.steps.hnf && not (primop_needs_arg cfg t) &&
+           not (is_strict_arg cfg t stack) then (
            let arg = closure_as_term cfg env_arg tm in
            let t = extend_app t (arg, aq) r in
            rebuild cfg env_arg stack t
         ) else (
           (* If the argument was already normalized+memoized, reuse it. *)
           match read_memo cfg m with
-          | Some (_, a) ->
-            let t = S.extend_app t (a, aq) r in
-            rebuild cfg env_arg stack t
+          | Some (memo_env, a) ->
+            if Cons? memo_env then
+              norm cfg memo_env (App(env, t, aq, r)::stack) a
+            else
+              let t = S.extend_app t (a, aq) r in
+              rebuild cfg env_arg stack t
 
           | None when not cfg.steps.iota ->
             (* If we are not doing iota, do not memoize the partial solution.
@@ -2738,6 +2927,7 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
             let stack = MemoLazy m::App(env, t, aq, r)::stack in
             norm cfg env_arg stack tm
         )
+        end
 
       | App(env, head, aq, r)::stack' when should_reify cfg stack ->
         let t0 = t in
@@ -2842,268 +3032,317 @@ and do_rebuild (cfg:cfg) (env:env) (stack:stack) (t:term) : ML term =
         norm cfg env' (Arg (Clos (env, t, fresh_cfg_memo (), false), aq, t.pos) :: stack) head
 
       | Match(env', asc_opt, branches, lopt, cfg, r) :: stack ->
-        let lopt = Option.map (norm_residual_comp cfg env') lopt in
-        log cfg  (fun () -> Format.print1 "Rebuilding with match, scrutinee is %s ...\n" (show t));
-        //the scrutinee is always guaranteed to be a pure or ghost term
-        //see tc.fs, the case of Tm_match and the comment related to issue #594
-        let scrutinee_env = env in
-        let env = env' in
-        let scrutinee = t in
-        let norm_and_rebuild_match () =
-          log cfg (fun () ->
-              Format.print2 "match is irreducible: scrutinee=%s\nbranches=%s\n"
-                    (show scrutinee)
-                    (branches |> List.map (fun (p, _, _) -> show p) |> String.concat "\n\t"));
-          // If either Weak or HNF, then don't descend into branch
-          let whnf = cfg.steps.weak || cfg.steps.hnf in
-          let cfg_exclude_zeta =
-            if cfg.steps.zeta_full
-            then cfg
-            else
-             let new_delta =
-               cfg.delta_level |> List.filter (function
-                 | Env.InliningDelta
-                 | Env.Eager_unfolding_only -> true
-                 | _ -> false)
-             in
-             let steps = {
-                    cfg.steps with
-                    zeta = false;
-                    unfold_until = None;
-                    unfold_only = None;
-                    unfold_attr = None;
-                    unfold_qual = None;
-                    unfold_namespace = None;
-                    dont_unfold_attr = None;
-             }
-             in
-            ({cfg with delta_level=new_delta; steps=steps; strong=true})
-          in
-          let norm_or_whnf env t =
-            if whnf
-            then closure_as_term cfg_exclude_zeta env t
-            else norm cfg_exclude_zeta env [] t
-          in
-          let rec norm_pat (env: list (option binder & closure & memo subst_t)) p : ML (pat & list (option binder & closure & memo subst_t)) = match p.v with
-            | Pat_constant _ -> p, env
-            | Pat_cons(fv, us_opt, pats) ->
-              let us_opt =
-                if cfg.steps.erase_universes
-                then None
-                else (
-                  match us_opt with
-                  | None -> None
-                  | Some us ->
-                    Some (List.map (norm_universe cfg env) us)
-                )
-              in
-              let pats, env = pats |> List.fold_left (fun (pats, env) (p, b) ->
-                    let p, env = norm_pat env p in
-                    (p,b)::pats, env) ([], env) in
-              {p with v=Pat_cons(fv, us_opt, List.rev pats)}, env
-            | Pat_var x ->
-              let x = {x with sort=norm_or_whnf env x.sort} in
-              {p with v=Pat_var x}, dummy () ::env
-            | Pat_dot_term eopt ->
-              let eopt = Option.map (norm_or_whnf env) eopt in
-              {p with v=Pat_dot_term eopt}, env
-          in
-          let norm_branches () =
-            match env with
-            | [] when whnf -> branches //nothing to close over
-            | _ -> branches |> List.map (fun branch ->
-              let p, wopt, e = SS.open_branch branch in
-              //It's important to normalize all the sorts within the pat!
-              let p, env = norm_pat env p in
-              let wopt = match wopt with
-                | None -> None
-                | Some w -> Some (norm_or_whnf env w) in
-              let e = norm_or_whnf env e in
-              U.branch (p, wopt, e))
-          in
-          let maybe_commute_matches () =
-            let can_commute =
-                match branches with
-                | ({v=Pat_cons(fv, _, _)}, _, _)::_ ->
-                  Env.fv_has_attr cfg.tcenv fv FStarC.Parser.Const.commute_nested_matches_lid
-                | _ -> false in
-            match (U.unascribe scrutinee).n with
-            | Tm_match {scrutinee=sc0;
-                        ret_opt=asc_opt0;
-                        brs=branches0;
-                        rc_opt=lopt0} when can_commute ->
-              (* We have a blocked match, because of something like
-
-                  (match (match sc0 with P1 -> e1 | ... | Pn -> en) with
-                   | Q1 -> f1 ... | Qm -> fm)
-
-                  We'll reduce it as if it was instead
-
-                  (match sc0 with
-                    | P1 -> (match e1 with | Q1 -> f1 ... | Qm -> fm)
-                    ...
-                    | Pn -> (match en with | Q1 -> f1 ... | Qm -> fm))
-
-                  if the Qi are constructors from an inductive marked with the
-                  commute_nested_matches attribute
-             *)
-             let reduce_branch (b:S.branch) =
-               //reduce the inner branch `b` while setting the continuation
-               //stack to be the outer match
-               let stack = [Match(env', asc_opt, branches, lopt, cfg, r)] in
-               let p, wopt, e = SS.open_branch b in
-               //It's important to normalize all the sorts within the pat!
-               let p, branch_env = norm_pat scrutinee_env p in
-               let wopt = match wopt with
-                | None -> None
-                | Some w -> Some (norm_or_whnf branch_env w) in
-               let e = norm cfg branch_env stack e in
-               U.branch (p, wopt, e)
-             in
-             let branches0 = List.map reduce_branch branches0 in
-             rebuild cfg env stack (mk (Tm_match {scrutinee=sc0;
-                                                  ret_opt=asc_opt0;
-                                                  brs=branches0;
-                                                  rc_opt=lopt0}) r)
-            | _ ->
-              let scrutinee =
-                if cfg.steps.iota
-                && (not cfg.steps.weak)
-                && (not cfg.steps.compress_uvars)
-                && cfg.steps.weakly_reduce_scrutinee
-                && maybe_weakly_reduced scrutinee
-                then norm ({cfg with steps={cfg.steps with weakly_reduce_scrutinee=false}})
-                          scrutinee_env
-                          []
-                          scrutinee //scrutinee was only reduced to wnf; reduce it fully
-                else scrutinee
-              in
-              let asc_opt = norm_match_returns cfg env asc_opt in
-              let branches = norm_branches() in
-              rebuild cfg env stack (mk (Tm_match {scrutinee;
-                                                   ret_opt=asc_opt;
-                                                   brs=branches;
-                                                   rc_opt=lopt}) r)
-          in
-          maybe_commute_matches()
-        in
-
-        let rec is_cons head : ML bool = match (SS.compress head).n with
-          | Tm_uinst(h, _) -> is_cons h
-          | Tm_constant _
-          | Tm_fvar( {fv_qual=Some Data_ctor} )
-          | Tm_fvar( {fv_qual=Some (Record_ctor _)} ) -> true
-          | _ -> false
-        in
-
-        let guard_when_clause wopt b rest =
-          match wopt with
-          | None -> b
-          | Some w ->
-            let then_branch = b in
-            let else_branch = mk (Tm_match {scrutinee;
-                                            ret_opt=asc_opt;
-                                            brs=rest;
-                                            rc_opt=lopt}) r in
-            U.if_then_else w then_branch else_branch
-        in
-
-
-        let rec matches_pat (scrutinee_orig:term) (p:pat)
-          : ML (either (list (bv & term)) bool)
-            (* Inl ts: p matches t and ts are bindings for the branch *)
-            (* Inr false: p definitely does not match t *)
-            (* Inr true: p may match t, but p is an open term and we cannot decide for sure *)
-          = let scrutinee = U.unmeta scrutinee_orig in
-            let scrutinee = U.unlazy scrutinee in
-            let head, args = U.head_and_args_full scrutinee in
-            match p.v with
-            | Pat_var bv -> Inl [(bv, scrutinee_orig)]
-            | Pat_dot_term _ -> Inl []
-            | Pat_constant s -> begin
-              match scrutinee.n with
-                | Tm_constant s'
-                  when FStarC.Const.eq_const s s' ->
-                  Inl []
-                | _ -> Inr (not (is_cons head)) //if it's not a constant, it may match
-              end
-            | Pat_cons(fv, _, arg_pats) -> begin
-              match (U.un_uinst head).n with
-                | Tm_fvar fv' when fv_eq fv fv' ->
-                  matches_args [] args arg_pats
-                | _ -> Inr (not (is_cons head)) //if it's not a constant, it may match
-              end
-
-        and matches_args out (a:args) (p:list (pat & bool)) : ML (either (list (bv & term)) bool) = match a, p with
-          | [], [] -> Inl out
-          | (t, _)::rest_a, (p, _)::rest_p ->
-              begin match matches_pat t p with
-                  | Inl s -> matches_args (out@s) rest_a rest_p
-                  | m -> m
-              end
-          | _ -> Inr false
-        in
-
-        let rec matches scrutinee p : ML term = match p with
-          | [] -> norm_and_rebuild_match ()
-          | (p, wopt, b)::rest ->
-              match matches_pat scrutinee p with
-              | Inr false -> //definite mismatch; safe to consider the remaining patterns
-                matches scrutinee rest
-
-              | Inr true -> //may match this pattern but t is an open term; block reduction
-                norm_and_rebuild_match ()
-
-              | Inl s -> //definite match
-                log cfg (fun () -> Format.print2 "Matches pattern %s with subst = %s\n"
-                              (show p)
-                              (List.map (fun (_, t) -> show t) s |> String.concat "; "));
-                //the elements of s are sub-terms of t
-                //the have no free de Bruijn indices; so their env=[]; see pre-condition at the top of rebuild
-                let env0 = env in
-
-
-                // The scrutinee is (at least) in weak normal
-                // form. This means, it can be of the form (C v1
-                // ... (fun x -> e) ... vn)
-
-                //ie., it may have some sub-terms that are lambdas
-                //with unreduced bodies
-
-                //but, since the memo references are expected to hold
-                //weakly normal terms, it is safe to set them to the
-                //sub-terms of the scrutinee
-
-                //otherwise, we will keep reducing them over and over
-                //again. See, e.g., Issue #2757
-
-                //Except, if the normalizer is running in HEAD normal form mode, 
-                //then the sub-terms of the scrutinee might not be reduced yet.
-                //In that case, do not set the memo reference
-
-                //Note the subterms are only *weakly* normal, so we register
-                //them in the weak slot under the same cfg that was used to
-                //weakly reduce the scrutinee. Otherwise the weak reductions of
-                //the enclosing matches would keep recomputing them, making,
-                //e.g., normalizing List.length quadratic (issue #4394).
-                let env = List.fold_left
-                      (fun env (bv, t) ->
-                        let m = fresh_cfg_memo () in
-                        if not cfg.steps.hnf then begin
-                          m.weak_memo := Some (weak_cfg cfg, ([], t));
-                          if not cfg.steps.weak then
-                            m.strong_memo := Some (cfg, ([], t))
-                        end;
-                        (Some (S.mk_binder bv),
-                         Clos([], t, m, false),
-                         fresh_memo ()) :: env)
-                      env s in
-                norm cfg env stack (guard_when_clause wopt b rest)
-        in
-
         if cfg.steps.iota
-        then matches scrutinee branches
-        else norm_and_rebuild_match ()
+        then norm_match cfg env' stack (mk_match_scrutinee empty_env t)
+                        asc_opt branches lopt r
+        else rebuild_match cfg env env' stack t asc_opt branches lopt r
+
+and force_match_scrutinee cfg (s:match_scrutinee) : ML (env & term) =
+  let cfg_whnf = whnf_cfg cfg in
+  match !s.whnf with
+  | Some et -> et
+  | None ->
+    let et =
+      match s.source with
+      | Clos (cenv, t, m, _) ->
+        (match read_memo cfg_whnf m with
+         | Some et -> et
+         | None ->
+           let result = fresh_memo () in
+           let save env t = result := Some (env, t); t in
+           let _ = norm cfg_whnf cenv [MemoLazy m; Closure save] t in
+           Option.must !result)
+      | _ -> failwith "norm_match: expected a term closure"
+    in
+    s.whnf := Some et;
+    et
+
+(* Decidable equality can itself be the scrutinee of an if. Its syntax-based
+   primitive cannot compare unevaluated constructor fields. Inspect those
+   fields on demand, retaining their closures and stopping at inequality. *)
+and norm_decidable_equality cfg env stack head args r : ML term =
+  let rec equal_nodes x y : ML TEQ.eq_result =
+    let xenv, xt = force_match_scrutinee cfg x in
+    let yenv, yt = force_match_scrutinee cfg y in
+    let xh, xa = U.head_and_args_full (U.unlazy (U.unmeta xt)) in
+    let yh, ya = U.head_and_args_full (U.unlazy (U.unmeta yt)) in
+    let is_data fv =
+      match fv.fv_qual with
+      | Some Data_ctor | Some (Record_ctor _) -> true
+      | _ -> Env.is_datacon cfg.tcenv fv.fv_name in
+    let fallback () = TEQ.eq_tm cfg.tcenv
+      (closure_as_term cfg xenv xt) (closure_as_term cfg yenv yt) in
+    match (U.un_uinst xh).n, (U.un_uinst yh).n with
+    | Tm_fvar xf, Tm_fvar yf when is_data xf && is_data yf ->
+      (match Env.num_datacon_non_injective_ty_params cfg.tcenv xf.fv_name with
+       | None -> fallback ()
+       | Some n ->
+         if not (S.fv_eq xf yf) then TEQ.NotEqual
+         else if List.length xa <> List.length ya || List.length xa < n
+         then TEQ.Unknown
+         else
+           let _, xs = BU.first_N n (match_scrutinee_fields x xenv xa) in
+           let _, ys = BU.first_N n (match_scrutinee_fields y yenv ya) in
+           equal_fields TEQ.Equal xs ys)
+    | _ -> fallback ()
+  and equal_fields result xs ys : ML TEQ.eq_result =
+    match xs, ys with
+    | [], [] -> result
+    | (x, _)::xs, (y, _)::ys ->
+      (match equal_nodes x y with
+       | TEQ.NotEqual -> TEQ.NotEqual
+       | TEQ.Unknown -> equal_fields TEQ.Unknown xs ys
+       | TEQ.Equal -> equal_fields result xs ys)
+    | _ -> TEQ.Unknown
+  in
+  let (typ, aq)::(x, xq)::(y, yq)::[] = args in
+  let x = mk_match_scrutinee env x in
+  let y = mk_match_scrutinee env y in
+  let result = equal_nodes x y in
+  let t =
+    match result with
+    | TEQ.Equal | TEQ.NotEqual ->
+      let is_eq = match (U.un_uinst head).n with
+        | Tm_fvar fv -> S.fv_eq_lid fv PC.op_Eq
+        | _ -> false in
+      if (result = TEQ.Equal) = is_eq then U.exp_true_bool else U.exp_false_bool
+    | TEQ.Unknown ->
+      let close s =
+        let Clos (env, t, _, _) = match_scrutinee_closure s in
+        closure_as_term cfg env t in
+      S.mk_Tm_app (closure_as_term cfg env head)
+        [(closure_as_term cfg env typ, aq); (close x, xq); (close y, yq)] r
+  in
+  rebuild cfg empty_env stack t
+
+and norm_match cfg env stack (s:match_scrutinee) asc_opt branches lopt r : ML term =
+  let force s = force_match_scrutinee cfg s in
+  let is_cons head =
+    match (U.un_uinst head).n with
+    | Tm_constant _ -> true
+    | Tm_fvar fv ->
+      (match fv.fv_qual with
+       | Some Data_ctor | Some (Record_ctor _) -> true
+       | _ -> Env.is_datacon cfg.tcenv fv.fv_name)
+    | _ -> false
+  in
+  (* Inl: success and bindings, Inr false: definite mismatch, Inr true:
+     blocked. Stop at the first mismatch or blocked test, respecting both
+     branch order and the left-to-right order of nested patterns. *)
+  let rec matches_pat s p : ML (either (list (bv & match_scrutinee)) bool) =
+    match p.v with
+    | Pat_var bv -> Inl [(bv, s)]
+    | Pat_dot_term _ -> Inl []
+    | Pat_constant c ->
+      let _, t = force s in
+      let head, args = U.head_and_args_full (U.unlazy (U.unmeta t)) in
+      (match (U.un_uinst head).n, args with
+       | Tm_constant c', [] when FC.eq_const c c' -> Inl []
+       | _ -> Inr (not (is_cons head)))
+    | Pat_cons (fv, _, ps) ->
+      let cenv, t = force s in
+      let head, args = U.head_and_args_full (U.unlazy (U.unmeta t)) in
+      (match (U.un_uinst head).n with
+       | Tm_fvar fv' when S.fv_eq fv fv' ->
+         matches_args [] (match_scrutinee_fields s cenv args) ps
+       | _ -> Inr (not (is_cons head)))
+  and matches_args out args ps : ML (either (list (bv & match_scrutinee)) bool) =
+    match args, ps with
+    | [], [] -> Inl (List.rev out)
+    | (s, _)::args, (p, _)::ps ->
+      (match matches_pat s p with
+       | Inl bindings -> matches_args (List.rev bindings @ out) args ps
+       | result -> result)
+    | _ -> Inr false
+  in
+  let blocked () =
+    let Clos (cenv, t, _, _) = match_scrutinee_closure s in
+    (* A residual match must still satisfy the caller's requested normal
+       form. This work is needed only when branch selection is blocked. *)
+    let t =
+      if cfg.steps.weak && cfg.steps.hnf && Some? (!s.whnf)
+      then closure_as_term cfg cenv t
+      else norm cfg cenv [] t in
+    rebuild_match cfg empty_env env stack t asc_opt branches lopt r
+  in
+  let rec select branches_left : ML term =
+    match branches_left with
+    | [] -> blocked ()
+    | (p, guard, body)::rest ->
+      (match matches_pat s p with
+       | Inr false -> select rest
+       | Inr true -> blocked ()
+       | Inl bindings ->
+         let branch_env = List.fold_left (fun env (bv, s) ->
+           (Some (S.mk_binder bv), match_scrutinee_closure s, fresh_memo ())::env)
+           env bindings in
+         match guard with
+         | None -> norm cfg branch_env stack body
+         | Some guard ->
+           let g = mk_match_scrutinee branch_env guard in
+           let _, guard_whnf = force g in
+           (match (U.unlazy (U.unmeta guard_whnf)).n with
+            | Tm_constant (FC.Const_bool true) -> norm cfg branch_env stack body
+            | Tm_constant (FC.Const_bool false) -> select rest
+            | _ ->
+              (* A blocked guard becomes an if. Its fallback lives in the
+                 original branch environment, not the successful pattern's
+                 environment, and retains the evaluated scrutinee tree. *)
+              let var i = S.bv_to_tm
+                {ppname = Ident.mk_ident ("_", r); index = i; sort = S.tun} in
+              let rest_env = env @ [(None, match_scrutinee_closure s, fresh_memo ())] in
+              let rest_term = S.mk (Tm_match {
+                scrutinee = var (List.length env); ret_opt = asc_opt;
+                brs = rest; rc_opt = lopt}) r in
+              let if_env = [
+                (None, match_scrutinee_closure g, fresh_memo ());
+                (None, Clos (branch_env, body, fresh_cfg_memo (), false), fresh_memo ());
+                (None, Clos (rest_env, rest_term, fresh_cfg_memo (), false), fresh_memo ())] in
+              norm cfg if_env stack (U.if_then_else (var 0) (var 1) (var 2))))
+  in
+  select branches
+
+and rebuild_match cfg env env' stack t asc_opt branches lopt r : ML term =
+  let lopt = Option.map (norm_residual_comp cfg env') lopt in
+  log cfg  (fun () -> Format.print1 "Rebuilding with match, scrutinee is %s ...\n" (show t));
+  //the scrutinee is always guaranteed to be a pure or ghost term
+  //see tc.fs, the case of Tm_match and the comment related to issue #594
+  let scrutinee_env = env in
+  let env = env' in
+  let scrutinee = t in
+  let norm_and_rebuild_match () =
+    log cfg (fun () ->
+        Format.print2 "match is irreducible: scrutinee=%s\nbranches=%s\n"
+              (show scrutinee)
+              (branches |> List.map (fun (p, _, _) -> show p) |> String.concat "\n\t"));
+    // If either Weak or HNF, then don't descend into branch
+    let whnf = cfg.steps.weak || cfg.steps.hnf in
+    let cfg_exclude_zeta =
+      if cfg.steps.zeta_full
+      then cfg
+      else
+       let new_delta =
+         cfg.delta_level |> List.filter (function
+           | Env.InliningDelta
+           | Env.Eager_unfolding_only -> true
+           | _ -> false)
+       in
+       let steps = {
+              cfg.steps with
+              zeta = false;
+              unfold_until = None;
+              unfold_only = None;
+              unfold_attr = None;
+              unfold_qual = None;
+              unfold_namespace = None;
+              dont_unfold_attr = None;
+       }
+       in
+      ({cfg with delta_level=new_delta; steps=steps; strong=true})
+    in
+    let norm_or_whnf env t =
+      if whnf
+      then closure_as_term cfg_exclude_zeta env t
+      else norm cfg_exclude_zeta env [] t
+    in
+    let rec norm_pat (env: list (option binder & closure & memo subst_t)) p : ML (pat & list (option binder & closure & memo subst_t)) = match p.v with
+      | Pat_constant _ -> p, env
+      | Pat_cons(fv, us_opt, pats) ->
+        let us_opt =
+          if cfg.steps.erase_universes
+          then None
+          else (
+            match us_opt with
+            | None -> None
+            | Some us ->
+              Some (List.map (norm_universe cfg env) us)
+          )
+        in
+        let pats, env = pats |> List.fold_left (fun (pats, env) (p, b) ->
+              let p, env = norm_pat env p in
+              (p,b)::pats, env) ([], env) in
+        {p with v=Pat_cons(fv, us_opt, List.rev pats)}, env
+      | Pat_var x ->
+        let x = {x with sort=norm_or_whnf env x.sort} in
+        {p with v=Pat_var x}, dummy () ::env
+      | Pat_dot_term eopt ->
+        let eopt = Option.map (norm_or_whnf env) eopt in
+        {p with v=Pat_dot_term eopt}, env
+    in
+    let norm_branches () =
+      match env with
+      | [] when whnf -> branches //nothing to close over
+      | _ -> branches |> List.map (fun branch ->
+        let p, wopt, e = SS.open_branch branch in
+        //It's important to normalize all the sorts within the pat!
+        let p, env = norm_pat env p in
+        let wopt = match wopt with
+          | None -> None
+          | Some w -> Some (norm_or_whnf env w) in
+        let e = norm_or_whnf env e in
+        U.branch (p, wopt, e))
+    in
+    let maybe_commute_matches () =
+      let can_commute =
+          match branches with
+          | ({v=Pat_cons(fv, _, _)}, _, _)::_ ->
+            Env.fv_has_attr cfg.tcenv fv FStarC.Parser.Const.commute_nested_matches_lid
+          | _ -> false in
+      match (U.unascribe scrutinee).n with
+      | Tm_match {scrutinee=sc0;
+                  ret_opt=asc_opt0;
+                  brs=branches0;
+                  rc_opt=lopt0} when can_commute ->
+        (* We have a blocked match, because of something like
+
+            (match (match sc0 with P1 -> e1 | ... | Pn -> en) with
+             | Q1 -> f1 ... | Qm -> fm)
+
+            We'll reduce it as if it was instead
+
+            (match sc0 with
+              | P1 -> (match e1 with | Q1 -> f1 ... | Qm -> fm)
+              ...
+              | Pn -> (match en with | Q1 -> f1 ... | Qm -> fm))
+
+            if the Qi are constructors from an inductive marked with the
+            commute_nested_matches attribute
+       *)
+       let reduce_branch (b:S.branch) =
+         //reduce the inner branch `b` while setting the continuation
+         //stack to be the outer match
+         let stack = [Match(env', asc_opt, branches, lopt, cfg, r)] in
+         let p, wopt, e = SS.open_branch b in
+         //It's important to normalize all the sorts within the pat!
+         let p, branch_env = norm_pat scrutinee_env p in
+         let wopt = match wopt with
+          | None -> None
+          | Some w -> Some (norm_or_whnf branch_env w) in
+         let e =
+           if cfg.steps.iota
+           then norm_match cfg env' [] (mk_match_scrutinee branch_env e)
+                           asc_opt branches lopt r
+           else norm cfg branch_env stack e
+         in
+         U.branch (p, wopt, e)
+       in
+       let branches0 = List.map reduce_branch branches0 in
+       rebuild cfg env stack (mk (Tm_match {scrutinee=sc0;
+                                            ret_opt=asc_opt0;
+                                            brs=branches0;
+                                            rc_opt=lopt0}) r)
+      | _ ->
+        let asc_opt = norm_match_returns cfg env asc_opt in
+        let branches = norm_branches() in
+        rebuild cfg env stack (mk (Tm_match {scrutinee;
+                                             ret_opt=asc_opt;
+                                             brs=branches;
+                                             rc_opt=lopt}) r)
+    in
+    maybe_commute_matches()
+  in
+
+  norm_and_rebuild_match ()
 
 and norm_match_returns cfg env ret_opt : ML (option (binder & ascription)) =
   match ret_opt with

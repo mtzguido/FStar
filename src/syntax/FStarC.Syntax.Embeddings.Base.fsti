@@ -81,6 +81,10 @@ val set_type     : S.typ -> embedding 'a -> embedding 'a
  * able to unembed.
  *)
 val embed        : {| embedding 'a |} -> 'a -> embed_t
+(* Retry a failed decoder after requesting the input's normal form. This is
+   also used by recursive decoders, so computed list tails are demanded. *)
+val unembed_with_norm : (term -> norm_cb -> ML (option 'a))
+                    -> term -> norm_cb -> ML (option 'a)
 val try_unembed  : {| embedding 'a |} -> term -> norm_cb -> ML (option 'a)
 val unembed      : {| embedding 'a |} -> term -> norm_cb -> ML (option 'a)
 

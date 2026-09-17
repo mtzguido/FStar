@@ -33,6 +33,293 @@ open FStarC.Syntax.Subst { subst }
 
 open FStarC.Class.Show
 
+(* Universe readback must preserve unchanged syntax without skipping the
+   visitor's effects, and rebuild paths whose terms or attributes change. *)
+let readback_sharing_tests () : ML unit =
+  let r = dummyRange in
+  let f = S.fvar (lid_of_path ["Test"; "readback"] r) None in
+  let stable = S.mk_Tm_app f [S.as_arg (U.exp_int 7); S.as_arg (U.exp_int 8)] r in
+  let attr = U.exp_int 9 in
+  let aq = Some {aqual_implicit=true; aqual_attributes=[attr]} in
+  let poly = S.mk_Tm_uinst f [U_zero] in
+  let t = S.mk_Tm_app f [(stable, aq); S.as_arg poly] r in
+  let terms = mk_ref 0 in
+  let univs = mk_ref 0 in
+  let visit (vt:term -> ML term) (vu:universe -> ML universe) (t:term) : ML term =
+    terms := 0;
+    univs := 0;
+    Syntax.Visit.visit_term_univs false
+      (fun t -> terms := !terms + 1; vt t)
+      (fun u -> univs := !univs + 1; vu u) t in
+  let unchanged = visit (fun t -> t) (fun u -> u) t in
+  always 730 (BU.physical_equality unchanged t);
+  always 731 (!terms = 11 && !univs = 1);
+  let erased = visit (fun t -> t) (fun _ -> U_unknown) t in
+  let expected = S.mk_Tm_app f [(stable, aq); S.as_arg (S.mk_Tm_uinst f [U_unknown])] r in
+  always 732 (term_eq erased expected && not (BU.physical_equality erased t));
+  let _, args = U.head_and_args_full erased in
+  always 733 (BU.physical_equality (fst (List.hd args)) stable);
+  always 734 (!terms = 11 && !univs = 1);
+  let erased_again = visit (fun t -> t) (fun _ -> U_unknown) erased in
+  always 735 (BU.physical_equality erased_again erased && !terms = 11 && !univs = 1);
+  let changed_attr = visit
+    (fun t -> if BU.physical_equality t attr then U.exp_int 10 else t)
+    (fun u -> u) t in
+  let aq' = Some {aqual_implicit=true; aqual_attributes=[U.exp_int 10]} in
+  let expected = S.mk_Tm_app f [(stable, aq'); S.as_arg poly] r in
+  always 736 (term_eq changed_attr expected && not (BU.physical_equality changed_attr t));
+  (* The visitor discards cached hashes of internal nodes. Preserve that
+     contract without mutating the input's memo, even for an identity visit. *)
+  List.iter (fun (id, node) ->
+    let h = Syntax.Hash.ext_hash_term node in
+    let visited = visit (fun t -> t) (fun u -> u) node in
+    always id (None? !visited.hash_code && !node.hash_code = Some h &&
+               not (BU.physical_equality node visited)))
+    [(737, stable); (738, S.mk (Tm_type U_zero) r); (739, poly)];
+  (* A child callback may populate its parent's memo during traversal. *)
+  let leaf = U.exp_int 11 in
+  let parent = S.mk_Tm_app f [S.as_arg leaf] r in
+  let visited = visit
+    (fun t ->
+      if BU.physical_equality t leaf then
+        ignore (Syntax.Hash.ext_hash_term parent);
+      t)
+    (fun u -> u) parent in
+  always 740 (None? !visited.hash_code && Some? !parent.hash_code);
+  (* A universe union can change the hash without changing the syntax. *)
+  let u = Syntax.Unionfind.univ_fresh r in
+  let v = Syntax.Unionfind.univ_fresh r in
+  let typ = S.mk (Tm_type (U_unif v)) r in
+  let old_hash = Syntax.Hash.ext_hash_term typ in
+  Syntax.Unionfind.univ_union u v;
+  let visited = visit (fun t -> t) (fun u -> u) typ in
+  let expected_hash = Syntax.Hash.ext_hash_term_no_memo typ in
+  always 741 (None? !visited.hash_code &&
+              Syntax.Hash.ext_hash_term visited = expected_hash &&
+              !typ.hash_code = Some old_hash)
+
+(* Count reductions, rather than timing them: a correct result alone cannot
+   detect eagerly evaluated fields or repeated work across failed branches. *)
+let demand_matching_tests () : ML unit =
+  let r = dummyRange in
+  let int n = U.exp_int n in
+  let pat p = withinfo p r in
+  let wild = pat (Pat_var (S.new_bv None S.tun)) in
+  let pc n = match (int n).n with
+    | Tm_constant c -> pat (Pat_constant c)
+    | _ -> failwith "integer constant" in
+  let ctor name = S.lid_as_fv (lid_of_path ["Test"; name] r) (Some Data_ctor) in
+  let c = ctor "DemandC" in
+  let d = ctor "DemandD" in
+  let other = ctor "DemandOther" in
+  let construct c args = S.mk_Tm_app (S.mk (Tm_fvar c) r) (List.map S.as_arg args) r in
+  let pattern c args = pat (Pat_cons (c, None, List.map (fun p -> p, false) args)) in
+  let mt scrutinee branches = S.mk (Tm_match {
+    scrutinee; ret_opt=None; brs=branches; rc_opt=None}) r in
+  let counts = List.map (fun _ -> mk_ref 0) [0; 1; 2; 3; 4] in
+  let names = List.map (fun i -> lid_of_path ["Test"; "demand_probe_" ^ show i] r) [0; 1; 2; 3; 4] in
+  let probe i t = app (S.fvar (List.nth names i) None) [t] in
+  let primitives = List.mapi (fun i name ->
+    FStarC.TypeChecker.Primops.Base.as_primitive_step_nbecbs true
+      (name, 1, 0,
+       (fun _ _ _ args ->
+         let counter = List.nth counts i in
+         counter := !counter + 1;
+         match args with
+         | [(t, _)] -> Some t
+         | _ -> failwith "demand probe arity"),
+       (fun _ _ _ -> None))) names in
+  let blocked_lid = lid_of_path ["Test"; "demand_blocked"] r in
+  let blocked_primitive = FStarC.TypeChecker.Primops.Base.as_primitive_step_nbecbs true
+    (blocked_lid, 1, 0,
+     (fun _ _ _ _ ->
+       let counter = List.nth counts 4 in
+       counter := !counter + 1;
+       None),
+     (fun _ _ _ -> None)) in
+  let primitives = blocked_primitive::primitives in
+  let run_env env id steps t expected expected_counts =
+    List.iter (fun counter -> counter := 0) counts;
+    let result = N.normalize_with_primitive_steps primitives steps env t in
+    always id (term_eq result expected);
+    let actual_counts = List.map (fun counter -> !counter) counts in
+    if actual_counts <> expected_counts then
+      failwith (Format.fmt3 "Demand test %s: reductions %s, expected %s"
+        (show id) (show actual_counts) (show expected_counts))
+  in
+  let run id steps t expected expected_counts =
+    run_env (Pars.init ()) id steps t expected expected_counts in
+  List.iter (fun extra ->
+    let steps = FStar.List.Tot.append extra [Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+    (* A wildcard does not even ask for the outer head. *)
+    run 701 steps (mt (probe 0 (int 7)) [(wild, None, int 42)])
+      (int 42) [0; 0; 0; 0; 0];
+    (* All three branches inspect the same nested path. The second field
+       is irrelevant, and every node on the inspected path is forced once. *)
+    let s = probe 0 (construct c [probe 1 (construct d [probe 2 (int 2)]);
+                                 probe 3 (int 99)]) in
+    let branch n result = pattern c [pattern d [pc n]; wild], None, int result in
+    run 702 steps (mt s [branch 0 10; branch 1 20; branch 2 42])
+      (int 42) [1; 1; 1; 0; 0];
+    (* Stop at the first failing nested test; do not inspect the sibling. *)
+    run 703 steps (mt s [pattern c [pattern other []; pc 99], None, int 0;
+                        wild, None, int 42])
+      (int 42) [1; 1; 0; 0; 0];
+    (* A false guard on a variable pattern does not force the scrutinee. *)
+    run 704 steps (mt (probe 0 (int 7))
+      [(wild, Some (probe 4 U.exp_false_bool), int 0); wild, None, int 42])
+      (int 42) [0; 0; 0; 0; 1];
+    (* A failed guard must retain the work done by its pattern. *)
+    run 705 steps (mt s
+      [pattern c [pattern d [pc 2]; wild], Some (probe 4 U.exp_false_bool), int 0;
+       branch 2 42])
+      (int 42) [1; 1; 1; 0; 1];
+    (* Field binding order, including variables in nested constructors. *)
+    let x = S.new_bv None S.tun in
+    let y = S.new_bv None S.tun in
+    let p = pattern c [pattern d [pat (Pat_var x)]; pat (Pat_var y)] in
+    run 706 steps (mt s [U.branch (p, None, S.bv_to_name x)])
+      (int 2) [1; 1; 1; 0; 0];
+    (* Once an earlier constructor differs, a wildcard still need not force
+       any of the constructor's fields. *)
+    run 707 steps (mt s [pattern other [], None, int 0; wild, None, int 42])
+      (int 42) [1; 0; 0; 0; 0])
+    [[]; [Env.Weak]; [Env.Weak; Env.HNF]];
+  (* A blocked guard retains the pattern binding in its then branch and the
+     caller's environment in the fallback. Only residual branches are reduced. *)
+  let x = S.new_bv None S.tun in
+  let outer = S.new_bv None S.tun in
+  let guard = S.new_bv None U.t_bool in
+  let p = pattern c [pat (Pat_var x); wild] in
+  let s = construct c [probe 0 (int 42); probe 1 (int 99)] in
+  run 708 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt s [U.branch (p, Some (S.bv_to_name guard), S.bv_to_name x);
+           wild, None, S.bv_to_name outer])
+    (U.if_then_else (S.bv_to_name guard) (int 42) (S.bv_to_name outer))
+    [1; 0; 0; 0; 0];
+  (* A guard can force a field before a subsequent pattern inspects it. *)
+  let s = construct c [probe 0 U.exp_false_bool; probe 1 (int 99)] in
+  run 709 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt s [U.branch (p, Some (probe 4 (S.bv_to_name x)), int 0);
+           pattern c [pat (Pat_constant (FStarC.Const.Const_bool false)); wild], None, int 42])
+    (int 42) [1; 0; 0; 0; 1];
+  (* Equality in a scrutinee must inspect computed fields too. Use a real
+     inductive declaration so its injective arguments are known to the env. *)
+  let _ = Pars.pars_and_tc_fragment
+    "type demand_pair = | DemandPair : int -> int -> demand_pair | DemandPairOther" in
+  let pair = ctor "DemandPair" in
+  let pair_typ = S.fvar (lid_of_path ["Test"; "demand_pair"] r) None in
+  let eq x y = S.mk_Tm_app (S.fvar Const.op_Eq None)
+    [S.iarg pair_typ; S.as_arg x; S.as_arg y] r in
+  let choose_bool b = mt b
+    [pat (Pat_constant (FStarC.Const.Const_bool true)), None, int 42;
+     wild, None, int 0] in
+  let pair_value = construct pair [probe 0 (int 1); probe 1 (int 2)] in
+  run 710 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct pair [int 1; int 2])))
+    (int 42) [1; 1; 0; 0; 0];
+  run 711 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct pair [int 0; probe 2 (int 3)])))
+    (int 0) [1; 0; 0; 0; 0];
+  run 712 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (choose_bool (eq pair_value (construct (ctor "DemandPairOther") [])))
+    (int 0) [0; 0; 0; 0; 0];
+  (* Strictness only demands designated arguments, and only when unfolding
+     is permitted. Install the attribute directly: this unit-test environment
+     contains Prims, without the library declaration of the attribute. *)
+  let _ = Pars.pars_and_tc_fragment
+    "let demand_strict (x:int) (unused:int) = x" in
+  let strict_lid = lid_of_path ["Test"; "demand_strict"] r in
+  let env = Pars.init () in
+  let se = Option.must (Env.lookup_sigelt env strict_lid) in
+  let attr = app (S.fvar Const.strict_on_arguments_attr None)
+    [FStarC.TypeChecker.Primops.Base.embed_simple r ([0] <: list Prims.int)] in
+  let env = Env.push_sigelt_force env {se with sigattrs=attr::se.sigattrs} in
+  let t = mt (app (S.fvar strict_lid None) [probe 0 (int 7); probe 1 (int 99)])
+    [pc 7, None, int 42; wild, None, int 0] in
+  let steps = [Env.Weak; Env.HNF; Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+  run_env env 713 (Env.UnfoldOnly [strict_lid]::steps) t (int 42) [1; 0; 0; 0; 0];
+  run_env env 714 (Env.UnfoldOnly []::steps) t t [0; 0; 0; 0; 0];
+  (* Primitive inputs may contain computed fields and list tails. Their
+     embeddings must request those values before the outer match can select. *)
+  let str (s:string) = FStarC.TypeChecker.Primops.Base.embed_simple r s in
+  let string_typ = S.fvar Const.string_lid None in
+  let nil = S.mk_Tm_app (S.tdataconstr Const.nil_lid) [S.iarg string_typ] r in
+  let cons hd tl = S.mk_Tm_app (S.tdataconstr Const.cons_lid)
+    [S.iarg string_typ; S.as_arg hd; S.as_arg tl] r in
+  let strings = cons (probe 0 (str "a"))
+    (probe 1 (cons (probe 2 (str "b")) nil)) in
+  let joined = app (S.fvar Const.string_concat_lid None) [str "-"; strings] in
+  let p = match (str "a-b").n with
+    | Tm_constant c -> pat (Pat_constant c)
+    | _ -> failwith "string constant" in
+  run 715 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (mt joined [p, None, int 42; wild, None, int 0])
+    (int 42) [1; 1; 1; 0; 0];
+  let tail = S.bv_to_name (S.new_bv None S.tun) in
+  let joined = app (S.fvar Const.string_concat_lid None)
+    [str "-"; cons (probe 0 (str "a")) tail] in
+  let t = mt joined [p, None, int 42; wild, None, int 0] in
+  (* A blocked decoder must not repeat its prefix while saving the memo or
+     returning the already computed WHNF residual. *)
+  run 716 [Env.Weak; Env.HNF; Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    t t [1; 0; 0; 0; 0];
+  let int_typ = S.fvar Const.int_lid None in
+  let nil = S.mk_Tm_app (S.tdataconstr Const.nil_lid) [S.iarg int_typ] r in
+  let cons hd tl = S.mk_Tm_app (S.tdataconstr Const.cons_lid)
+    [S.iarg int_typ; S.as_arg hd; S.as_arg tl] r in
+  let payload = app (Pars.pars "fun x -> x") [probe 0 (int 7)] in
+  let xs = cons payload (probe 1 (cons (probe 2 (int 99)) nil)) in
+  let poly_call lid args = S.mk_Tm_app
+    (S.mk_Tm_uinst (S.fvar lid None) [U_zero]) (S.iarg int_typ::args) r in
+  let array = poly_call Const.immutable_array_of_list_lid [S.as_arg xs] in
+  let select n t = mt t [pc n, None, int 42; wild, None, int 0] in
+  run 717 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 (poly_call Const.immutable_array_index_lid [S.as_arg array; S.as_arg (int 0)]))
+    (int 42) [1; 1; 0; 0; 0];
+  run 718 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 2 (poly_call Const.immutable_array_length_lid [S.as_arg array]))
+    (int 42) [0; 1; 0; 0; 0];
+  let hidden = poly_call Const.hide [S.as_arg payload] in
+  run 719 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 (poly_call Const.reveal [S.as_arg hidden]))
+    (int 42) [1; 0; 0; 0; 0];
+  let set_range = app (S.mk (Tm_constant FStarC.Const.Const_set_range_of) r)
+    [payload; FStarC.TypeChecker.Primops.Base.embed_simple r r] in
+  run 720 [Env.Beta; Env.Iota; Env.Zeta; Env.Primops]
+    (select 7 set_range) (int 42) [1; 0; 0; 0; 0];
+  (* Short-circuiting demands the right operand only when selected. A
+     blocked left operand also leaves the right operand untouched in WHNF. *)
+  let boolop lid a b = app (S.fvar lid None) [a; b] in
+  let steps = [Env.Beta; Env.Iota; Env.Zeta; Env.Primops] in
+  run 721 steps
+    (choose_bool (boolop Const.op_And U.exp_false_bool (probe 0 U.exp_true_bool)))
+    (int 0) [0; 0; 0; 0; 0];
+  run 722 steps
+    (choose_bool (boolop Const.op_And U.exp_true_bool (probe 0 U.exp_true_bool)))
+    (int 42) [1; 0; 0; 0; 0];
+  run 723 steps
+    (choose_bool (boolop Const.op_Or U.exp_true_bool (probe 0 U.exp_false_bool)))
+    (int 42) [0; 0; 0; 0; 0];
+  run 724 steps
+    (choose_bool (boolop Const.op_Or U.exp_false_bool (probe 0 U.exp_false_bool)))
+    (int 0) [1; 0; 0; 0; 0];
+  let lhs = S.bv_to_name (S.new_bv None U.t_bool) in
+  let t = choose_bool (boolop Const.op_And lhs (probe 0 U.exp_false_bool)) in
+  run 725 (Env.Weak::Env.HNF::steps) t t [0; 0; 0; 0; 0];
+  (* Failed scalar decoding must not normalize already inspected operands
+     again. The blocked primitive's retry count is independent of depth. *)
+  let blocked = app (S.fvar blocked_lid None) [int 0] in
+  let add t = app (S.fvar Const.op_Plus None) [t; int 1] in
+  List.iter (fun (id, depth) ->
+    let rec nest (n:Prims.int) (t:term) : ML term =
+      if n = 0 then t else nest (n - 1) (add t) in
+    let t = select 0 (nest depth blocked) in
+    run id (Env.Weak::Env.HNF::steps) t t [0; 0; 0; 0; 2])
+    [726, 1; 727, 10];
+  Format.print_string "Demand-driven matching tests passed\n"
+
+
 (* A big chunk of this module is thunkued to not incur in a top-level effect. *)
 
 let run_all () : ML unit =
@@ -407,4 +694,6 @@ let run_all () : ML unit =
       compare_times l_int l_nbe
   in
 
-  run_all ()
+  run_all ();
+  demand_matching_tests ();
+  readback_sharing_tests ()

@@ -90,7 +90,7 @@ let nbe_reveal (a:NBE.abstract_nbe_term) (e : emb_erased NBETerm.t NBE.abstract_
 
 let ops = [
   (* unconditionally reduce reveal #t' (hide #t x) to x *)
-  mk2' 1 PC.reveal s_reveal nbe_reveal
+  {mk2' 1 PC.reveal s_reveal nbe_reveal with renorm_after = true}
 ]
 
 let s_hide (a:EMB.abstract_term) (e : emb_erased term EMB.abstract_term) =
@@ -105,5 +105,5 @@ let nbe_hide (a:NBE.abstract_nbe_term) (e : emb_erased NBETerm.t NBE.abstract_nb
 
 let simplify_ops = [
   (* reduce hide t (reveal #t x) to x, making sure the types match exactly. *)
-  mk2' 1 PC.hide s_hide nbe_hide;
+  {mk2' 1 PC.hide s_hide nbe_hide with renorm_after = true};
 ]
