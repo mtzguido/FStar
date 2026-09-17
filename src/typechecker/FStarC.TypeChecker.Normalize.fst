@@ -1605,7 +1605,22 @@ let rec norm : cfg -> env -> stack -> term -> ML term =
                     | Tm_fvar _ -> empty_env
                     | _ -> env
                   in
-                  Arg (Clos(env, a, fresh_cfg_memo (), false),aq,t.pos)::stack)
+                  (* Passing a variable passes its existing thunk. Wrapping it
+                     in another closure would retain this entire environment,
+                     including unrelated arguments, for as long as the thunk
+                     survives. It would also give the alias a separate memo.
+                     Keep recursive bindings behind the variable lookup so its
+                     zeta checks still govern opening the recursive knot. *)
+                  let c =
+                    match a.n with
+                    | Tm_bvar x ->
+                      let c = lookup_bvar env x in
+                      (match c with
+                       | Clos (_, _, _, false) -> c
+                       | _ -> Clos (env, a, fresh_cfg_memo (), false))
+                    | _ -> Clos (env, a, fresh_cfg_memo (), false)
+                  in
+                  Arg (c,aq,t.pos)::stack)
                 args
                 stack
             in
